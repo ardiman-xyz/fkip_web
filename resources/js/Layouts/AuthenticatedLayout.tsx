@@ -3,6 +3,7 @@ import { User } from "@/types";
 import Navigation from "@/Components/Navigation";
 import AppHeader from "@/Components/AppHeader";
 import Footer from "@/Components/Footer";
+import { PiGraduationCapDuotone, PiGraduationCapFill } from "react-icons/pi";
 
 interface EventResponse {
     user_id: number;
@@ -22,12 +23,7 @@ export default function Authenticated({
                     <div className="max-h-vh hidden h-full w-96 flex-col justify-between overflow-y-auto rounded-s-xl border border-gray-200 bg-white xl:flex dark:border-gray-800 dark:bg-gray-900">
                         <div className="flex flex-col">
                             <header className="flex h-20 shrink-0 items-center justify-center gap-2 border-b border-gray-200 dark:border-gray-800">
-                                <img
-                                    src="/images/sample-logo.svg"
-                                    alt="Logo"
-                                    className="size-6 dark:text-white"
-                                />
-
+                                <PiGraduationCapFill className="size-8" />
                                 <h1 className="font-bold">Web fkip v1.0</h1>
                             </header>
 

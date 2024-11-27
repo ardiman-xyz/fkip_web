@@ -7,11 +7,14 @@ import {
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { PiArrowDownBold } from "react-icons/pi";
 import { useState } from "react";
+import { PageProps } from "@/types";
 
 const UserDropdownMenu = () => {
+    const { auth } = usePage<PageProps>().props;
+
     const [dropDownOpen, setDropDownOpen] = useState(false);
     const toggleDropdown = () => {
         setDropDownOpen((dropDownOpen) => !dropDownOpen);
@@ -29,8 +32,8 @@ const UserDropdownMenu = () => {
                         <AvatarFallback>GR</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col p-2 text-xs font-medium">
-                        <span className="text-sm">Ardiman</span>
-                        <span className="text-gray-400">Ardiman</span>
+                        <span className="text-sm">{auth?.user.name}</span>
+                        <span className="text-gray-400">{auth.user.email}</span>
                     </div>
                     <PiArrowDownBold
                         className={`transition duration-300 ease-in-out ${

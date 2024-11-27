@@ -1,6 +1,5 @@
 import menuItems from "@/menus";
 import { Link, usePage } from "@inertiajs/react";
-import SearchMenu from "./SearchMenu";
 
 const Navigation = () => {
     const { url } = usePage();
