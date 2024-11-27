@@ -41,7 +41,7 @@ const menuItems: MenuItem[] = [
     {
         label: "Tags",
         icon: <PiTagSimpleDuotone className="size-5" />,
-        href: "/analytics",
+        href: "/admin/tags",
     },
     {
         label: "separator",

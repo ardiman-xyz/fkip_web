@@ -4,6 +4,7 @@ import Navigation from "@/Components/Navigation";
 import AppHeader from "@/Components/AppHeader";
 import Footer from "@/Components/Footer";
 import { PiGraduationCapDuotone, PiGraduationCapFill } from "react-icons/pi";
+import { Toaster } from "@/Components/ui/sonner";
 
 interface EventResponse {
     user_id: number;
@@ -17,6 +18,7 @@ export default function Authenticated({
 }: PropsWithChildren<{ header?: ReactNode }>) {
     return (
         <div className="relative min-h-dvh bg-gray-200 dark:bg-black">
+            <Toaster />
             <div className="flex p-3 2xl:h-dvh">
                 <div className="flex w-full rounded-xl shadow-sm dark:bg-gray-900">
                     {/* Sidebar */}
