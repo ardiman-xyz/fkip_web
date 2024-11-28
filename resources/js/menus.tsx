@@ -26,7 +26,7 @@ const menuItems: MenuItem[] = [
     {
         label: "News",
         icon: <PiNewspaperDuotone className="size-5" />,
-        href: "/transactions",
+        href: "/admin/news",
     },
     {
         label: "Agenda",

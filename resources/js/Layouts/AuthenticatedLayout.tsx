@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode } from "react";
+import { PropsWithChildren, ReactNode, useEffect } from "react";
 import { User } from "@/types";
 import Navigation from "@/Components/Navigation";
 import AppHeader from "@/Components/AppHeader";
@@ -16,6 +16,16 @@ export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
+    useEffect(() => {
+        const eventName = ".notification.uploaded";
+
+        const echoInstance = (window as any).Echo;
+
+        echoInstance.channel(`media`).listen(eventName, (data: any) => {
+            console.info(data);
+        });
+    }, []);
+
     return (
         <div className="relative min-h-dvh bg-gray-200 dark:bg-black">
             <Toaster />

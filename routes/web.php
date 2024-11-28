@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
 use App\Models\User;
@@ -30,7 +32,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::controller(TagController::class)->prefix('tags')->name('tags.')->group(function() {
         Route::get('/', 'index')->name('index');
         Route::get('/get', 'getAll')->name('get');
-        Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::get('/{tag}/edit', 'edit')->name('edit');
         Route::put('/{tag}', 'update')->name('update');
@@ -41,7 +42,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
       Route::controller(CategoryController::class)->prefix('category')->name('category.')->group(function() {
         Route::get('/', 'index')->name('index');
         Route::get('/get', 'getAll')->name('get');
-        Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::get('/{category}/edit', 'edit')->name('edit');
         Route::put('/{category}', 'update')->name('update');
@@ -49,14 +49,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     });
 
     // News Management
-    // Route::controller(NewsController::class)->prefix('news')->name('news.')->group(function() {
-    //     Route::get('/', 'index')->name('index');
-    //     Route::get('/create', 'create')->name('create');
-    //     Route::post('/', 'store')->name('store');
-    //     Route::get('/{news}/edit', 'edit')->name('edit');
-    //     Route::put('/{news}', 'update')->name('update');
-    //     Route::delete('/{news}', 'destroy')->name('destroy');
-    // });
+    Route::controller(NewsController::class)->prefix('news')->name('news.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{news}/edit', 'edit')->name('edit');
+        Route::put('/{news}', 'update')->name('update');
+        Route::delete('/{news}', 'destroy')->name('destroy');
+    });
 
     // // Events Management
     // Route::controller(EventController::class)->prefix('events')->name('events.')->group(function() {
@@ -67,6 +67,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     //     Route::put('/{event}', 'update')->name('update');
     //     Route::delete('/{event}', 'destroy')->name('destroy');
     // });
+
+    Route::controller(MediaController::class)->prefix('media')->name('media.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::post('/upload', 'store')->name('store');
+        Route::delete('/{media}', 'destroy')->name('destroy');
+    });
 });
 
 Route::middleware('auth')->group(function () {
