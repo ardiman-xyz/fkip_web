@@ -3,24 +3,21 @@ import { useState } from "react";
 import {
     Table,
     TableBody,
-    TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from "@/Components/ui/table";
-import { Tag } from "../_types";
-
+import { Category } from "../_types";
 import { TableItem } from "./TableItem";
 
-//   import DeleteConfirmationModal from "@/Components/modals/delete-confirmation-modal"
-//   import TagFormModal from "@/Components/modals/tag-form-modal"
-
-interface TagsTableProps {
-    tags: Tag[];
+interface CategoryTableProps {
+    data: Category[];
     onRefresh: () => void;
 }
 
-export const TagsTable = ({ tags, onRefresh }: TagsTableProps) => {
+export const CategoryTable = ({ data, onRefresh }: CategoryTableProps) => {
+    const [loading, setLoading] = useState<number | null>(null);
+
     return (
         <>
             <Table>
@@ -33,11 +30,11 @@ export const TagsTable = ({ tags, onRefresh }: TagsTableProps) => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {tags.map((tag, index) => (
+                    {data.map((category, index) => (
                         <TableItem
                             index={index}
-                            key={tag.id}
-                            tag={tag}
+                            key={category.id}
+                            category={category}
                             onRefresh={onRefresh}
                         />
                     ))}

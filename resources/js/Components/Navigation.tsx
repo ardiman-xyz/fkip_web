@@ -4,7 +4,7 @@ import { Link, usePage } from "@inertiajs/react";
 const Navigation = () => {
     const { url } = usePage();
     return (
-        <nav className="flex flex-col gap-y-1 py-4 text-sm font-medium xl:h-[85%] xl:overflow-y-scroll 2xl:h-auto">
+        <nav className="flex flex-col gap-y-1 py-4 text-sm font-medium xl:h-[85%] xl:overflow-y-auto 2xl:h-auto">
             {menuItems.map((menu, index) =>
                 menu.label === "separator" ? (
                     <div

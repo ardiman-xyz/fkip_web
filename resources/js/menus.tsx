@@ -36,7 +36,7 @@ const menuItems: MenuItem[] = [
     {
         label: "Categories",
         icon: <PiFolderOpenDuotone className="size-5" />,
-        href: "/inventory",
+        href: "/admin/category",
     },
     {
         label: "Tags",

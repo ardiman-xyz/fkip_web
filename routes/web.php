@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
 use App\Models\User;
@@ -28,12 +29,23 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Tags Management
     Route::controller(TagController::class)->prefix('tags')->name('tags.')->group(function() {
         Route::get('/', 'index')->name('index');
-          Route::get('/get', 'getAll')->name('get');
+        Route::get('/get', 'getAll')->name('get');
         Route::get('/create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::get('/{tag}/edit', 'edit')->name('edit');
         Route::put('/{tag}', 'update')->name('update');
         Route::delete('/{tag}', 'destroy')->name('destroy');
+    });
+
+      // Categories Management
+      Route::controller(CategoryController::class)->prefix('category')->name('category.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::get('/get', 'getAll')->name('get');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{category}/edit', 'edit')->name('edit');
+        Route::put('/{category}', 'update')->name('update');
+        Route::delete('/{category}', 'destroy')->name('destroy');
     });
 
     // News Management

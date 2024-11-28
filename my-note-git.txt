@@ -1,0 +1,6 @@
+git checkout main
+git pull origin main
+git merge feature/tags
+git push origin main
+git branch -d feature/tags
+git push origin --delete feature/tags
