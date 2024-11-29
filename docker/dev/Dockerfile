@@ -1,32 +1,26 @@
 FROM php:8.2-fpm
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
+WORKDIR /var/www/html
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libzip-dev \
     zip \
     unzip \
-    nodejs \
-    npm
+    pkg-config \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN docker-php-ext-install pdo pdo_mysql zip pcntl \
+    && pecl install -o -f redis \
+    && docker-php-ext-enable redis
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-
-# Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Create system user
-RUN useradd -G www-data,root -u 1000 -d /home/dev dev
-RUN mkdir -p /home/dev/.composer && \
-    chown -R dev:dev /home/dev
+RUN groupadd --gid 1000 appuser \
+    && useradd --uid 1000 --gid appuser --groups www-data,root \
+    --shell /bin/bash --create-home appuser
 
-# Set working directory
-WORKDIR /var/www
-
-USER dev
+USER appuser

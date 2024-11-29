@@ -5,19 +5,22 @@ namespace App\Services;
 use App\Events\MediaUploaded;
 use App\Models\Media;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class MediaService
 {
     public function upload(UploadedFile $file)
     {
         try {
-            $fileName = uniqid() . '_' . $file->getClientOriginalName();
+            $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
             
-            $path = $file->storeAs('media', $fileName, 'public');
-            
+            $randomSubdirectory = 'media/' . date('Y') . '/' . date('m') . '/' . Str::random(10);
+
+            $path = $file->storeAs($randomSubdirectory, $randomFileName, 'public');
+
             $media = Media::create([
                 'name' => $file->getClientOriginalName(),
-                'file_name' => $fileName,
+                'file_name' => $randomFileName,
                 'mime_type' => $file->getMimeType(),
                 'path' => $path,
                 'size' => $file->getSize()

@@ -40,9 +40,11 @@ import {
 } from "@/Components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { MediaModal } from "@/Components/MediaModal";
+import { Media } from "@/types/app";
 
 const Create = () => {
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+    const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
 
     const [editorContent, setEditorContent] = useState({
         id: "",
@@ -208,21 +210,57 @@ const Create = () => {
                                                 Featured Image (Optional)
                                             </Label>
                                             <div className="space-y-4">
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={() =>
-                                                        setIsMediaModalOpen(
-                                                            true
-                                                        )
-                                                    }
-                                                    className="w-full h-32 flex flex-col items-center justify-center"
-                                                >
-                                                    <PiImageDuotone className="size-8 mb-2 text-muted-foreground" />
-                                                    <span>
-                                                        Choose from Media
-                                                        Library
-                                                    </span>
-                                                </Button>
+                                                {selectedMedia ? (
+                                                    <div className="relative group">
+                                                        <img
+                                                            src={`/storage/${selectedMedia.path}`}
+                                                            alt={
+                                                                selectedMedia.name
+                                                            }
+                                                            className="w-full h-32 object-cover rounded-lg"
+                                                        />
+                                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="secondary"
+                                                                onClick={() =>
+                                                                    setIsMediaModalOpen(
+                                                                        true
+                                                                    )
+                                                                }
+                                                            >
+                                                                Change
+                                                            </Button>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="destructive"
+                                                                onClick={() =>
+                                                                    setSelectedMedia(
+                                                                        null
+                                                                    )
+                                                                }
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <Button
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            setIsMediaModalOpen(
+                                                                true
+                                                            )
+                                                        }
+                                                        className="w-full h-32 flex flex-col items-center justify-center"
+                                                    >
+                                                        <PiImageDuotone className="size-8 mb-2 text-muted-foreground" />
+                                                        <span>
+                                                            Choose from Media
+                                                            Library
+                                                        </span>
+                                                    </Button>
+                                                )}
 
                                                 <MediaModal
                                                     isOpen={isMediaModalOpen}
@@ -231,6 +269,12 @@ const Create = () => {
                                                             false
                                                         )
                                                     }
+                                                    onSelect={(media) => {
+                                                        setSelectedMedia(media);
+                                                        setIsMediaModalOpen(
+                                                            false
+                                                        );
+                                                    }}
                                                 />
                                             </div>
                                         </div>
