@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
@@ -59,14 +60,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     });
 
     // // Events Management
-    // Route::controller(EventController::class)->prefix('events')->name('events.')->group(function() {
-    //     Route::get('/', 'index')->name('index');
-    //     Route::get('/create', 'create')->name('create');
-    //     Route::post('/', 'store')->name('store');
-    //     Route::get('/{event}/edit', 'edit')->name('edit');
-    //     Route::put('/{event}', 'update')->name('update');
-    //     Route::delete('/{event}', 'destroy')->name('destroy');
-    // });
+    Route::controller(EventController::class)->prefix('events')->name('events.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{event}/edit', 'edit')->name('edit');
+        Route::put('/{event}', 'update')->name('update');
+        Route::delete('/{event}', 'destroy')->name('destroy');
+    });
 
     Route::controller(MediaController::class)->prefix('media')->name('media.')->group(function() {
         Route::get('/', 'index')->name('index');

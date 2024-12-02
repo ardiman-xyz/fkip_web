@@ -31,7 +31,7 @@ const menuItems: MenuItem[] = [
     {
         label: "Agenda",
         icon: <PiCalendarDuotone className="size-5" />,
-        href: "/transactions",
+        href: "/admin/events",
     },
     {
         label: "Categories",

@@ -1,36 +1,28 @@
-import { PiNewspaperDuotone } from "react-icons/pi";
-import { Head, router } from "@inertiajs/react";
-
 import { Button } from "@/Components/ui/button";
 import {
-    Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { News } from "./_types";
-import { DataTable } from "./DataTable";
-import { columns } from "./Columns";
+import { Head, router } from "@inertiajs/react";
+import React from "react";
+import { PiCalendarDuotone } from "react-icons/pi";
 
-interface IndexProps {
-    news: News[];
-}
-
-const Index = ({ news }: IndexProps) => {
+const Index = () => {
     return (
         <Authenticated
-            header={<h2 className="text-2xl font-black">News Management</h2>}
+            header={<h2 className="text-2xl font-black">Event Management</h2>}
         >
-            <Head title="News Management" />
+            <Head title="Event Management" />
             <div className="flex flex-col gap-4 overflow-y-auto scroll-smooth p-4">
                 <div className="grid grid-cols-1 gap-4">
-                    <Card className="relative overflow-hidden">
+                    <CardContent className="relative overflow-hidden">
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between text-2xl font-bold">
                                 <div className="flex items-center gap-x-2">
-                                    <PiNewspaperDuotone className="size-7" />
+                                    <PiCalendarDuotone className="size-7" />
 
                                     <span>Content News</span>
                                 </div>
@@ -42,19 +34,17 @@ const Index = ({ news }: IndexProps) => {
                                             )
                                         }
                                     >
-                                        Add news
+                                        Add event
                                     </Button>
                                 </div>
                             </CardTitle>
                             <CardDescription>
-                                Manage and organize content news across multiple
-                                languages
+                                Manage and organize content event across
+                                multiple languages
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="relative flex flex-col gap-2">
-                            <DataTable columns={columns} data={news} />
-                        </CardContent>
-                    </Card>
+                        <CardContent className="relative flex flex-col gap-2"></CardContent>
+                    </CardContent>
                 </div>
             </div>
         </Authenticated>
