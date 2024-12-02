@@ -41,23 +41,90 @@ import {
 import { ChevronDown } from "lucide-react";
 import { MediaModal } from "@/Components/MediaModal";
 import { Media } from "@/types/app";
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/Components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+    CategoryLabelValues,
+    newsFormSchema,
+    type NewsFormValues,
+} from "./_types";
+import axios from "axios";
+import { toast } from "sonner";
 
-const Create = () => {
+interface Props {
+    categories: CategoryLabelValues[];
+}
+
+const Create = ({ categories }: Props) => {
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    const [editorContent, setEditorContent] = useState({
-        id: "",
-        en: "",
+    const form = useForm<NewsFormValues>({
+        resolver: zodResolver(newsFormSchema),
+        defaultValues: {
+            id: {
+                title: "",
+                content: "",
+            },
+            en: {
+                title: "",
+                content: "",
+            },
+            category_id: "",
+            featured_image: null,
+            is_featured: false,
+            status: "draft",
+            publish_date: new Date().toISOString().split("T")[0],
+            tags: [],
+        },
     });
 
-    const [title, setTitle] = useState({
-        id: "",
-        en: "",
-    });
+    const onSubmit = async (values: NewsFormValues) => {
+        try {
+            // Set loading state
+            form.setValue("status", values.status);
+            setIsSubmitting(true);
 
-    const handleSave = () => {
-        console.info(editorContent);
+            // Submit form data
+            const response = await axios.post(route("admin.news.store"), {
+                ...values,
+                featured_image: values.featured_image?.id, // Ambil hanya ID dari media
+            });
+
+            if (response.data.status) {
+                toast.success(response.data.message);
+                router.get(route("admin.news.index"));
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const errorMessage =
+                    error.response?.data?.message || "Failed to save news";
+                toast.error(errorMessage);
+
+                if (error.response?.status === 422) {
+                    const errors = error.response.data.errors;
+
+                    Object.keys(errors).forEach((key) => {
+                        form.setError(key as any, {
+                            type: "manual",
+                            message: errors[key][0],
+                        });
+                    });
+                }
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -76,14 +143,16 @@ const Create = () => {
             }
         >
             <Head title="News Management" />
-            <div className="flex flex-col gap-4 overflow-y-auto scroll-smooth p-4">
-                <div className="grid grid-cols-1 gap-4">
-                    <Card className="relative overflow-hidden">
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="flex flex-col gap-4 p-4"
+                >
+                    <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between text-2xl font-bold">
                                 <div className="flex items-center gap-x-2">
                                     <PiNewspaperDuotone className="size-7" />
-
                                     <span>News</span>
                                 </div>
                                 <div>
@@ -95,11 +164,33 @@ const Create = () => {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent>
-                                            <DropdownMenuItem className="cursor-pointer">
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onClick={() => {
+                                                    form.setValue(
+                                                        "status",
+                                                        "published"
+                                                    );
+                                                    form.handleSubmit(
+                                                        onSubmit
+                                                    )();
+                                                }}
+                                            >
                                                 <PiCheckFatDuotone className="size-4" />
                                                 Save & Publish
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem className="cursor-pointer">
+                                            <DropdownMenuItem
+                                                className="cursor-pointer"
+                                                onClick={() => {
+                                                    form.setValue(
+                                                        "status",
+                                                        "draft"
+                                                    );
+                                                    form.handleSubmit(
+                                                        onSubmit
+                                                    )();
+                                                }}
+                                            >
                                                 <PiArchiveDuotone className="size-4" />
                                                 Draft
                                             </DropdownMenuItem>
@@ -107,15 +198,11 @@ const Create = () => {
                                     </DropdownMenu>
                                 </div>
                             </CardTitle>
-                            <CardDescription>
-                                Manage and organize content categories across
-                                multiple languages
-                            </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-3 gap-6">
                                 <div className="col-span-2">
-                                    <Tabs defaultValue="id" className="w-full">
+                                    <Tabs defaultValue="id">
                                         <TabsList>
                                             <TabsTrigger value="id">
                                                 Indonesian
@@ -129,223 +216,282 @@ const Create = () => {
                                             value="id"
                                             className="space-y-4 pt-5"
                                         >
-                                            <div className="space-y-2">
-                                                <Label>
-                                                    Title (Indonesian)
-                                                </Label>
-                                                <Input
-                                                    placeholder="Enter title in Indonesian"
-                                                    value={title.id}
-                                                    onChange={(e) =>
-                                                        setTitle((prev) => ({
-                                                            ...prev,
-                                                            id: e.target.value,
-                                                        }))
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label>
-                                                    Content (Indonesian)
-                                                </Label>
-                                                <TiptapEditor
-                                                    content={editorContent.id}
-                                                    onChange={(content) =>
-                                                        setEditorContent(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                id: content,
-                                                            })
-                                                        )
-                                                    }
-                                                />
-                                            </div>
+                                            <FormField
+                                                control={form.control}
+                                                name="id.title"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Title (Indonesian)
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                placeholder="Enter title in Indonesian"
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="id.content"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Content (Indonesian)
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <TiptapEditor
+                                                                content={
+                                                                    field.value ||
+                                                                    ""
+                                                                }
+                                                                onChange={
+                                                                    field.onChange
+                                                                }
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </TabsContent>
+
                                         <TabsContent
                                             value="en"
                                             className="space-y-4 pt-5"
                                         >
-                                            <div className="space-y-2">
-                                                <Label>Title (English)</Label>
-                                                <Input
-                                                    placeholder="Enter title in English"
-                                                    value={title.en}
-                                                    onChange={(e) =>
-                                                        setTitle((prev) => ({
-                                                            ...prev,
-                                                            en: e.target.value,
-                                                        }))
-                                                    }
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label>Content (English)</Label>
-                                                <TiptapEditor
-                                                    content={editorContent.en}
-                                                    onChange={(content) =>
-                                                        setEditorContent(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                en: content,
-                                                            })
-                                                        )
-                                                    }
-                                                />
-                                            </div>
+                                            <FormField
+                                                control={form.control}
+                                                name="en.title"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Title (English)
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                placeholder="Enter title in English"
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="en.content"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Content (English)
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <TiptapEditor
+                                                                content={
+                                                                    field.value ||
+                                                                    ""
+                                                                }
+                                                                onChange={
+                                                                    field.onChange
+                                                                }
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </TabsContent>
                                     </Tabs>
                                 </div>
-                                <div className="space-y-6">
-                                    <div>
+
+                                <div className="">
+                                    <div className="space-y-6">
                                         <h2 className="text-lg font-semibold mb-4">
                                             Article Details
                                         </h2>
-                                        <p className="text-sm text-muted-foreground mb-6">
-                                            Provide additional information about
-                                            your article.
-                                        </p>
 
-                                        <div className="space-y-2 mb-4">
-                                            <Label>
-                                                Featured Image (Optional)
-                                            </Label>
-                                            <div className="space-y-4">
-                                                {selectedMedia ? (
-                                                    <div className="relative group">
-                                                        <img
-                                                            src={`/storage/${selectedMedia.path}`}
-                                                            alt={
-                                                                selectedMedia.name
-                                                            }
-                                                            className="w-full h-32 object-cover rounded-lg"
-                                                        />
-                                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                            <Button
-                                                                size="sm"
-                                                                variant="secondary"
-                                                                onClick={() =>
-                                                                    setIsMediaModalOpen(
-                                                                        true
-                                                                    )
-                                                                }
-                                                            >
-                                                                Change
-                                                            </Button>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="destructive"
-                                                                onClick={() =>
-                                                                    setSelectedMedia(
-                                                                        null
-                                                                    )
-                                                                }
-                                                            >
-                                                                Remove
-                                                            </Button>
+                                        <FormField
+                                            control={form.control}
+                                            name="featured_image"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Featured Image
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <div className="space-y-4">
+                                                            {field.value ? (
+                                                                <div className="relative group">
+                                                                    <img
+                                                                        src={`/storage/${field.value.path}`}
+                                                                        alt="Featured"
+                                                                        className="w-full h-32 object-cover rounded-lg"
+                                                                    />
+                                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="secondary"
+                                                                            onClick={() =>
+                                                                                setIsMediaModalOpen(
+                                                                                    true
+                                                                                )
+                                                                            }
+                                                                            type="button"
+                                                                        >
+                                                                            Change
+                                                                        </Button>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            variant="destructive"
+                                                                            onClick={() =>
+                                                                                field.onChange(
+                                                                                    null
+                                                                                )
+                                                                            }
+                                                                            type="button"
+                                                                        >
+                                                                            Remove
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            ) : (
+                                                                <Button
+                                                                    variant="outline"
+                                                                    onClick={() =>
+                                                                        setIsMediaModalOpen(
+                                                                            true
+                                                                        )
+                                                                    }
+                                                                    className="w-full h-32"
+                                                                    type="button"
+                                                                >
+                                                                    <PiImageDuotone className="size-8" />
+                                                                    Choose Image
+                                                                </Button>
+                                                            )}
                                                         </div>
-                                                    </div>
-                                                ) : (
-                                                    <Button
-                                                        variant="outline"
-                                                        onClick={() =>
-                                                            setIsMediaModalOpen(
-                                                                true
-                                                            )
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="category_id"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Category
+                                                    </FormLabel>
+                                                    <Select
+                                                        onValueChange={
+                                                            field.onChange
                                                         }
-                                                        className="w-full h-32 flex flex-col items-center justify-center"
+                                                        defaultValue={
+                                                            field.value
+                                                        }
                                                     >
-                                                        <PiImageDuotone className="size-8 mb-2 text-muted-foreground" />
-                                                        <span>
-                                                            Choose from Media
-                                                            Library
-                                                        </span>
-                                                    </Button>
-                                                )}
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Select a category" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {categories.map(
+                                                                (category) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            category.value
+                                                                        }
+                                                                        value={category.value.toString()}
+                                                                        className="capitalize"
+                                                                    >
+                                                                        {
+                                                                            category.label
+                                                                        }
+                                                                    </SelectItem>
+                                                                )
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                                <MediaModal
-                                                    isOpen={isMediaModalOpen}
-                                                    onClose={() =>
-                                                        setIsMediaModalOpen(
-                                                            false
-                                                        )
-                                                    }
-                                                    onSelect={(media) => {
-                                                        setSelectedMedia(media);
-                                                        setIsMediaModalOpen(
-                                                            false
-                                                        );
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
+                                        <FormField
+                                            control={form.control}
+                                            name="publish_date"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Publish Date
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="date"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                        <div className="space-y-4">
-                                            <div className="space-y-2">
-                                                <Label>Category</Label>
-                                                <Select>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a category" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="news">
-                                                            News
-                                                        </SelectItem>
-                                                        <SelectItem value="events">
-                                                            Events
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label>Publish Date</Label>
-                                                <Input type="date" />
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label>Author</Label>
-                                                <Input placeholder="Enter author's name" />
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <Label>Tags</Label>
-                                                <Input
-                                                    placeholder="Enter tags separated by commas"
-                                                    className="mb-1"
-                                                />
-                                                <p className="text-sm text-muted-foreground">
-                                                    Add relevant tags to help
-                                                    categorize your article.
-                                                </p>
-                                            </div>
-
-                                            <div className="pt-2">
-                                                <div className="flex items-center space-x-2">
-                                                    <Checkbox id="featured" />
-                                                    <div className="grid gap-1.5 leading-none">
-                                                        <label
-                                                            htmlFor="featured"
-                                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                                        >
+                                        <FormField
+                                            control={form.control}
+                                            name="is_featured"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onChange={(e) =>
+                                                                field.onChange(
+                                                                    e.target
+                                                                        .checked
+                                                                )
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
                                                             Featured Article
-                                                        </label>
-                                                        <p className="text-sm text-muted-foreground">
+                                                        </FormLabel>
+                                                        <FormDescription>
                                                             This article will
                                                             appear in the
-                                                            featured section of
-                                                            the homepage.
-                                                        </p>
+                                                            featured section
+                                                        </FormDescription>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                </FormItem>
+                                            )}
+                                        />
                                     </div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
-                </div>
-            </div>
+                </form>
+            </Form>
+
+            <MediaModal
+                isOpen={isMediaModalOpen}
+                onClose={() => setIsMediaModalOpen(false)}
+                onSelect={(media) => {
+                    form.setValue("featured_image", media);
+                    setIsMediaModalOpen(false);
+                }}
+            />
         </Authenticated>
     );
 };

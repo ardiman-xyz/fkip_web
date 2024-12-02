@@ -38,7 +38,7 @@ class MediaService
 
     public function getAll()
     {
-        return Media::latest()->get();
+        return Media::latest()->limit(50)->get();
     }
 
     public function delete($id)

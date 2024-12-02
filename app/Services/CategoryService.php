@@ -33,6 +33,21 @@ class CategoryService
     }
 
 
+    public function getAllWithTranslationsLabelAndValues()
+    {
+        return Category::with(['translations' => function($query) {
+            $query->whereHas('language', fn($q) => $q->where('code', 'id'));
+        }])
+        ->get()
+        ->map(function($category) {
+            return [
+                'value' => (string) $category->id, 
+                'label' => $category->translations->first()?->name ?? 'Untitled'
+            ];
+        });
+    }
+
+
     public function create(array $data)
     {
         try {

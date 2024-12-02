@@ -65,7 +65,6 @@ export const MediaModal = ({
         const echoInstance = (window as any).Echo;
 
         echoInstance.channel(`media`).listen(eventName, (data: any) => {
-            console.info("New media:", data);
             setMedias((prev) => [data.media, ...prev]);
         });
 

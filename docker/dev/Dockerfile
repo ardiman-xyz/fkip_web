@@ -19,6 +19,8 @@ RUN docker-php-ext-install pdo pdo_mysql zip pcntl \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+COPY ./php/custom.ini /usr/local/etc/php/conf.d/custom.ini
+
 RUN groupadd --gid 1000 appuser \
     && useradd --uid 1000 --gid appuser --groups www-data,root \
     --shell /bin/bash --create-home appuser

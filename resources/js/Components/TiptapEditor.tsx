@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
+import ImageResize from "tiptap-extension-resize-image";
 import StarterKit from "@tiptap/starter-kit";
 import { Button } from "@/Components/ui/button";
 import {
@@ -24,6 +25,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
+import { useState } from "react";
+import { Media } from "@/types/app";
+import { MediaModal } from "./MediaModal";
 
 interface TiptapEditorProps {
     content: string;
@@ -36,8 +40,17 @@ export function TiptapEditor({
     onChange,
     disabled = false,
 }: TiptapEditorProps) {
+    const [isMediaModalOpen, setIsMediaModalOpen] = useState<boolean>(false);
+
     const editor = useEditor({
-        extensions: [StarterKit, OrderedList, ListItem, BulletList, Image],
+        extensions: [
+            StarterKit,
+            OrderedList,
+            ListItem,
+            BulletList,
+            Image,
+            ImageResize,
+        ],
         content,
         editorProps: {
             attributes: {
@@ -49,6 +62,19 @@ export function TiptapEditor({
         },
         editable: !disabled,
     });
+
+    const handleImageSelect = (media: Media) => {
+        if (editor) {
+            editor
+                .chain()
+                .focus()
+                .setImage({
+                    src: `/storage/${media.path}`,
+                })
+                .run();
+        }
+        setIsMediaModalOpen(false);
+    };
 
     if (!editor) return null;
 
@@ -206,12 +232,7 @@ export function TiptapEditor({
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                        const url = window.prompt("Enter image URL");
-                        if (url) {
-                            editor.chain().focus().setImage({ src: url }).run();
-                        }
-                    }}
+                    onClick={() => setIsMediaModalOpen(true)}
                     disabled={disabled}
                 >
                     <PiImageDuotone className="size-4" />
@@ -221,6 +242,12 @@ export function TiptapEditor({
             <EditorContent
                 editor={editor}
                 className="min-h-[300px] p-4 tiptap prose-base"
+            />
+
+            <MediaModal
+                isOpen={isMediaModalOpen}
+                onClose={() => setIsMediaModalOpen(false)}
+                onSelect={handleImageSelect}
             />
         </div>
     );
