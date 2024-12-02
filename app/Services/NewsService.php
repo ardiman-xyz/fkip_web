@@ -9,6 +9,59 @@ use Illuminate\Support\Str;
 
 class NewsService
 {
+
+    public function getAllWithTranslations()
+    {
+        return News::with(['translations.language', 'media', 'category', 'tags'])->orderBy("id", "desc")->get()
+            ->map(function ($news) {
+               
+               
+                $newsTranslations = $news->translations->groupBy('language.code')
+                    ->map(function ($items) {
+                        return $items->first();
+                    });
+
+                $categoryTranslations = $news->category->translations->groupBy('language.code')
+                    ->map(function ($items) {
+                        return $items->first();
+                    });
+
+                return [
+                    'id' => $news->id,
+                    'translations' => [
+                        'id' => [
+                            'title' => $newsTranslations->get('id')?->title ?? null,
+                            'slug' => $newsTranslations->get('id')?->slug ?? null,
+                            'content' => $newsTranslations->get('id')?->content ?? null,
+                        ],
+                        'en' => [
+                            'title' => $newsTranslations->get('en')?->title ?? null,
+                            'slug' => $newsTranslations->get('en')?->slug ?? null,
+                            'content' => $newsTranslations->get('en')?->content ?? null,
+                        ],
+                    ],
+                    'category' => [
+                        'id' => $news->category->id ?? null,
+                        'translations' => [
+                            'id' => [
+                                'name' => $categoryTranslations->get('id')?->name ?? null,
+                            ],
+                            'en' => [
+                                'name' => $categoryTranslations->get('en')?->name ?? null,
+                            ],
+                        ],
+                    ],
+                    'media' => $news->media,
+                    'tags' => $news->tags,
+                    'status' => $news->status,
+                    'is_featured' => $news->is_featured,
+                    'publish_date' => $news->publish_date,
+                    'created_at' => $news->created_at,
+                    'updated_at' => $news->updated_at,
+                ];
+            });
+    }
+
     public function create(array $data)
     {
         $languages = Language::whereIn('code', ['id', 'en'])->get();

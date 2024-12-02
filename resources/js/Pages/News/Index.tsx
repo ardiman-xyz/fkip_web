@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import { PiFolderOpenDuotone, PiNewspaperDuotone } from "react-icons/pi";
-import axios from "axios";
+import { PiNewspaperDuotone } from "react-icons/pi";
 import { Head, router } from "@inertiajs/react";
 
 import { Button } from "@/Components/ui/button";
@@ -12,8 +10,17 @@ import {
     CardTitle,
 } from "@/Components/ui/card";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
+import { News } from "./_types";
+import { DataTable } from "./DataTable";
+import { columns } from "./Columns";
 
-const Index = () => {
+interface IndexProps {
+    news: News[];
+}
+
+const Index = ({ news }: IndexProps) => {
+    console.info(news);
+
     return (
         <Authenticated
             header={<h2 className="text-2xl font-black">Create Management</h2>}
@@ -42,11 +49,13 @@ const Index = () => {
                                 </div>
                             </CardTitle>
                             <CardDescription>
-                                Manage and organize content categories across
-                                multiple languages
+                                Manage and organize content news across multiple
+                                languages
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="relative flex flex-col gap-2"></CardContent>
+                        <CardContent className="relative flex flex-col gap-2">
+                            <DataTable columns={columns} data={news} />
+                        </CardContent>
                     </Card>
                 </div>
             </div>

@@ -1,3 +1,5 @@
+import { Category } from "@/Pages/Category/_types";
+import { Tag } from "@/Pages/Tag/_types";
 import * as z from "zod";
 
 export const newsFormSchema = z.object({
@@ -30,4 +32,37 @@ export type NewsFormValues = z.infer<typeof newsFormSchema>;
 export type CategoryLabelValues = {
     value: number;
     label: string;
+};
+
+type Translation = {
+    title?: string | null;
+    slug?: string | null;
+    content?: string | null;
+};
+
+type LanguageTranslations<T> = {
+    id?: T;
+    en?: T;
+};
+
+type Media = {
+    id: number;
+    file_name: string;
+    mime_type: string;
+    path: string;
+    size: number;
+    url: string;
+};
+
+export type News = {
+    id: number;
+    translations: LanguageTranslations<Translation>;
+    media: Media[];
+    category: Category | null;
+    tags: Tag[];
+    status: string;
+    is_featured: boolean;
+    publish_date: string | null;
+    created_at: string;
+    updated_at: string;
 };
