@@ -20,7 +20,6 @@ import {
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { TiptapEditor } from "@/Components/TiptapEditor";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
-import { Label } from "@/Components/ui/label";
 import { Input } from "@/Components/ui/input";
 import {
     Select,
@@ -29,13 +28,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
-import Checkbox from "@/Components/Checkbox";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
 import { Check, ChevronDown, X } from "lucide-react";
@@ -65,15 +61,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/Components/ui/popover";
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-} from "@/Components/ui/command";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/Components/ui/badge";
+
 import { MultiSelect } from "@/Components/MultiSelect";
 
 interface Props {

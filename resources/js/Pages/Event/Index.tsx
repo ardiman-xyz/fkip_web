@@ -30,7 +30,7 @@ const Index = () => {
                                     <Button
                                         onClick={() =>
                                             router.get(
-                                                route("admin.news.create")
+                                                route("admin.events.create")
                                             )
                                         }
                                     >
