@@ -59,7 +59,10 @@ export type News = {
     translations: LanguageTranslations<Translation>;
     media: Media;
     category: Category | null;
-    tags: Tag[];
+    tags: {
+        value: string;
+        label: string;
+    }[];
     status: string;
     is_featured: boolean;
     publish_date: string | null;

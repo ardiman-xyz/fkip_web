@@ -40,6 +40,9 @@ export function MultiSelect({
     disabled = false,
     emptyMessage = "No items found.",
 }: MultiSelectProps) {
+    console.log("Options:", options);
+    console.log("Value:", value);
+
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -65,7 +68,7 @@ export function MultiSelect({
                                         className="mr-1"
                                     >
                                         {option.label}
-                                        <button
+                                        <div
                                             className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                             onKeyDown={(e) => {
                                                 if (e.key === "Enter") {
@@ -91,7 +94,7 @@ export function MultiSelect({
                                             }}
                                         >
                                             <X className="h-3 w-3" />
-                                        </button>
+                                        </div>
                                     </Badge>
                                 ) : null;
                             })}

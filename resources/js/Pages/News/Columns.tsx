@@ -2,18 +2,30 @@ import { ColumnDef } from "@tanstack/react-table";
 import { News } from "./_types";
 import { formatDateToIndonesian } from "@/lib/utils";
 import { ActionTable } from "./_components/ActionTable";
+import { PiImageDuotone } from "react-icons/pi";
 
 export const columns: ColumnDef<News>[] = [
     {
         id: "Gambar",
         header: "Gambar",
         cell: ({ row }) => {
+            if (!row.original.media) {
+                return (
+                    <div className="relative w-[150px] h-[100px] flex flex-col items-center justify-center bg-muted rounded-md">
+                        <PiImageDuotone className="size-8 text-muted-foreground" />
+                        <p className="text-sm font-semibold text-muted-foreground">
+                            No Image
+                        </p>
+                    </div>
+                );
+            }
+
             return (
                 <div className="relative w-[150px] h-[100px] flex items-center justify-center">
                     <img
-                        src={row.original.media?.url}
+                        src={row.original.media.url}
                         alt={row.original.translations.id?.title ?? "Foto"}
-                        className="object-cover rounded-md"
+                        className="object-cover w-full h-full rounded-md"
                     />
                 </div>
             );

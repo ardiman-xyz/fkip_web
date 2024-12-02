@@ -10,7 +10,7 @@ class News extends Model
 
     protected $casts = [
         'is_featured' => 'boolean',
-        'publish_date' => 'date'
+        'publish_date' => 'date:Y-m-d',
     ];
 
     public function translations()

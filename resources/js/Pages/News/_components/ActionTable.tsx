@@ -14,6 +14,7 @@ import {
 } from "@/Components/ui/dropdown-menu";
 import { useState } from "react";
 import { DeleteConfirm } from "@/Components/ModalDeleteConfirmation";
+import { router } from "@inertiajs/react";
 
 interface ActionTableProps {
     news: News;
@@ -33,7 +34,14 @@ export const ActionTable = ({ news }: ActionTableProps) => {
                         <PiGlobeDuotone className="size-4" />
                         Visit page
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer">
+                    <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() =>
+                            router.get(
+                                route("admin.news.edit", { id: news.id })
+                            )
+                        }
+                    >
                         <PiPencilDuotone className="size-4" />
                         Edit
                     </DropdownMenuItem>
