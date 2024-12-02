@@ -9,3 +9,8 @@ export type Tag = {
         en: TagTranslation;
     };
 };
+
+export type TagLabelValues = {
+    value: string;
+    label: string;
+};

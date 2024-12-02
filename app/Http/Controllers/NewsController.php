@@ -6,6 +6,7 @@ use App\Http\Requests\StoreNewsRequest;
 use App\Http\Resources\ResponseApi;
 use App\Services\CategoryService;
 use App\Services\NewsService;
+use App\Services\TagService;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,7 +17,8 @@ class NewsController extends Controller
 
     public function __construct(
         protected NewsService $newsService,
-        protected CategoryService $categoryService
+        protected CategoryService $categoryService,
+        protected TagService $tagService
     ){}
 
 
@@ -28,9 +30,11 @@ class NewsController extends Controller
     public function create()
     {
         $categories = $this->categoryService->getAllWithTranslationsLabelAndValues();
+        $tags = $this->tagService->getAllWithTranslationsLabelAndValues();
     
         return Inertia::render("News/Create", [
-            'categories' => $categories
+            'categories' => $categories,
+            'tags' => $tags
         ]);
     }
 

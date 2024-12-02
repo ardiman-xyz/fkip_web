@@ -32,6 +32,20 @@ class TagService
             });
     }
 
+    public function getAllWithTranslationsLabelAndValues()
+    {
+        return Tag::with(['translations' => function($query) {
+            $query->whereHas('language', fn($q) => $q->where('code', 'id'));
+        }])
+        ->get()
+        ->map(function($tag) {
+            return [
+                'value' => (string) $tag->id,
+                'label' => $tag->translations->first()?->name ?? 'Untitled'
+            ];
+        });
+    }
+
 
     public function create(array $data)
     {

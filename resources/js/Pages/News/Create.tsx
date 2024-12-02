@@ -38,7 +38,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown, X } from "lucide-react";
 import { MediaModal } from "@/Components/MediaModal";
 import { Media } from "@/types/app";
 import {
@@ -59,12 +59,29 @@ import {
 } from "./_types";
 import axios from "axios";
 import { toast } from "sonner";
+import { TagLabelValues } from "../Tag/_types";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/Components/ui/popover";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+} from "@/Components/ui/command";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/Components/ui/badge";
+import { MultiSelect } from "@/Components/MultiSelect";
 
 interface Props {
     categories: CategoryLabelValues[];
+    tags: TagLabelValues[];
 }
 
-const Create = ({ categories }: Props) => {
+const Create = ({ categories, tags }: Props) => {
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -90,12 +107,12 @@ const Create = ({ categories }: Props) => {
     });
 
     const onSubmit = async (values: NewsFormValues) => {
+        if (isSubmitting) return;
+
         try {
-            // Set loading state
             form.setValue("status", values.status);
             setIsSubmitting(true);
 
-            // Submit form data
             const response = await axios.post(route("admin.news.store"), {
                 ...values,
                 featured_image: values.featured_image?.id, // Ambil hanya ID dari media
@@ -420,6 +437,40 @@ const Create = ({ categories }: Props) => {
                                                             )}
                                                         </SelectContent>
                                                     </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="tags"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Tags</FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <MultiSelect
+                                                                    options={
+                                                                        tags
+                                                                    }
+                                                                    value={
+                                                                        field.value
+                                                                    }
+                                                                    onChange={
+                                                                        field.onChange
+                                                                    }
+                                                                    placeholder="Select tags..."
+                                                                    searchPlaceholder="Search tags..."
+                                                                    disabled={
+                                                                        isSubmitting
+                                                                    }
+                                                                />
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-full p-0"></PopoverContent>
+                                                    </Popover>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
