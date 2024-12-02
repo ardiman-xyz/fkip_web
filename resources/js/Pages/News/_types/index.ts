@@ -57,7 +57,7 @@ type Media = {
 export type News = {
     id: number;
     translations: LanguageTranslations<Translation>;
-    media: Media[];
+    media: Media;
     category: Category | null;
     tags: Tag[];
     status: string;

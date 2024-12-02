@@ -5,11 +5,26 @@ import { ActionTable } from "./_components/ActionTable";
 
 export const columns: ColumnDef<News>[] = [
     {
+        id: "Gambar",
+        header: "Gambar",
+        cell: ({ row }) => {
+            return (
+                <div className="relative w-[150px] h-[100px] flex items-center justify-center">
+                    <img
+                        src={row.original.media?.url}
+                        alt={row.original.translations.id?.title ?? "Foto"}
+                        className="object-cover rounded-md"
+                    />
+                </div>
+            );
+        },
+    },
+    {
         id: "judul",
         header: "Judul [id]",
         cell: ({ row }) => {
             return (
-                <div className="font-medium capitalize">
+                <div className="font-medium capitalize md:w-[400px] w-auto  truncate">
                     {row.original.translations.id?.title}
                 </div>
             );

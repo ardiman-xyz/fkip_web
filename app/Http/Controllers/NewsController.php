@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreNewsRequest;
 use App\Http\Resources\ResponseApi;
+use App\Models\News;
 use App\Services\CategoryService;
 use App\Services\NewsService;
 use App\Services\TagService;
@@ -51,5 +52,15 @@ class NewsController extends Controller
         } catch (Exception $e) {
             return ResponseApi::error('Failed to create news', 500, ['error' => $e->getMessage()]);
         }
+    }
+
+    public function destroy(News $news)
+    {
+    try {
+        $this->newsService->delete($news);
+        return ResponseApi::success(null, 'News deleted successfully');
+    } catch (\Exception $e) {
+        return ResponseApi::error('Failed to delete news', 500, ['error' => $e->getMessage()]); 
+    }
     }
 }

@@ -102,4 +102,25 @@ class NewsService
             throw $e;
         }
     }
+
+
+    public function delete(News $news)
+    {
+    try {
+        DB::beginTransaction();
+
+        $news->translations()->delete();
+        
+        $news->tags()->detach();
+        
+        $news->delete();
+
+        DB::commit();
+        return true;
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        throw $e;
+    }
+    }
 }

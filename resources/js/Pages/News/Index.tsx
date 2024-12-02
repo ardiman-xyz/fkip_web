@@ -19,8 +19,6 @@ interface IndexProps {
 }
 
 const Index = ({ news }: IndexProps) => {
-    console.info(news);
-
     return (
         <Authenticated
             header={<h2 className="text-2xl font-black">Create Management</h2>}
