@@ -2,8 +2,8 @@ import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Media } from "@/types/app";
-import { Head } from "@inertiajs/react";
-import { useState } from "react";
+import { Head, usePage } from "@inertiajs/react";
+import { useEffect, useState } from "react";
 import {
     PiImageDuotone,
     PiPencilDuotone,
@@ -13,14 +13,37 @@ import {
 import { UploadModalMedia } from "./_components/UploadModal";
 import { ChevronDown, LayoutGrid, List } from "lucide-react";
 import { MediaItem } from "./_components/MediaItem";
+import { PageProps } from "@/types";
 
 interface Props {
     media: Media[];
 }
 
-const MediaLibrary = ({ media }: Props) => {
+const MediaLibrary = ({ media: initialMedia }: Props) => {
     const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
     const [viewType, setViewType] = useState<"grid" | "list">("grid");
+
+    const [media, setMedia] = useState<Media[]>(initialMedia);
+
+    const { auth } = usePage<PageProps>().props;
+
+    useEffect(() => {
+        const echoInstance = (window as any).Echo;
+        const eventName = ".media.upload";
+
+        // Subscribe ke private channel
+        const channel = echoInstance.private(`App.User.${auth.user.id}`);
+
+        channel.listen(eventName, (event: any) => {
+            if (event.isComplete && event.media) {
+                setMedia((prev) => [event.media, ...prev]);
+            }
+        });
+
+        return () => {
+            channel.stopListening(eventName);
+        };
+    }, []);
 
     return (
         <AuthenticatedLayout
@@ -76,7 +99,12 @@ const MediaLibrary = ({ media }: Props) => {
                 {viewType === "grid" ? (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                         {media.map((item) => (
-                            <MediaItem key={item.id} item={item} />
+                            <div
+                                key={item.id}
+                                className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                            >
+                                <MediaItem item={item} />
+                            </div>
                         ))}
                     </div>
                 ) : (

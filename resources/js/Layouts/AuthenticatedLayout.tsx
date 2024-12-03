@@ -4,6 +4,9 @@ import AppHeader from "@/Components/AppHeader";
 import Footer from "@/Components/Footer";
 import { PiGraduationCapFill } from "react-icons/pi";
 import { Toaster } from "@/Components/ui/sonner";
+import TestConnection from "@/Components/TestConnectionReverb";
+import { BroadcastTest } from "@/Components/BroadcastTest";
+import { UploadProgress } from "@/Components/UploadProgres";
 
 interface EventResponse {
     user_id: number;
@@ -15,16 +18,6 @@ export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    useEffect(() => {
-        const eventName = ".notification.uploaded";
-
-        const echoInstance = (window as any).Echo;
-
-        echoInstance.channel(`media`).listen(eventName, (data: any) => {
-            console.info(data);
-        });
-    }, []);
-
     return (
         <div className="relative min-h-dvh bg-gray-200 dark:bg-black">
             <Toaster />
@@ -50,6 +43,8 @@ export default function Authenticated({
                             <div className="absolute left-0 top-0 z-10 h-4 w-full bg-gradient-to-b from-white dark:from-gray-900"></div>
                             {children}
                         </main>
+
+                        <UploadProgress />
 
                         <Footer />
                     </div>

@@ -6,6 +6,7 @@ use App\Http\Resources\ResponseApi;
 use App\Models\Media;
 use App\Services\MediaService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class MediaController extends Controller 
@@ -53,13 +54,15 @@ class MediaController extends Controller
 
     public function storeBatch(Request $request)
     {
+        $userId = Auth::id();
+
         try {
             $request->validate([
                 'files' => 'required|array',
                 'files.*' => 'required|file|max:2048|mimes:jpeg,png,jpg,gif'
             ]);
 
-            $result = $this->mediaService->create($request->file('files'));
+            $result = $this->mediaService->create($request->file('files'), $userId);
             
             if (count($result['uploaded']) > 0 && count($result['failed']) > 0) {
                 return response()->json([

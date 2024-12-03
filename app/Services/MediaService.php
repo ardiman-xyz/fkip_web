@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\MediaUploaded;
+use App\Events\MediaUploadProgress;
 use App\Models\Event;
 use App\Models\EventTranslation;
 use App\Models\Media;
@@ -52,17 +53,26 @@ class MediaService
     }
 
 
-    public function create(array $files): array
+    public function create(array $files, string $userId): array
     {
         $results = [];
         $errors = [];
+        $uploadId = Str::uuid();
 
         foreach ($files as $file) {
             try {
-                $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
-            
-                $randomSubdirectory = 'media/' . date('Y') . '/' . date('m') . '/' . Str::random(10);
+                // Broadcast start upload
+                broadcast(new MediaUploadProgress(
+                    uploadId: $uploadId,
+                    fileName: $file->getClientOriginalName(),
+                    progress: 0,
+                    isComplete: false,
+                    media: null,
+                    userId: $userId
+                ));
 
+                $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $randomSubdirectory = 'media/' . date('Y') . '/' . date('m') . '/' . Str::random(10);
                 $path = $file->storeAs($randomSubdirectory, $randomFileName, 'public');
 
                 $media = Media::create([
@@ -73,14 +83,34 @@ class MediaService
                     'size' => $file->getSize()
                 ]);
 
-
                 $results[] = $media;
+
+                // Broadcast success
+                broadcast(new MediaUploadProgress(
+                    uploadId: $uploadId,
+                    fileName: $file->getClientOriginalName(),
+                    progress: 100,
+                    isComplete: true,
+                    media: $media,
+                    userId: $userId
+                ));
 
             } catch (\Exception $e) {
                 $errors[] = [
                     'file' => $file->getClientOriginalName(),
                     'error' => $e->getMessage()
                 ];
+
+                // Broadcast error
+                broadcast(new MediaUploadProgress(
+                    uploadId: $uploadId,
+                    fileName: $file->getClientOriginalName(),
+                    progress: 0,
+                    isComplete: false,
+                    media: null,
+                    userId: $userId,
+                    error: $e->getMessage()
+                ));
             }
         }
 
