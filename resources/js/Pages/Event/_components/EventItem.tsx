@@ -3,6 +3,8 @@ import { Event } from "../_types";
 import {
     PiCalendarDuotone,
     PiGlobeDuotone,
+    PiGlobeHemisphereEastDuotone,
+    PiGlobeHemisphereEastFill,
     PiImageDuotone,
     PiMapPinLineDuotone,
     PiNotePencilDuotone,
@@ -12,6 +14,7 @@ import { Button } from "@/Components/ui/button";
 import { stripHtml, truncateText } from "@/lib/htmlUtils";
 import { useState } from "react";
 import { DeleteConfirm } from "@/Components/DeleteConfirmation";
+import { router } from "@inertiajs/react";
 
 const getStatusColor = (status: string) => {
     switch (status) {
@@ -129,7 +132,13 @@ const EventItem = ({ data }: Props) => {
 
                 {/* Action Buttons */}
                 <div className="flex gap-2">
-                    <Button variant={"outline"} size={"icon"}>
+                    <Button
+                        variant={"outline"}
+                        size={"icon"}
+                        onClick={() =>
+                            router.get(route("admin.events.edit", data.id))
+                        }
+                    >
                         <PiNotePencilDuotone className="size-4" />
                     </Button>
                     <Button
@@ -139,8 +148,9 @@ const EventItem = ({ data }: Props) => {
                     >
                         <PiTrashDuotone className="size-4" />
                     </Button>
-                    <button className="px-4 py-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 ml-auto">
-                        View Details
+                    <button className="px-4 py-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 ml-auto flex items-center gap-x-2">
+                        <PiGlobeHemisphereEastFill className="size-4 " />
+                        <span>Visit site</span>
                     </button>
                 </div>
             </div>
