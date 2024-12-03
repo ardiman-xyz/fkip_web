@@ -10,37 +10,40 @@ import {
 } from "react-icons/pi";
 import { Button } from "@/Components/ui/button";
 import { stripHtml, truncateText } from "@/lib/htmlUtils";
+import { useState } from "react";
+import { DeleteConfirm } from "@/Components/DeleteConfirmation";
 
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case "upcoming":
+            return "bg-green-100 text-green-700";
+        case "ongoing":
+            return "bg-blue-100 text-blue-700";
+        case "completed":
+            return "bg-gray-100 text-gray-700";
+        default:
+            return "bg-gray-100 text-gray-700";
+    }
+};
+
+const getStatusText = (status: string) => {
+    switch (status) {
+        case "upcoming":
+            return "Upcoming";
+        case "ongoing":
+            return "Ongoing";
+        case "completed":
+            return "Completed";
+        default:
+            return status;
+    }
+};
 interface Props {
     data: Event;
 }
 
 const EventItem = ({ data }: Props) => {
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "upcoming":
-                return "bg-green-100 text-green-700";
-            case "ongoing":
-                return "bg-blue-100 text-blue-700";
-            case "completed":
-                return "bg-gray-100 text-gray-700";
-            default:
-                return "bg-gray-100 text-gray-700";
-        }
-    };
-
-    const getStatusText = (status: string) => {
-        switch (status) {
-            case "upcoming":
-                return "Upcoming";
-            case "ongoing":
-                return "Ongoing";
-            case "completed":
-                return "Completed";
-            default:
-                return status;
-        }
-    };
+    const [isModalDeleteOpen, setIsModalDeleteOpen] = useState<boolean>(false);
 
     const content = data.translations.id?.content
         ? truncateText(stripHtml(data.translations.id.content))
@@ -129,7 +132,11 @@ const EventItem = ({ data }: Props) => {
                     <Button variant={"outline"} size={"icon"}>
                         <PiNotePencilDuotone className="size-4" />
                     </Button>
-                    <Button variant={"outline"} size={"icon"}>
+                    <Button
+                        onClick={() => setIsModalDeleteOpen(true)}
+                        variant={"outline"}
+                        size={"icon"}
+                    >
                         <PiTrashDuotone className="size-4" />
                     </Button>
                     <button className="px-4 py-1.5 text-sm font-medium text-gray-600 border border-gray-200 rounded-md hover:bg-gray-50 ml-auto">
@@ -137,6 +144,13 @@ const EventItem = ({ data }: Props) => {
                     </button>
                 </div>
             </div>
+            {isModalDeleteOpen && (
+                <DeleteConfirm
+                    onClose={() => setIsModalDeleteOpen(false)}
+                    id={data.id}
+                    routeAction="admin.events.destroy"
+                />
+            )}
         </div>
     );
 };

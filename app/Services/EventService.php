@@ -158,5 +158,25 @@ class EventService
         }
     }
 
+    public function delete(Event $event): bool
+    {
+        try {
+            DB::beginTransaction();
+            
+            $event->translations()->delete();
+            
+            $event->tags()->detach();
+            
+            $event->delete();
+            
+            DB::commit();
+            return true;
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
 
 }
