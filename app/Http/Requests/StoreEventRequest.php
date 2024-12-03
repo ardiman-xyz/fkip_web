@@ -32,7 +32,28 @@ class StoreEventRequest extends FormRequest
            'status' => 'required|in:draft,published',
            'type' => 'required|in:online,offline,hybrid',
            'start_date' => 'required|date',
-           'end_date' => 'required|date|after:start_date',
+            'end_date' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    $startDate = \Carbon\Carbon::parse(request('start_date'));
+                    $endDate = \Carbon\Carbon::parse($value);
+                    
+                    if ($endDate->format('Y-m-d') < $startDate->format('Y-m-d')) {
+                        $fail('Tanggal selesai tidak boleh kurang dari tanggal mulai.');
+                        return;
+                    }
+                    
+                    if ($endDate->format('Y-m-d') === $startDate->format('Y-m-d')) {
+                        $startTime = $startDate->format('H:i');
+                        $endTime = $endDate->format('H:i');
+                        
+                        if ($endTime <= $startTime) {
+                            $fail('Waktu selesai tidak boleh lebih awal dari waktu mulai.');
+                        }
+                    }
+                }
+            ],
            'location' => 'required_if:type,offline,hybrid',
            'platform' => 'required_if:type,online,hybrid',
            'meeting_url' => 'nullable|url',

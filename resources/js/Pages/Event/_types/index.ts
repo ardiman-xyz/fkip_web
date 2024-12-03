@@ -27,3 +27,75 @@ export const eventFormSchema = z.object({
 });
 
 export type EventFormValues = z.infer<typeof eventFormSchema>;
+
+export type Event = {
+    id: number;
+    translations: Translations;
+    formatted_date: string;
+    event_status: string;
+    category: Category;
+    media: Media;
+    tags: Tag[];
+    status: string;
+    is_featured: boolean;
+    start_date: string;
+    end_date: string;
+    location: string;
+    type: string;
+    platform: null;
+    meeting_url: null;
+    registration_url: null;
+    quota: number;
+    is_free: boolean;
+    price: null;
+    created_at: string;
+};
+
+interface Tag {
+    id: number;
+    created_at: string;
+    updated_at: string;
+    pivot: Pivot;
+}
+
+interface Pivot {
+    event_id: number;
+    tag_id: number;
+}
+
+interface Media {
+    id: number;
+    name: string;
+    file_name: string;
+    mime_type: string;
+    path: string;
+    size: number;
+    created_at: string;
+    updated_at: string;
+    url: string;
+}
+
+interface Category {
+    id: number;
+    translations: Translations2;
+}
+
+interface Translations2 {
+    id: Id2;
+    en: Id2;
+}
+
+interface Id2 {
+    name: string;
+}
+
+interface Translations {
+    id: Id;
+    en: Id;
+}
+
+interface Id {
+    title: string;
+    slug: string;
+    content: string;
+}

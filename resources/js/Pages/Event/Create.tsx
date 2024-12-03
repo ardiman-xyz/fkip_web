@@ -1,4 +1,4 @@
-import { PiArrowLeftDuotone } from "react-icons/pi";
+import { PiArrowLeftDuotone, PiImageDuotone } from "react-icons/pi";
 import { Head, router } from "@inertiajs/react";
 import { useState } from "react";
 
@@ -42,6 +42,7 @@ import { toast } from "sonner";
 import { MultiSelect } from "@/Components/MultiSelect";
 import Checkbox from "@/Components/Checkbox";
 import { Loader2 } from "lucide-react";
+import { MediaModal } from "@/Components/MediaModal";
 
 interface Props {
     categories: CategoryLabelValues[];
@@ -187,7 +188,8 @@ const Create = ({ categories, tags }: Props) => {
                                                         <FormControl>
                                                             <TiptapEditor
                                                                 content={
-                                                                    field.value
+                                                                    field.value ??
+                                                                    ""
                                                                 }
                                                                 onChange={
                                                                     field.onChange
@@ -200,7 +202,53 @@ const Create = ({ categories, tags }: Props) => {
                                             />
                                         </TabsContent>
 
-                                        {/* English tab similar to Indonesian */}
+                                        <TabsContent
+                                            value="en"
+                                            className="space-y-4 pt-5"
+                                        >
+                                            <FormField
+                                                control={form.control}
+                                                name="en.title"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Title (English)
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                placeholder="Enter title in English"
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="en.content"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Content (English)
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <TiptapEditor
+                                                                content={
+                                                                    field.value ||
+                                                                    ""
+                                                                }
+                                                                onChange={
+                                                                    field.onChange
+                                                                }
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </TabsContent>
                                     </Tabs>
                                 </CardContent>
                             </Card>
@@ -393,6 +441,59 @@ const Create = ({ categories, tags }: Props) => {
                                             <FormLabel>
                                                 Featured Image
                                             </FormLabel>
+                                            <FormControl>
+                                                <div className="space-y-4">
+                                                    {field.value ? (
+                                                        <div className="relative group">
+                                                            <img
+                                                                src={`/storage/${field.value.path}`}
+                                                                alt="Featured"
+                                                                className="w-full h-32 object-cover rounded-lg"
+                                                            />
+                                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="secondary"
+                                                                    onClick={() =>
+                                                                        setIsMediaModalOpen(
+                                                                            true
+                                                                        )
+                                                                    }
+                                                                    type="button"
+                                                                >
+                                                                    Change
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    onClick={() =>
+                                                                        field.onChange(
+                                                                            null
+                                                                        )
+                                                                    }
+                                                                    type="button"
+                                                                >
+                                                                    Remove
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <Button
+                                                            variant="outline"
+                                                            onClick={() =>
+                                                                setIsMediaModalOpen(
+                                                                    true
+                                                                )
+                                                            }
+                                                            className="w-full h-32"
+                                                            type="button"
+                                                        >
+                                                            <PiImageDuotone className="size-8" />
+                                                            Choose Image
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </FormControl>
                                         </FormItem>
                                     )}
                                 />
@@ -421,6 +522,7 @@ const Create = ({ categories, tags }: Props) => {
                                                                     category.value
                                                                 }
                                                                 value={category.value.toString()}
+                                                                className="capitalize"
                                                             >
                                                                 {category.label}
                                                             </SelectItem>
@@ -582,6 +684,14 @@ const Create = ({ categories, tags }: Props) => {
                     </div>
                 </form>
             </Form>
+            <MediaModal
+                isOpen={isMediaModalOpen}
+                onClose={() => setIsMediaModalOpen(false)}
+                onSelect={(media) => {
+                    form.setValue("featured_image", media);
+                    setIsMediaModalOpen(false);
+                }}
+            />
         </Authenticated>
     );
 };

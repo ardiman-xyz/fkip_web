@@ -21,7 +21,12 @@ class EventController extends Controller
 
     public function index()
     {
-        return Inertia::render("Event/Index");
+
+        $events = $this->eventService->getAllWithTranslations();
+
+        return Inertia::render("Event/Index", [
+            "events" => $events
+        ]);
     }
 
 
