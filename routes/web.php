@@ -71,7 +71,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     Route::controller(MediaController::class)->prefix('media')->name('media.')->group(function() {
         Route::get('/', 'index')->name('index');
+        Route::get('view', 'indexView')->name('indexView');
         Route::post('/upload', 'store')->name('store');
+        Route::post('uploadBatch', 'storeBatch')->name('storeBatch');
         Route::delete('/{media}', 'destroy')->name('destroy');
     });
 });

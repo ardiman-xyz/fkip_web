@@ -51,7 +51,7 @@ const menuItems: MenuItem[] = [
     {
         label: "Media Library",
         icon: <PiImageDuotone className="size-5" />,
-        href: "/subscribers",
+        href: "/admin/media/view",
     },
     {
         label: "Authors",
