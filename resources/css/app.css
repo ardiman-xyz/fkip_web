@@ -113,3 +113,14 @@
     margin-top: 0.5em;
     margin-bottom: 0.5em;
 }
+
+.tiptap {
+    a {
+        @apply text-blue-600;
+        cursor: pointer;
+
+        &:hover {
+            @apply underline;
+        }
+    }
+}

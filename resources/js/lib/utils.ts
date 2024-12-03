@@ -31,3 +31,11 @@ export const formatDateToIndonesian = (dateString: string): string => {
 
     return `${day}/${month}/${year}`;
 };
+
+export const formatDateTimeLocal = (dateString: string | null): string => {
+    if (!dateString) return "";
+
+    const date = new Date(dateString);
+
+    return date.toISOString().slice(0, 16);
+};
