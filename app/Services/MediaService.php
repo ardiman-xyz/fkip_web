@@ -20,7 +20,7 @@ class MediaService
         try {
             $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
             
-            $randomSubdirectory = 'media/' . date('Y') . '/' . date('m') . '/' . Str::random(10);
+            $randomSubdirectory = 'media/' . date('Y') . '/' . date('m');
 
             $path = $file->storeAs($randomSubdirectory, $randomFileName, 'public');
 
@@ -118,6 +118,22 @@ class MediaService
             'uploaded' => $results,
             'failed' => $errors
         ];
+    }
+
+    public function update(Media $media, string $name)
+    {
+        try {
+           
+            $newName = $name;
+
+            $media->update([
+                'name' => $newName
+            ]);
+
+            return $media->fresh();
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 
     public function deleteById(Media $media): array

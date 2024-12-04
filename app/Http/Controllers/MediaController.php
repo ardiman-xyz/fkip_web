@@ -88,6 +88,21 @@ class MediaController extends Controller
         }
     }
 
+    public function update(Request $request, Media $media)
+    {
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255'
+            ]);
+
+            $updatedMedia = $this->mediaService->update($media, $request->name);
+            
+            return ResponseApi::success($updatedMedia, 'Media updated successfully');
+        } catch (\Exception $e) {
+            return ResponseApi::error('Failed to update media', 500, ['error' => $e->getMessage()]);
+        }
+    }
+
 
     public function destroy(Media $media)
     {

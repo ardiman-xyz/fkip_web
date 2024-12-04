@@ -14,15 +14,28 @@ import {
 import { PiImageDuotone } from "react-icons/pi";
 import { useState } from "react";
 import { DeleteConfirm } from "@/Components/ModalDeleteConfirmation";
+import { ViewMediaModal } from "./ViewMediaModal";
 
 interface MediaItemProps {
     item: Media;
+    onDelete?: (id: number) => void;
+    handleUpdate?: (updatedMedia: Media) => void;
 }
 
-export const MediaItem = ({ item }: MediaItemProps) => {
+export const MediaItem = ({ item, onDelete, handleUpdate }: MediaItemProps) => {
     const [isModalDeleteOpen, setIsModalDeleteOpen] = useState<boolean>(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
+
+    const handleDeleteSuccess = () => {
+        onDelete?.(item.id);
+        setIsModalDeleteOpen(false);
+    };
+
     return (
-        <div className="group relative bg-white  ">
+        <div
+            className="group relative bg-white  "
+            onDoubleClick={() => setIsViewModalOpen(true)}
+        >
             <div className="relative h-40 flex items-center justify-center bg-gray-100 group-hover:bg-gray-200 transition ease-in-out duration-100">
                 {item.mime_type?.includes("image") ? (
                     <img
@@ -60,7 +73,10 @@ export const MediaItem = ({ item }: MediaItemProps) => {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <DropdownMenuItem className="cursor-pointer">
+                            <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => setIsViewModalOpen(true)}
+                            >
                                 <Eye className="size-4 mr-1" />
                                 View
                             </DropdownMenuItem>
@@ -89,11 +105,18 @@ export const MediaItem = ({ item }: MediaItemProps) => {
             </div>
             {isModalDeleteOpen && (
                 <DeleteConfirm
-                    onClose={() => setIsModalDeleteOpen(false)}
+                    onClose={() => handleDeleteSuccess()}
                     id={item.id}
                     routeAction="admin.media.destroy"
                 />
             )}
+
+            <ViewMediaModal
+                media={item}
+                isOpen={isViewModalOpen}
+                onClose={() => setIsViewModalOpen(false)}
+                onUpdate={handleUpdate}
+            />
         </div>
     );
 };

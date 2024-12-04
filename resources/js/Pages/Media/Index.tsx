@@ -45,6 +45,18 @@ const MediaLibrary = ({ media: initialMedia }: Props) => {
         };
     }, []);
 
+    const handleDelete = (id: number) => {
+        setMedia((prev) => prev.filter((item) => item.id !== id));
+    };
+
+    const handleUpdate = (updatedMedia: Media) => {
+        setMedia((prev) =>
+            prev.map((item) =>
+                item.id === updatedMedia.id ? updatedMedia : item
+            )
+        );
+    };
+
     return (
         <AuthenticatedLayout
             header={
@@ -103,7 +115,11 @@ const MediaLibrary = ({ media: initialMedia }: Props) => {
                                 key={item.id}
                                 className="animate-in fade-in slide-in-from-bottom-4 duration-500"
                             >
-                                <MediaItem item={item} />
+                                <MediaItem
+                                    item={item}
+                                    onDelete={handleDelete}
+                                    handleUpdate={handleUpdate}
+                                />
                             </div>
                         ))}
                     </div>
