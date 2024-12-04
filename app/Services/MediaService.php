@@ -72,7 +72,7 @@ class MediaService
                 ));
 
                 $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $randomSubdirectory = 'media/' . date('Y') . '/' . date('m') . '/' . Str::random(10);
+                $randomSubdirectory = 'media/' . date('Y') . '/' . date('m');
                 $path = $file->storeAs($randomSubdirectory, $randomFileName, 'public');
 
                 $media = Media::create([
