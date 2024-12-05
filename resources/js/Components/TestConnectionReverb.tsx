@@ -12,12 +12,19 @@ const TestConnection = () => {
     useEffect(() => {
         const echoInstance = (window as any).Echo;
 
-        const channel = echoInstance.private(`App.User.${auth.user.id}`);
+        const channel = echoInstance.channel(`ods-notifications`);
 
         channel.subscribed(() => {
             console.log("Successfully subscribed to private channel");
             setStatus("Subscribed to private channel");
-            toast.success("Subscribed to private channel");
+        });
+
+        channel.listen(".ods.notification", (data: any) => {
+            // Tambahkan titik di depan
+            console.log("New notification:", data);
+            toast.info("New notification from ODS!", {
+                description: data.message,
+            });
         });
     }, []);
 

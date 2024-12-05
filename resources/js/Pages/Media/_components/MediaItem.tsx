@@ -36,7 +36,7 @@ export const MediaItem = ({ item, onDelete, handleUpdate }: MediaItemProps) => {
             className="group relative bg-white  "
             onDoubleClick={() => setIsViewModalOpen(true)}
         >
-            <div className="relative h-40 flex items-center justify-center bg-gray-100 group-hover:bg-gray-200 transition ease-in-out duration-100">
+            <div className="relative h-40 flex items-center justify-center bg-white group-hover:bg-gray-200 transition ease-in-out duration-100">
                 {item.mime_type?.includes("image") ? (
                     <img
                         src={item.url}
@@ -80,7 +80,10 @@ export const MediaItem = ({ item, onDelete, handleUpdate }: MediaItemProps) => {
                                 <Eye className="size-4 mr-1" />
                                 View
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
+                            <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => setIsViewModalOpen(true)}
+                            >
                                 <Pencil className="size-4 mr-1" />
                                 Rename
                             </DropdownMenuItem>

@@ -11,6 +11,42 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
+Route::get('/test-rabbitmq', function() {
+    try {
+        // Test koneksi
+        $connection = new AMQPStreamConnection(
+            'shared_rabbitmq',
+            5672,
+            'admin',
+            'admin123'
+        );
+        
+        $channel = $connection->channel();
+        
+        // Coba baca message
+        $channel->queue_declare('fkip.notifications', false, true, false, false);
+        
+        $msg = new AMQPMessage('Test message from FKIP');
+        $channel->basic_publish($msg, '', 'fkip.notifications');
+        
+        $channel->close();
+        $connection->close();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'RabbitMQ connection successful!'
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to connect: ' . $e->getMessage()
+        ], 500);
+    }
+});
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

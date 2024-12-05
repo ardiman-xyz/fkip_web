@@ -72,6 +72,26 @@ return [
             'after_commit' => false,
         ],
 
+       'rabbitmq' => [
+            'driver' => 'rabbitmq',
+            'queue' => env('RABBITMQ_QUEUE', 'default'),
+            'connection' => PhpAmqpLib\Connection\AMQPLazyConnection::class,
+            'hosts' => [
+                [
+                    'host' => env('RABBITMQ_HOST', 'shared_rabbitmq'),
+                    'port' => env('RABBITMQ_PORT', 5672),
+                    'user' => env('RABBITMQ_USER', 'admin'),
+                    'password' => env('RABBITMQ_PASSWORD', 'admin123'),
+                    'vhost' => env('RABBITMQ_VHOST', '/'),
+                ],
+            ],
+            'options' => [
+                'ssl_options' => [
+                    'verify_peer' => false,
+                ],
+            ],
+        ],
+
     ],
 
     /*

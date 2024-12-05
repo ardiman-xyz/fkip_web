@@ -13,6 +13,8 @@ services:
         networks:
             fkip_web:
                 ipv4_address: 172.28.0.10
+            rabbitmq_shared_network: # Tambahkan network RabbitMQ
+                ipv4_address: 172.27.0.4 # IP yang belum digunakan di network RabbitMQ
         ports:
             - "9091:9091"
             - "9000:9000"
@@ -84,7 +86,10 @@ networks:
         driver: bridge
         ipam:
             config:
-                - subnet: 172.28.0.0/16 # Definisikan subnet untuk IP static
+                - subnet: 172.28.0.0/16
+    rabbitmq_shared_network:
+        external: true
+        name: rabbitmq_shared_network # Pastikan nama network sesuai
 
 volumes:
     dbdata:
