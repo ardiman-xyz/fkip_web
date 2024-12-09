@@ -12,9 +12,8 @@ services:
             - ../../:/var/www/html
         networks:
             fkip_web:
-                ipv4_address: 172.28.0.10
-            rabbitmq_shared_network: # Tambahkan network RabbitMQ
-                ipv4_address: 172.27.0.4 # IP yang belum digunakan di network RabbitMQ
+            rabbitmq_shared_network:
+
         ports:
             - "9091:9091"
             - "9000:9000"
