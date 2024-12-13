@@ -29,7 +29,6 @@ export default function Authenticated({
                                 <PiGraduationCapFill className="size-8" />
                                 <h1 className="font-bold">Web fkip v1.0</h1>
                             </header>
-
                             <Navigation />
                         </div>
                         <div className="flex justify-start p-4 text-xs text-gray-400 dark:text-gray-600">

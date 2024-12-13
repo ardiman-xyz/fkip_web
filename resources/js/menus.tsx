@@ -56,12 +56,12 @@ const menuItems: MenuItem[] = [
     {
         label: "Authors",
         icon: <PiUserCircleDuotone className="size-5" />,
-        href: "/clients",
+        href: "/authors",
     },
     {
         label: "Analytics",
         icon: <PiChartLineDuotone className="size-5" />,
-        href: "/clients",
+        href: "/analytics",
     },
     {
         label: "separator",
@@ -71,12 +71,12 @@ const menuItems: MenuItem[] = [
     {
         label: "Settings",
         icon: <PiGearDuotone className="size-5" />,
-        href: "/reports",
+        href: "/settings",
     },
     {
         label: "Help Center",
         icon: <PiQuestionDuotone className="size-5" />,
-        href: "/traffic-analysis",
+        href: "/help",
     },
 ];
 

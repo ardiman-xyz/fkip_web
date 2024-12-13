@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreEventRequest extends FormRequest
@@ -36,8 +37,14 @@ class StoreEventRequest extends FormRequest
                 'required',
                 'date',
                 function ($attribute, $value, $fail) {
-                    $startDate = \Carbon\Carbon::parse(request('start_date'));
-                    $endDate = \Carbon\Carbon::parse($value);
+                    $startDate = Carbon::parse(request('start_date'));
+                    $endDate = Carbon::parse($value);
+                    $now = Carbon::now();
+                    
+                    if ($endDate->format('Y-m-d') < $now->format('Y-m-d')) {
+                        $fail('Tanggal selesai tidak boleh kurang dari hari ini.');
+                        return;
+                    }
                     
                     if ($endDate->format('Y-m-d') < $startDate->format('Y-m-d')) {
                         $fail('Tanggal selesai tidak boleh kurang dari tanggal mulai.');
@@ -49,7 +56,7 @@ class StoreEventRequest extends FormRequest
                         $endTime = $endDate->format('H:i');
                         
                         if ($endTime <= $startTime) {
-                            $fail('Waktu selesai tidak boleh lebih awal dari waktu mulai.');
+                            $fail('Waktu selesai tidak boleh lebih awal atau sama dengan waktu mulai.');
                         }
                     }
                 }

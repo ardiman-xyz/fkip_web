@@ -68,8 +68,8 @@ const Create = ({ categories, tags }: Props) => {
             is_featured: false,
             status: "draft",
             type: "offline",
-            start_date: new Date().toISOString().split("T")[0],
-            end_date: new Date().toISOString().split("T")[0],
+            start_date: new Date().toISOString().slice(0, 16),
+            end_date: new Date().toISOString().slice(0, 16),
             location: "",
             platform: "",
             meeting_url: "",
@@ -81,16 +81,27 @@ const Create = ({ categories, tags }: Props) => {
         },
     });
 
+    const getAdjustedDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+        return new Date(date.getTime() - userTimezoneOffset).toISOString();
+    };
+
     const onSubmit = async (values: EventFormValues) => {
+        const formattedStartDate = getAdjustedDate(values.start_date);
+        const formattedEndDate = getAdjustedDate(values.end_date);
+        console.info(formattedStartDate, formattedEndDate);
         try {
             setIsSubmitting(true);
+
+            // Format dates with timezone consideration
 
             const response = await axios.post(route("admin.events.store"), {
                 ...values,
                 featured_image: values.featured_image?.id,
                 price: values.is_free ? null : values.price,
-                start_date: new Date(values.start_date).toISOString(),
-                end_date: new Date(values.end_date).toISOString(),
+                start_date: getAdjustedDate(values.start_date),
+                end_date: getAdjustedDate(values.end_date),
             });
 
             if (response.data.status) {
