@@ -6,18 +6,29 @@ services:
             dockerfile: Dockerfile
         container_name: fkip_web_app
         restart: unless-stopped
-        working_dir: /app
+        working_dir: /var/www/html
         volumes:
-            - ../../:/app
+            - ../../:/var/www/html
+        ports:
+            - "9099:9091"
+            - "9001:9000"
         networks:
             fkip_web:
             rabbitmq_shared_network:
+
+    nginx:
+        image: nginx:alpine
+        container_name: fkip_web_nginx
+        restart: unless-stopped
         ports:
-            - "8007:8000" # FrankenPHP port
-            - "9091:9091" # Reverb WebSocket
+            - "8007:80"
+        volumes:
+            - ../../:/var/www/html
+            - ./nginx/conf.d:/etc/nginx/conf.d
+        networks:
+            - fkip_web
         depends_on:
-            db:
-                condition: service_healthy
+            - app
 
     db:
         image: mysql:8.0

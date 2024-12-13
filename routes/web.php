@@ -6,6 +6,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\WelcomeController;
 use App\Models\User;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+
+Route::get("/berita", [WelcomeController::class, "detailBerita"]);
 
 Route::get('/test-rabbitmq', function() {
     try {
@@ -49,13 +52,10 @@ Route::get('/test-rabbitmq', function() {
 });
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return Inertia::render('Welcome');
 });
+
+
 
 Route::get('/dashboard', function () {
     $users = User::where('id', '!=', Auth::id())->simplePaginate(10);
@@ -120,5 +120,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
+
 
 require __DIR__.'/auth.php';
