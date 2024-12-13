@@ -1,22 +1,24 @@
-FROM php:8.2-fpm
+FROM dunglas/frankenphp:latest-php8.2-alpine
 
-RUN apt-get update && apt-get install -y \
+WORKDIR /app
+
+RUN apk add --no-cache \
     git \
     curl \
     libpng-dev \
-    libonig-dev \
+    oniguruma-dev \
     libxml2-dev \
     libzip-dev \
     zip \
     unzip \
-    supervisor
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    supervisor \
+    autoconf \
+    gcc \
+    g++ \
+    make
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
-RUN docker-php-ext-install opcache && docker-php-ext-enable opcache
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip opcache
 RUN pecl install redis && docker-php-ext-enable redis
 
 # Setup supervisor
@@ -24,22 +26,23 @@ RUN mkdir -p /var/log/supervisor /var/run/supervisor
 COPY supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chmod -R 777 /var/log/supervisor /var/run/supervisor
 
-# Get latest Composer
+# Get Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /var/www/html
+# Create necessary directories with proper permissions
+RUN mkdir -p /app/storage/framework/{sessions,views,cache} \
+    /app/storage/logs \
+    /app/bootstrap/cache && \
+    chown -R www-data:www-data /app && \
+    chmod -R 775 /app && \
+    chmod -R 777 /app/storage && \
+    chmod -R 777 /app/bootstrap/cache
 
-# Copy application
-COPY ../../ /var/www/html
+RUN mkdir -p /var/log/supervisor /var/run/supervisor && \
+chmod -R 777 /var/log/supervisor /var/run/supervisor && \
+chown -R www-data:www-data /var/log/supervisor /var/run/supervisor
 
-# Create necessary directories and set permissions
-RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
-    /var/www/html/storage/logs \
-    /var/www/html/bootstrap/cache && \
-    chown -R www-data:www-data /var/www/html && \
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-EXPOSE 9000 9091
+EXPOSE 8000 9091
 
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
