@@ -4,9 +4,23 @@ services:
       context: .
       dockerfile: docker/prod/Dockerfile
     image: "ghcr.io/ardiman-xyz/fkip_web:latest"
+    container_name: fkip_web
+    restart: unless-stopped
+    networks:
+      - app-network
 
   nginx:
     build:
       context: .
       dockerfile: docker/prod/Dockerfile
     image: "ghcr.io/ardiman-xyz/fkip_web-nginx:latest"
+    container_name: fkip_nginx
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - app
+
+networks:
+  app-network:
+    driver: bridge
