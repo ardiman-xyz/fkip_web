@@ -44,7 +44,7 @@ export default function Authenticated({
                         </main>
 
                         <UploadProgress />
-                        {/* <TestConnection /> */}
+                        <TestConnection />
 
                         <Footer />
                     </div>
