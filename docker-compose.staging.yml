@@ -3,27 +3,10 @@ services:
     build:
       context: .
       dockerfile: docker/prod/Dockerfile
-      target: php
-      tags:
-        - "fkip_web:latest"
-    restart: unless-stopped
-    networks:
-      - app-network
+    image: "ghcr.io/ardiman-xyz/fkip_web:latest"
 
   nginx:
     build:
       context: .
       dockerfile: docker/prod/Dockerfile
-      target: nginx
-      tags:
-        - "fkip_nginx:latest"
-    ports:
-      - "80:80"
-    networks:
-      - app-network
-    depends_on:
-      - app
-
-networks:
-  app-network:
-    driver: bridge
+    image: "ghcr.io/ardiman-xyz/fkip_web-nginx:latest"
