@@ -26,10 +26,10 @@ jobs:
       - name: Build and push images
         run: |
           docker compose -f docker-compose.staging.yml build
-          docker tag fkip_web ghcr.io/ardiman-xyz/fkip_web:latest       
-          docker tag fkip_web-nginx ghcr.io/ardiman-xyz/fkip_web-nginx:latest
-          docker push ghcr.io/ardiman-xyz/fkip_web:latest
-          docker push ghcr.io/ardiman-xyz/fkip_web-nginx:latest
+          docker tag ghcr.io/ardiman-xyz/fkip_web:latest ghcr.io/ardiman-xyz/fkip_web:staging
+          docker tag ghcr.io/ardiman-xyz/fkip_web-nginx:latest ghcr.io/ardiman-xyz/fkip_web-nginx:staging
+          docker push ghcr.io/ardiman-xyz/fkip_web:staging
+          docker push ghcr.io/ardiman-xyz/fkip_web-nginx:staging
 
       # - name: Deploy to staging
       #   uses: appleboy/ssh-action@master
