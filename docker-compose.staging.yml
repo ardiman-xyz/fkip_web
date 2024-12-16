@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: docker/prod/Dockerfile
       target: php
-    image: "fkip_web:latest"
+    image: "ghcr.io/ardiman-xyz/fkip_web:latest"
     container_name: fkip_web
     restart: unless-stopped
     networks:
@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: docker/prod/Dockerfile
       target: nginx
-    image: "fkip_web_nginx:latest"
+    image: "ghcr.io/ardiman-xyz/fkip_web-nginx:latest"
     container_name: fkip_nginx
     restart: unless-stopped
     networks:
