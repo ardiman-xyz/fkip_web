@@ -64,12 +64,17 @@ COPY --from=composer-build /var/www/html/vendor/ ./vendor/
 COPY --from=npm-build /var/www/html/public/build /var/www/html/public/build
 
 # Create directories and set permissions
-RUN mkdir -p storage/framework/{sessions,views,cache} \
-        storage/logs \
-        bootstrap/cache \
-    && chown -R www-data:www-data . \
-    && chmod -R 775 storage bootstrap/cache \
-    && composer dump-autoload -o
+RUN mkdir -p storage/framework && \
+   mkdir -p storage/framework/sessions && \
+   mkdir -p storage/framework/views && \
+   mkdir -p storage/framework/cache && \
+   mkdir -p storage/logs && \
+   mkdir -p storage/app && \
+   mkdir -p storage/app/public && \
+   mkdir -p bootstrap/cache && \
+   chown -R www-data:www-data . && \
+   chmod -R 775 storage bootstrap/cache && \
+   composer dump-autoload -o
 
 # Tidak menggunakan USER www-data
 EXPOSE 9000 8080
