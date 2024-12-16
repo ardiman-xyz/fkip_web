@@ -11,7 +11,7 @@ services:
             - ../../:/var/www/html
         ports:
             - "9099:9091"
-            - "9001:9000"
+            - "9010:9000"
         networks:
             fkip_web:
             rabbitmq_shared_network:

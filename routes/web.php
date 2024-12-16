@@ -6,6 +6,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TagController;
+use App\Http\Controllers\UploadMinio;
 use App\Http\Controllers\WelcomeController;
 use App\Models\User;
 use Illuminate\Foundation\Application;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+
 
 Route::get("/berita", [WelcomeController::class, "detailBerita"]);
 

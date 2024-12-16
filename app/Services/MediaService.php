@@ -73,13 +73,20 @@ class MediaService
 
                 $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
                 $randomSubdirectory = 'media/' . date('Y') . '/' . date('m');
-                $path = $file->storeAs($randomSubdirectory, $randomFileName, 'public');
+                
+                $path = Storage::disk('minio')->putFileAs(
+                    $randomSubdirectory, 
+                    $file, 
+                    $randomFileName
+                );
+
+                $url = config('filesystems.disks.minio.url') . '/' . config('filesystems.disks.minio.bucket') . '/' . $path;
 
                 $media = Media::create([
                     'name' => $file->getClientOriginalName(),
                     'file_name' => $randomFileName,
                     'mime_type' => $file->getMimeType(),
-                    'path' => $path,
+                    'path' => $url,
                     'size' => $file->getSize()
                 ]);
 

@@ -34,7 +34,8 @@ WORKDIR /var/www/html
 COPY ../.. /var/www/html
 
 # Create necessary directories and set permissions
-RUN mkdir -p /var/www/html/storage/framework/{sessions,views,cache} \
+RUN mkdir -p /var/www/html/storage/app/public \
+    /var/www/html/storage/framework/{sessions,views,cache} \
     /var/www/html/storage/logs \
     /var/www/html/bootstrap/cache && \
     chown -R www-data:www-data /var/www/html && \

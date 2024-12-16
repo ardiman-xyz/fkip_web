@@ -93,7 +93,7 @@ export const ViewMediaModal = ({
                         <div className="h-full bg-gray-100 rounded-lg flex items-center justify-center p-4">
                             {media.mime_type?.includes("image") ? (
                                 <img
-                                    src={media.url}
+                                    src={media.path}
                                     alt={media.name}
                                     className="max-w-full max-h-full object-contain"
                                 />
@@ -195,7 +195,7 @@ export const ViewMediaModal = ({
                                 </label>
                                 <div className="flex gap-2 items-center">
                                     <Input
-                                        value={media.url}
+                                        value={media.path}
                                         readOnly
                                         className="text-sm"
                                     />

@@ -39,7 +39,7 @@ export const MediaItem = ({ item, onDelete, handleUpdate }: MediaItemProps) => {
             <div className="relative h-40 flex items-center justify-center bg-white group-hover:bg-gray-200 transition ease-in-out duration-100">
                 {item.mime_type?.includes("image") ? (
                     <img
-                        src={item.url}
+                        src={item.path}
                         alt={item.name}
                         className="max-w-full max-h-full object-contain"
                     />
