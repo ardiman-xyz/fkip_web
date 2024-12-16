@@ -64,7 +64,7 @@ const EventItem = ({ data }: Props) => {
                 {data.media ? (
                     <div className="w-48 h-48 flex-shrink-0 overflow-hidden">
                         <img
-                            src={data?.media?.url}
+                            src={data?.media?.path}
                             alt="Event cover"
                             className="w-full h-full object-cover"
                         />

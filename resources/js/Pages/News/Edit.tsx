@@ -348,7 +348,11 @@ const Edit = ({ categories, tags, news }: Props) => {
                                                             {field.value ? (
                                                                 <div className="relative group">
                                                                     <img
-                                                                        src={`/storage/${field.value.path}`}
+                                                                        src={
+                                                                            field
+                                                                                .value
+                                                                                .path
+                                                                        }
                                                                         alt="Featured"
                                                                         className="w-full h-32 object-cover rounded-lg"
                                                                     />

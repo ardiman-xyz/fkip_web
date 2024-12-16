@@ -139,7 +139,7 @@ export const MediaModal = ({
                                             "image/"
                                         ) ? (
                                             <img
-                                                src={`/storage/${media.path}`}
+                                                src={media.path}
                                                 alt={media.name}
                                                 className="object-cover"
                                             />

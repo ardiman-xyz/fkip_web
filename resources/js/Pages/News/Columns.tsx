@@ -23,7 +23,7 @@ export const columns: ColumnDef<News>[] = [
             return (
                 <div className="relative w-[150px] h-[100px] flex items-center justify-center">
                     <img
-                        src={row.original.media.url}
+                        src={row.original.media.path}
                         alt={row.original.translations.id?.title ?? "Foto"}
                         className="object-cover w-full h-full rounded-md"
                     />
