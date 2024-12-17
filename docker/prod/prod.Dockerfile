@@ -33,7 +33,6 @@ RUN npm ci && npm run build && \
     npm cache clean --force
 
 
-
 FROM php:8.2-fpm-alpine AS php
 
 WORKDIR /var/www/html

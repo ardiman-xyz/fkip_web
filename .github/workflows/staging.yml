@@ -23,14 +23,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Build and push images
+      - name: Build and Push App Image
         run: |
-          docker compose -f docker-compose.staging.yml build
-          docker tag ghcr.io/ardiman-xyz/fkip_web:latest ghcr.io/ardiman-xyz/fkip_web:staging
-          docker tag ghcr.io/ardiman-xyz/fkip_web-nginx:latest ghcr.io/ardiman-xyz/fkip_web-nginx:staging
-          docker push ghcr.io/ardiman-xyz/fkip_web:staging
-          docker push ghcr.io/ardiman-xyz/fkip_web-nginx:staging
+          docker build -f docker/prod/prod.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_app:latest .
+          docker tag ghcr.io/ardiman-xyz/fkip_web_app:latest ghcr.io/ardiman-xyz/fkip_web_app:staging
+          docker push ghcr.io/ardiman-xyz/fkip_web_app:staging
 
+      # Build Nginx Image
+      - name: Build and Push Nginx Image
+        run: |
+          docker build -f docker/prod/nginx.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
+          docker tag ghcr.io/ardiman-xyz/fkip_web_nginx:latest ghcr.io/ardiman-xyz/fkip_web_nginx:staging
+          docker push ghcr.io/ardiman-xyz/fkip_web_nginx:staging
       # - name: Deploy to staging
       #   uses: appleboy/ssh-action@master
       #   with:

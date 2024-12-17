@@ -19,7 +19,7 @@ services:
             minio_minionetwork:
 
     nginx:
-        image: nginx:alpine
+        image: testdocker4web-nginx:latest
         container_name: fkip_web_nginx
         restart: unless-stopped
         ports:
