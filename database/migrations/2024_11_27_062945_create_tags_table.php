@@ -25,11 +25,12 @@ return new class extends Migration
             $table->foreignId('language_id')    
                   ->references('id')           
                   ->on('languages')            
-                  ->onDelete('cascade');        
+                  ->onDelete('cascade');
+            $table->string('name');
             $table->timestamps();
         });
     }
-
+    
     /**
      * Reverse the migrations.
      */

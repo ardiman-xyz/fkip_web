@@ -25,9 +25,10 @@ COPY vite.config.js ./
 COPY resources/ ./resources/
 
 ENV VITE_REVERB_APP_KEY=xryckfivmpyxvl3qfzit \
-    VITE_REVERB_HOST=localhost \
-    VITE_REVERB_PORT=8080 \
-    VITE_REVERB_SCHEME=http
+    REVERB_APP_SECRET=jhfdpgblex6up6cemwp8 \
+    VITE_REVERB_HOST=web-stag.fkip.umkendari.ac.id \
+    VITE_REVERB_PORT=443 \
+    VITE_REVERB_SCHEME=https
 
 RUN npm ci && npm run build && \
     npm cache clean --force
