@@ -31,8 +31,9 @@ COPY docker/prod/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY docker/prod/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 
 # Copy static assets from node build
-COPY --from=npm-build /var/www/html/public/build /usr/share/nginx/html/build
-COPY public /usr/share/nginx/html
+COPY public /var/www/html/public
+COPY --from=npm-build /var/www/html/public/build /var/www/html/public/build
+
 
 # Create storage for logs
 RUN mkdir -p /var/log/nginx && \
