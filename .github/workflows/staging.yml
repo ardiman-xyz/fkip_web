@@ -38,5 +38,5 @@ jobs:
       # Build Nginx dengan assets yang sudah diekstrak
       - name: Build Nginx Image
         run: |
-          docker build --build-arg BUILD_ASSETS=./build_assets -f docker/prod/nginx.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
+          docker build --build-arg BUILD_ASSETS=./build_assets -f docker/prod/nginx/nginx.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
           docker push ghcr.io/ardiman-xyz/fkip_web_nginx:latest
