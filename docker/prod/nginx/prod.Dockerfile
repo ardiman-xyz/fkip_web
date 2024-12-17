@@ -1,24 +1,20 @@
 FROM nginx:alpine
 
-# Terima build assets sebagai argument
-ARG BUILD_ASSETS
+ARG PUBLIC_FILES
 
-# Buat struktur direktori yang diperlukan
-RUN mkdir -p /var/www/html/public/build
+# Create necessary directories
+RUN mkdir -p /var/www/html/public
 
 # Copy nginx configs
 COPY docker/prod/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY docker/prod/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf
 
-# Copy assets yang sudah di-build
-COPY ${BUILD_ASSETS} /var/www/html/public/build
+# Copy semua isi public folder dari app container
+COPY ${PUBLIC_FILES} /var/www/html/public/
 
 # Set permissions
-RUN chown -R nginx:nginx /var/www/html
-
-# Create logs directory
-RUN mkdir -p /var/log/nginx && \
-    chown -R nginx:nginx /var/log/nginx
+RUN chown -R nginx:nginx /var/www && \
+    chmod -R 755 /var/www
 
 EXPOSE 80
 

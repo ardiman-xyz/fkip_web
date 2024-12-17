@@ -28,15 +28,16 @@ jobs:
           docker build -f docker/prod/prod.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_app:latest .
           docker push ghcr.io/ardiman-xyz/fkip_web_app:latest
 
-      # Extract assets dari app image
-      - name: Extract Assets
+      - name: Extract Assets and Public Files
         run: |
           docker create --name temp_app ghcr.io/ardiman-xyz/fkip_web_app:latest
-          docker cp temp_app:/var/www/html/public/build ./build_assets
+          docker cp temp_app:/var/www/html/public ./public_files
           docker rm temp_app
 
-      # Build Nginx dengan assets yang sudah diekstrak
       - name: Build Nginx Image
         run: |
-          docker build --build-arg BUILD_ASSETS=./build_assets -f docker/prod/nginx/prod.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
+          docker build \
+            --build-arg PUBLIC_FILES=./public_files \
+            -f docker/prod/nginx/prod.Dockerfile \
+            -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
           docker push ghcr.io/ardiman-xyz/fkip_web_nginx:latest
