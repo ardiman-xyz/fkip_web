@@ -61,7 +61,7 @@ export const ViewMediaModal = ({
     };
 
     const handleCopyUrl = () => {
-        navigator.clipboard.writeText(media.url);
+        navigator.clipboard.writeText(media.path);
         toast.success("URL copied to clipboard");
 
         if (copyButtonRef.current) {

@@ -14,6 +14,10 @@ FROM node:22-alpine as npm-build
 
 WORKDIR /var/www/html
 
+ARG NODE_ENV=production
+ARG APP_ENV=production
+
+
 COPY package*.json ./
 COPY postcss.config.js ./
 COPY tailwind.config.js ./

@@ -28,6 +28,7 @@ class NewsController extends Controller
     {
         $news = $this->newsService->getAllWithTranslations();
 
+
         return Inertia::render("News/Index", [
             'news' => $news
         ]);
