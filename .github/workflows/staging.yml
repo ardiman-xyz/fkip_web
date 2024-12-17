@@ -23,28 +23,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      # Build Application Image
-      - name: Build and Push Application Image
+      - name: Build Application Image
         run: |
-          docker build --no-cache -f docker/prod/prod.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_app:latest .
-          docker tag ghcr.io/ardiman-xyz/fkip_web_app:latest ghcr.io/ardiman-xyz/fkip_web_app:latest
+          docker build -f docker/prod/prod.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_app:latest .
           docker push ghcr.io/ardiman-xyz/fkip_web_app:latest
 
-      # Build Nginx Image
-      - name: Build and Push Nginx Image
+      # Extract assets dari app image
+      - name: Extract Assets
         run: |
-          docker build -f docker/prod/nginx/prod.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
-          docker tag ghcr.io/ardiman-xyz/fkip_web_nginx:latest ghcr.io/ardiman-xyz/fkip_web_nginx:latest
-          docker push ghcr.io/ardiman-xyz/fkip_web_nginx:latest
+          docker create --name temp_app ghcr.io/ardiman-xyz/fkip_web_app:latest
+          docker cp temp_app:/var/www/html/public/build ./build_assets
+          docker rm temp_app
 
-      # - name: Deploy to staging
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.STAGING_HOST }}
-      #     username: ${{ secrets.STAGING_USER }}
-      #     key: ${{ secrets.STAGING_SSH_KEY }}
-      #     script: |
-      #       cd /var/www/html/docker/ods-fkip
-      #       docker compose pull
-      #       docker compose down
-      #       docker compose up -d
+      # Build Nginx dengan assets yang sudah diekstrak
+      - name: Build Nginx Image
+        run: |
+          docker build --build-arg BUILD_ASSETS=./build_assets -f docker/prod/nginx.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
+          docker push ghcr.io/ardiman-xyz/fkip_web_nginx:latest
