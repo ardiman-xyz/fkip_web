@@ -33,8 +33,8 @@ jobs:
       - name: Build and Push Nginx Image
         run: |
           docker build -f docker/prod/nginx/prod.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
-          docker tag ghcr.io/ardiman-xyz/fkip_web_nginx:latest ghcr.io/ardiman-xyz/fkip_web_nginx:staging
-          docker push ghcr.io/ardiman-xyz/fkip_web_nginx:staging
+          docker tag ghcr.io/ardiman-xyz/fkip_web_nginx:latest ghcr.io/ardiman-xyz/fkip_web_nginx:latest
+          docker push ghcr.io/ardiman-xyz/fkip_web_nginx:latest
       # - name: Deploy to staging
       #   uses: appleboy/ssh-action@master
       #   with:
