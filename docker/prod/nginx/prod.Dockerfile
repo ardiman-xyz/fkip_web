@@ -11,9 +11,9 @@ COPY vite.config.js ./
 COPY resources/ ./resources/
 
 ENV VITE_REVERB_APP_KEY=xryckfivmpyxvl3qfzit \
-    VITE_REVERB_HOST=localhost \
-    VITE_REVERB_PORT=8080 \
-    VITE_REVERB_SCHEME=http
+    VITE_REVERB_HOST=web-stag.fkip.umkendari.ac.id \
+    VITE_REVERB_PORT=443 \
+    VITE_REVERB_SCHEME=https
 
 RUN npm ci && npm run build && \
     npm cache clean --force
@@ -21,6 +21,8 @@ RUN npm ci && npm run build && \
 
 # nginx production
 FROM nginx:alpine
+
+RUN mkdir -p /var/www/html
 
 # Remove default nginx static assets
 RUN rm -rf /usr/share/nginx/html/*
