@@ -4,9 +4,7 @@ import { Link, usePage } from "@inertiajs/react";
 import { PropsWithChildren } from "react";
 
 export default function Guest({ children }: PropsWithChildren) {
-    const props = usePage<PageProps>();
-
-    console.info(props);
+    const { app_version } = usePage<PageProps>().props; // Use your custom type
 
     return (
         <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
@@ -20,7 +18,7 @@ export default function Guest({ children }: PropsWithChildren) {
                 {children}
             </div>
             <p className="text-center mt-6 text-gray-400 font-semibold text-sm">
-                {import.meta.env.VITE_LARAVEL_APP_VERSION}
+                {app_version}
             </p>
         </div>
     );
