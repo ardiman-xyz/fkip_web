@@ -1,15 +1,14 @@
 version: "3.8"
 services:
     app:
-        image: testdocker4web-php:latest
-        # build:
-        #     context: .
-        #     dockerfile: Dockerfile
+        build:
+            context: .
+            dockerfile: Dockerfile
         container_name: fkip_web_app
-        # restart: unless-stopped
-        # working_dir: /var/www/html
+        restart: unless-stopped
+        working_dir: /var/www/html
         volumes:
-            - ../../.env:/var/www/html/.env
+            - ../../:/var/www/html/
         ports:
             - "8080:8080"
             - "9010:9000"
@@ -19,7 +18,7 @@ services:
             minio_minionetwork:
 
     nginx:
-        image: testdocker4web-nginx:latest
+        image: nginx:alpine
         container_name: fkip_web_nginx
         restart: unless-stopped
         ports:

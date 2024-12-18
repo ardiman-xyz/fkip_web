@@ -23,14 +23,22 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}"
+
       - name: Build Application Image
         run: |
-          docker build -f docker/prod/prod.Dockerfile -t ghcr.io/ardiman-xyz/fkip_web_app:latest .
+          docker build -f docker/prod/prod.Dockerfile \
+            -t ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }} \
+            -t ghcr.io/ardiman-xyz/fkip_web_app:latest .
+
+          docker push ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }}
           docker push ghcr.io/ardiman-xyz/fkip_web_app:latest
 
       - name: Extract Assets and Public Files
         run: |
-          docker create --name temp_app ghcr.io/ardiman-xyz/fkip_web_app:latest
+          docker create --name temp_app ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }}
           docker cp temp_app:/var/www/html/public ./public_files
           docker rm temp_app
 
@@ -39,5 +47,30 @@ jobs:
           docker build \
             --build-arg PUBLIC_FILES=./public_files \
             -f docker/prod/nginx/prod.Dockerfile \
+            -t ghcr.io/ardiman-xyz/fkip_web_nginx:${{ env.VERSION }} \
             -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
+
+          docker push ghcr.io/ardiman-xyz/fkip_web_nginx:${{ env.VERSION }}
           docker push ghcr.io/ardiman-xyz/fkip_web_nginx:latest
+
+      - name: Deploy to staging
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /var/www/html/docker/web-fkip
+
+             if grep -q "APP_VERSION=" .env; then
+              sed -i "s/APP_VERSION=.*/APP_VERSION=${{ env.VERSION }}/" .env
+            else
+              echo "APP_VERSION=${{ env.VERSION }}" >> .env
+            fi
+
+            docker compose pull
+
+            docker image prune -f
+
+            docker compose down
+            docker compose up -d
