@@ -10,7 +10,7 @@ services:
         volumes:
             - ../../:/var/www/html/
         ports:
-            - "8080:8080"
+            - "9091:9091"
             - "9010:9000"
         networks:
             fkip_web:
