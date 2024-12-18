@@ -28,23 +28,23 @@ Route::get('/test-rabbitmq', function() {
             'admin',
             'admin123'
         );
-        
+
         $channel = $connection->channel();
-        
+
         // Coba baca message
         $channel->queue_declare('fkip.notifications', false, true, false, false);
-        
+
         $msg = new AMQPMessage('Test message from FKIP');
         $channel->basic_publish($msg, '', 'fkip.notifications');
-        
+
         $channel->close();
         $connection->close();
-        
+
         return response()->json([
             'success' => true,
             'message' => 'RabbitMQ connection successful!'
         ]);
-        
+
     } catch (\Exception $e) {
         return response()->json([
             'success' => false,
@@ -53,9 +53,8 @@ Route::get('/test-rabbitmq', function() {
     }
 });
 
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-});
+Route::get('/', [WelcomeController::class, "index"])->name("welcome");
+Route::get('berita/{slug}', [WelcomeController::class, "newsDetail"])->name("news.detail");
 
 
 
@@ -66,7 +65,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    
+
     // Tags Management
     Route::controller(TagController::class)->prefix('tags')->name('tags.')->group(function() {
         Route::get('/', 'index')->name('index');

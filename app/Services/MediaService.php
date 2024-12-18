@@ -19,7 +19,7 @@ class MediaService
     {
         try {
             $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
-            
+
             $randomSubdirectory = 'media/' . date('Y') . '/' . date('m');
 
             $path = $file->storeAs($randomSubdirectory, $randomFileName, 'public');
@@ -73,12 +73,13 @@ class MediaService
 
                 $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
                 $randomSubdirectory = 'media/' . date('Y') . '/' . date('m');
-                
+
                 $path = Storage::disk('minio')->putFileAs(
-                    $randomSubdirectory, 
-                    $file, 
+                    $randomSubdirectory,
+                    $file,
                     $randomFileName
                 );
+
 
                 $url = config('filesystems.disks.minio.url') . '/' . config('filesystems.disks.minio.bucket') . '/' . $path;
 
@@ -92,7 +93,6 @@ class MediaService
 
                 $results[] = $media;
 
-                // Broadcast success
                 broadcast(new MediaUploadProgress(
                     uploadId: $uploadId,
                     fileName: $file->getClientOriginalName(),
@@ -130,7 +130,7 @@ class MediaService
     public function update(Media $media, string $name)
     {
         try {
-           
+
             $newName = $name;
 
             $media->update([
@@ -146,16 +146,14 @@ class MediaService
     public function deleteById(Media $media): array
     {
         try {
-            // Check media usage in all related models
             $usageCheck = $this->checkMediaUsage($media);
-            
+
             if ($usageCheck['isUsed']) {
                 throw new \Exception("Media sedang digunakan di: " . $usageCheck['usedIn']);
             }
 
-            // Delete file from storage
             Storage::delete($media->path);
-            
+
             $media->delete();
 
             return [
@@ -176,8 +174,7 @@ class MediaService
     private function checkMediaUsage(Media $media): array
     {
         $usedIn = [];
-        
-        // Check in events
+
         $usedInEvents = Event::where('media_id', $media->id)->first();
         if ($usedInEvents) {
             $usedIn[] = "Event (" . $usedInEvents->translations()
@@ -186,8 +183,7 @@ class MediaService
                 })
                 ->first()?->title . ")";
         }
-    
-        // Check in Event translations (content might contain media references)
+
         $eventTranslations = EventTranslation::whereRaw('content LIKE ?', ['%' . $media->id . '%'])->first();
         if ($eventTranslations) {
             $usedIn[] = "Konten Event (" . $eventTranslations->event->translations()
@@ -196,7 +192,7 @@ class MediaService
                 })
                 ->first()?->title . ")";
         }
-        
+
         // Check in news
         $usedInNews = News::where('media_id', $media->id)->first();
         if ($usedInNews) {
@@ -206,8 +202,7 @@ class MediaService
                 })
                 ->first()?->title . ")";
         }
-    
-        // Check in News translations (content might contain media references)
+
         $newsTranslations = NewsTranslation::whereRaw('content LIKE ?', ['%' . $media->id . '%'])->first();
         if ($newsTranslations) {
             $usedIn[] = "Konten News (" . $newsTranslations->news->translations()
@@ -216,7 +211,7 @@ class MediaService
                 })
                 ->first()?->title . ")";
         }
-    
+
         return [
             'isUsed' => count($usedIn) > 0,
             'usedIn' => implode(", ", $usedIn)

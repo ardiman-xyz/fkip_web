@@ -1,91 +1,91 @@
-import Guest2 from "@/Layouts/GuestLayout2";
+// resources/js/Pages/Web/News/Detail.tsx
 import { Link } from "@inertiajs/react";
-import { ArrowLeft, Calendar, User } from "lucide-react";
-import React from "react";
+import { ChevronLeft } from "lucide-react";
+import { News } from "@/Pages/News/_types";
+import {formatDate} from "@/lib/utils";
+import Guest2 from "@/Layouts/GuestLayout2";
 
-const Detail = () => {
-    const news = {
-        title: "Mahasiswa FKIP Raih Prestasi Gemilang dalam Kompetisi Nasional Pendidikan",
-        date: "12 Desember 2024",
-        author: "Dr. Ahmad Syafiq",
-        image: "/placeholder.svg?height=600&width=1200&text=Foto+Berita",
-        content: `
-          <p class="text-lg leading-relaxed mb-6">
-            Fakultas Keguruan dan Ilmu Pendidikan (FKIP) kembali mengukir prestasi membanggakan melalui tim mahasiswa yang berhasil meraih juara dalam Kompetisi Nasional Pendidikan 2024. Kompetisi yang diselenggarakan oleh Kementerian Pendidikan ini diikuti oleh berbagai universitas terkemuka di Indonesia.
-          </p>
-    
-          <h2 class="text-2xl font-bold mb-4">Inovasi dalam Pendidikan</h2>
-          
-          <p class="text-lg leading-relaxed mb-6">
-            Tim yang terdiri dari mahasiswa Program Studi Pendidikan Matematika dan Pendidikan Bahasa Indonesia ini menghadirkan inovasi pembelajaran yang menggabungkan teknologi augmented reality dengan metode pembelajaran konvensional.
-          </p>
-    
-          <div class="bg-green-50 border-l-4 border-green-600 p-4 my-6">
-            <p class="text-lg italic">
-              "Prestasi ini merupakan bukti nyata bahwa mahasiswa FKIP memiliki kapasitas untuk berinovasi dalam bidang pendidikan," ujar Dekan FKIP dalam sambutannya.
-            </p>
-          </div>
-    
-          <h2 class="text-2xl font-bold mb-4">Dampak dan Keberlanjutan</h2>
-          
-          <p class="text-lg leading-relaxed mb-6">
-            Inovasi yang dikembangkan oleh tim mahasiswa FKIP ini telah mendapatkan perhatian dari berbagai pihak, termasuk beberapa sekolah yang tertarik untuk mengimplementasikan metode pembelajaran ini.
-          </p>
-        `,
-    };
+interface Props {
+    news: News;
+}
+
+const Detail = ({ news }: Props)=> {
+
+    const translation = news.translations.id || news.translations.en;
+
+    console.info(news)
+
+    if (!translation) return null;
 
     return (
         <Guest2>
-            <div className="min-h-screen bg-white">
-                <article className="container mx-auto px-4 py-8 max-w-4xl">
-                    <h1 className="text-4xl md:text-3xl font-bold mb-6 leading-tight">
-                        {news.title}
-                    </h1>
-
-                    <div className="flex items-center gap-6 text-gray-600 mb-8">
-                        <div className="flex items-center">
-                            <Calendar className="w-5 h-5 mr-2" />
-                            <time dateTime={news.date}>{news.date}</time>
-                        </div>
-                        <div className="flex items-center">
-                            <User className="w-5 h-5 mr-2" />
-                            <span>{news.author}</span>
-                        </div>
+            <div className="min-h-screen bg-gray-50 py-12">
+                <div className="container max-w-5xl mx-auto px-4">
+                    {/* Breadcrumb */}
+                    <div className="mb-8">
+                        <Link
+                            href="/berita"
+                            className="text-green-600 hover:underline flex items-center"
+                        >
+                            <ChevronLeft className="w-4 h-4 mr-1"/>
+                            Kembali ke Berita
+                        </Link>
                     </div>
 
-                    <div className="relative w-full h-[400px] mb-8 rounded-lg overflow-hidden">
-                        <img
-                            src={news.image}
-                            alt={news.title}
-                            className="object-cover"
+                    {/* Main Content */}
+                    <div className="bg-white rounded-lg shadow-md p-8">
+                        {/* Header */}
+                        <div className="mb-8">
+                            <div className="flex items-center gap-4 mb-4">
+                                {news.category?.translations.id && (
+                                    <Link
+                                        href={`/kategori/${news.category.translations.id.name}`}
+                                        className="text-green-600 hover:underline"
+                                    >
+                                        {news.category.translations.id.name}
+                                    </Link>
+                                )}
+                                <span className="text-gray-400">•</span>
+                                <time className="text-gray-500">
+                                    {formatDate(news.publish_date ?? "")}
+                                </time>
+                            </div>
+                            <h1 className="text-3xl font-bold mb-4">{translation.title}</h1>
+                            {/* Tags */}
+                            <div className="flex flex-wrap gap-2">
+                                {news.tags.map(tag => (
+                                    <Link
+                                        key={tag.value}
+                                        href={`/tag/${tag.value}`}
+                                        className="text-sm text-gray-500 hover:text-green-600 hover:underline"
+                                    >
+                                        #{tag.label}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Featured Image */}
+                        {news.media?.path && (
+                            <div className="mb-8">
+                                <img
+                                    src={news.media.path}
+                                    className="w-full h-[400px] object-cover rounded-lg"
+                                />
+                            </div>
+                        )}
+
+                        {/* Content */}
+                        <div
+                            className="prose prose-lg max-w-none"
+                            dangerouslySetInnerHTML={{__html: translation.content ?? ""}}
                         />
                     </div>
-
-                    <div
-                        className="prose prose-lg max-w-none"
-                        dangerouslySetInnerHTML={{ __html: news.content }}
-                    />
-
-                    <div className="mt-12 pt-8 border-t border-gray-200">
-                        <h3 className="text-xl font-semibold mb-4">
-                            Bagikan Artikel
-                        </h3>
-                        <div className="flex gap-4">
-                            <button className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700">
-                                Facebook
-                            </button>
-                            <button className="px-6 py-2 bg-sky-500 text-white rounded-full hover:bg-sky-600">
-                                Twitter
-                            </button>
-                            <button className="px-6 py-2 bg-green-600 text-white rounded-full hover:bg-green-700">
-                                WhatsApp
-                            </button>
-                        </div>
-                    </div>
-                </article>
+                </div>
             </div>
         </Guest2>
     );
-};
+}
+
 
 export default Detail;

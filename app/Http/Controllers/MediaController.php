@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ResponseApi;
 use App\Models\Media;
 use App\Services\MediaService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
-class MediaController extends Controller 
+class MediaController extends Controller
 {
-    protected $mediaService;
+    protected MediaService $mediaService;
 
     public function __construct(MediaService $mediaService)
     {
@@ -32,7 +33,7 @@ class MediaController extends Controller
         try {
             $media = $this->mediaService->getAll();
             return ResponseApi::success($media, 'Media retrieved successfully');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return ResponseApi::error('Failed to retrieve media', 500, ['error' => $e->getMessage()]);
         }
     }
@@ -45,7 +46,7 @@ class MediaController extends Controller
 
         try {
             $media = $this->mediaService->upload($request->file('file'));
-            
+
             return ResponseApi::success($media, 'File uploaded successfully');
         } catch (\Exception $e) {
             return ResponseApi::error('Upload failed', 500, ['error' => $e->getMessage()]);
@@ -59,19 +60,19 @@ class MediaController extends Controller
         try {
             $request->validate([
                 'files' => 'required|array',
-                'files.*' => 'required|file|max:2048|mimes:jpeg,png,jpg,gif'
+                'files.*' => 'required|file|max:2048|mimes:jpeg,png,jpg,gif,webp'
             ]);
 
             $result = $this->mediaService->create($request->file('files'), $userId);
-            
+
             if (count($result['uploaded']) > 0 && count($result['failed']) > 0) {
                 return response()->json([
                     'status' => 'partial_success',
                     'message' => 'Some files were uploaded successfully',
                     'data' => $result
-                ], 207); 
+                ], 207);
             }
-            
+
             if (count($result['uploaded']) === 0) {
                 return response()->json([
                     'status' => 'error',
@@ -79,8 +80,8 @@ class MediaController extends Controller
                     'errors' => $result['failed']
                 ], 500);
             }
-            
-           
+
+
             return ResponseApi::success($result['uploaded'], 'File uploaded successfully');
 
         } catch (\Exception $e) {
@@ -96,7 +97,7 @@ class MediaController extends Controller
             ]);
 
             $updatedMedia = $this->mediaService->update($media, $request->name);
-            
+
             return ResponseApi::success($updatedMedia, 'Media updated successfully');
         } catch (\Exception $e) {
             return ResponseApi::error('Failed to update media', 500, ['error' => $e->getMessage()]);

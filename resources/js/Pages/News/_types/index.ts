@@ -64,6 +64,7 @@ export type News = {
         label: string;
     }[];
     status: string;
+    path: string;
     is_featured: boolean;
     publish_date: string | null;
     created_at: string;

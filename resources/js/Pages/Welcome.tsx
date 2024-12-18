@@ -1,8 +1,15 @@
 import Guest2 from "@/Layouts/GuestLayout2";
 import { Head, Link } from "@inertiajs/react";
 import { Book, Calendar, ChevronRight, Clock, Users } from "lucide-react";
+import {News} from "@/Pages/News/_types";
+import {NewsComponent} from "@/Components/web/News";
 
-export default function Welcome() {
+interface WelcomeProps {
+    news : News[]
+}
+
+export default function Welcome({news}:  WelcomeProps) {
+
     return (
         <Guest2>
             <Head title="Welcome" />
@@ -62,47 +69,7 @@ export default function Welcome() {
                 </div>
             </section>
 
-            <section className="bg-green-50 py-16">
-                <div className="container mx-auto px-4">
-                    <h3 className="text-2xl font-bold mb-8 text-center">
-                        Berita Terbaru
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {[1, 2, 3].map((item) => (
-                            <div
-                                key={item}
-                                className="bg-white rounded-lg overflow-hidden shadow-md"
-                            >
-                                <img
-                                    src={`/placeholder.svg?height=200&width=400&text=Berita ${item}`}
-                                    alt={`Berita ${item}`}
-                                    width={400}
-                                    height={200}
-                                    className="w-full h-48 object-cover"
-                                />
-                                <div className="p-6">
-                                    <h4 className="text-xl font-semibold mb-2">
-                                        Judul Berita {item}
-                                    </h4>
-                                    <p className="text-gray-600 mb-4">
-                                        Lorem ipsum dolor sit amet, consectetur
-                                        adipiscing elit. Sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna
-                                        aliqua.
-                                    </p>
-                                    <Link
-                                        href={"/berita"}
-                                        className="text-green-600 font-semibold flex items-center hover:underline"
-                                    >
-                                        Baca Selengkapnya{" "}
-                                        <ChevronRight className="w-4 h-4 ml-1" />
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+         <NewsComponent news={news} />
 
             <section className="py-16">
                 <div className="container mx-auto px-4">
