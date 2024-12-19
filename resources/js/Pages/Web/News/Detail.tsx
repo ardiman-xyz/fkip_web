@@ -5,6 +5,7 @@ import { News } from "@/Pages/News/_types";
 import {formatDate} from "@/lib/utils";
 import Guest2 from "@/Layouts/GuestLayout2";
 import {ShareButtons} from "@/Components/web/ShareButtons";
+import {useState} from "react";
 
 interface Props {
     news: News;
@@ -13,6 +14,8 @@ interface Props {
 const Detail = ({ news }: Props)=> {
 
     const translation = news.translations.id || news.translations.en;
+
+    const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
     if (!translation) return null;
 
@@ -65,12 +68,25 @@ const Detail = ({ news }: Props)=> {
                             </div>
                         </div>
 
-                        {/* Featured Image */}
                         {news.media?.path && (
-                            <div className="mb-8">
+                            <div className="mb-8 relative">
                                 <img
-                                    src={news.media.path}
-                                    className="w-full h-[400px] object-cover rounded-lg"
+                                    src={news.media?.paths.blur || "/placeholder.svg"}
+                                    alt={translation.title ?? "Gambar"}
+                                    width={400}
+                                    height={200}
+                                    className={`w-full h-[400px] object-cover rounded-lg absolute transition-opacity duration-500 ${
+                                        imageLoaded ? "opacity-0" : "opacity-100"
+                                    }`}
+                                />
+                                <img
+                                    src={news.media?.path || "/placeholder.svg"}
+                                    alt={translation.title ?? "Gambar"}
+                                    width={400}
+                                    height={200}
+                                    loading="lazy"
+                                    className="w-full h-[400px] object-cover rounded-lg transition-opacity duration-500"
+                                    onLoad={() => setImageLoaded(true)}
                                 />
                             </div>
                         )}

@@ -45,6 +45,12 @@ type LanguageTranslations<T> = {
     en?: T;
 };
 
+export type MediaPaths = {
+    blur: string;
+    original: string;
+    thumbnail: string;
+};
+
 type Media = {
     id: number;
     file_name: string;
@@ -52,7 +58,9 @@ type Media = {
     path: string;
     size: number;
     url: string;
+    paths: MediaPaths;
 };
+
 
 export type News = {
     id: number;
@@ -70,3 +78,4 @@ export type News = {
     created_at: string;
     updated_at: string;
 };
+

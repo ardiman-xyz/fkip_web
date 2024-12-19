@@ -1,6 +1,7 @@
 import { Link } from "@inertiajs/react";
 import { ChevronRight } from "lucide-react";
 import { News } from "@/Pages/News/_types";
+import {useState} from "react";
 
 interface NewsItemProps {
     news: News;
@@ -9,20 +10,32 @@ interface NewsItemProps {
 export const NewsItem = ({ news }: NewsItemProps) => {
     const translation = news.translations.id || news.translations.en;
 
+    const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+
     if (!translation) {
         return null;
     }
 
     return (
         <div className="bg-white rounded-lg overflow-hidden shadow-md h-[370px] flex flex-col">
-            <div className="w-full h-48 flex-shrink-0">
+            <div className="w-full h-48 flex-shrink-0 relative">
+                <img
+                    src={news.media?.paths.blur || "/placeholder.svg"}
+                    alt={translation.title ?? "Gambar"}
+                    width={400}
+                    height={200}
+                    className={`w-full h-full object-cover absolute transition-opacity duration-500 ${
+                        imageLoaded ? "opacity-0" : "opacity-100"
+                    }`}
+                />
                 <img
                     src={news.media?.path || "/placeholder.svg"}
                     alt={translation.title ?? "Gambar"}
                     width={400}
                     height={200}
                     loading="lazy"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-opacity duration-500"
+                    onLoad={() => setImageLoaded(true)}
                 />
             </div>
             <div className="p-6 flex flex-col flex-grow">
@@ -59,7 +72,7 @@ export const NewsItem = ({ news }: NewsItemProps) => {
                     className="text-green-600 font-semibold flex items-center hover:underline mt-auto"
                 >
                     Baca Selengkapnya{" "}
-                    <ChevronRight className="w-4 h-4 ml-1" />
+                    <ChevronRight className="w-4 h-4 ml-1"/>
                 </Link>
             </div>
         </div>
