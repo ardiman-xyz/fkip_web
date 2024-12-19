@@ -5,9 +5,6 @@ import { Media } from "@/types/app";
 import { Head, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import {
-    PiImageDuotone,
-    PiPencilDuotone,
-    PiTrashDuotone,
     PiUploadSimpleDuotone,
 } from "react-icons/pi";
 import { UploadModalMedia } from "./_components/UploadModal";

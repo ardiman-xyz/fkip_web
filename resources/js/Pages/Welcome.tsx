@@ -2,31 +2,37 @@ import Guest2 from "@/Layouts/GuestLayout2";
 import { Head, Link } from "@inertiajs/react";
 import { Book, Calendar, ChevronRight, Clock, Users } from "lucide-react";
 import {News} from "@/Pages/News/_types";
+import {Event} from "@/Pages/Event/_types";
 import {NewsComponent} from "@/Components/web/News";
+import {EventSection} from "@/Components/web/EventSection";
 
 interface WelcomeProps {
     news : News[]
+    events: Event[]
 }
 
-export default function Welcome({news}:  WelcomeProps) {
+export default function Welcome({news, events}:  WelcomeProps) {
+
+    console.info(events)
 
     return (
         <Guest2>
-            <Head title="Welcome" />
-            <section className="bg-green-700 text-white py-20">
+            <Head title="Home" />
+            <section className="bg-green-700 text-white md:py-32 py-20">
                 <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-4xl font-bold mb-4">
+                    <h2 className="md:text-4xl text-2xl font-bold mb-4">
                         Selamat Datang di Fakultas Keguruan dan Ilmu Pendidikan
                     </h2>
-                    <p className="text-xl mb-8">
+                    <p className="md:text-xl text-base mb-8">
                         Membentuk Pendidik Profesional untuk Masa Depan Bangsa
                     </p>
-                    <Link
-                        href="#"
-                        className="bg-white text-green-600 px-6 py-2 rounded-full font-semibold hover:bg-green-100 transition duration-300"
+                    <a
+                        target="_blank"
+                        href="https://admisi.umkendari.ac.id/"
+                        className="bg-white text-green-600 px-6 py-3 rounded-sm font-semibold hover:bg-green-100 transition duration-300"
                     >
                         Pelajari Lebih Lanjut
-                    </Link>
+                    </a>
                 </div>
             </section>
             <section className="py-16">
@@ -69,75 +75,8 @@ export default function Welcome({news}:  WelcomeProps) {
                 </div>
             </section>
 
-         <NewsComponent news={news} />
-
-            <section className="py-16">
-                <div className="container mx-auto px-4">
-                    <div className="">
-                        <h3 className="text-2xl font-bold mb-8 text-center">
-                            Agenda
-                        </h3>
-                        <p className="text-sm text-muted-foreground text-center">
-                            Berbagai agenda dan agenda mendatang
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
-                        {[
-                            {
-                                title: "Seminar Pendidikan Nasional",
-                                date: "15 Agustus 2023",
-                                time: "09:00 - 15:00",
-                                image: "/placeholder.svg?height=200&width=400&text=Seminar+Pendidikan",
-                            },
-                            {
-                                title: "Workshop Metode Pembelajaran Inovatif",
-                                date: "22 Agustus 2023",
-                                time: "13:00 - 17:00",
-                                image: "/placeholder.svg?height=200&width=400&text=Workshop+Pembelajaran",
-                            },
-                            {
-                                title: "Kuliah Umum: Teknologi dalam Pendidikan",
-                                date: "5 September 2023",
-                                time: "10:00 - 12:00",
-                                image: "/placeholder.svg?height=200&width=400&text=Kuliah+Umum",
-                            },
-                        ].map((event, index) => (
-                            <div
-                                key={index}
-                                className="bg-white rounded-lg overflow-hidden shadow-md"
-                            >
-                                <img
-                                    src={event.image}
-                                    alt={event.title}
-                                    width={400}
-                                    height={200}
-                                    className="w-full h-48 object-cover"
-                                />
-                                <div className="p-6">
-                                    <h4 className="text-xl font-semibold mb-2">
-                                        {event.title}
-                                    </h4>
-                                    <div className="flex items-center text-gray-600 mb-2">
-                                        <Calendar className="w-4 h-4 mr-2" />
-                                        <span>{event.date}</span>
-                                    </div>
-                                    <div className="flex items-center text-gray-600 mb-4">
-                                        <Clock className="w-4 h-4 mr-2" />
-                                        <span>{event.time}</span>
-                                    </div>
-                                    <Link
-                                        href="/agenda/sadfasdf"
-                                        className="text-green-600 font-semibold flex items-center hover:underline"
-                                    >
-                                        Detail Event{" "}
-                                        <ChevronRight className="w-4 h-4 ml-1" />
-                                    </Link>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+            <NewsComponent news={news} />
+            <EventSection events={events} />
         </Guest2>
     );
 }

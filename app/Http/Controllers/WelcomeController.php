@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\WelcomeService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
@@ -21,9 +20,11 @@ class WelcomeController extends Controller
     public function index(): InertiaResponse
     {
         $news = $this->welcomeService->getLatestNews();
+        $events = $this->welcomeService->getLatestEvents();
 
         return Inertia::render('Welcome', [
             "news" => $news,
+            "events" => $events,
         ]);
     }
 
@@ -43,5 +44,23 @@ class WelcomeController extends Controller
             ]
         ]);
     }
+
+    public function eventDetail(string $slug): InertiaResponse
+    {
+        $event = $this->welcomeService->getEventDetail($slug);
+        $translation = $event['translations']['id'] ?? $event['translations']['en'] ?? null;
+
+        return Inertia::render("Web/Event/Detail", [
+            'event' => $event,
+            'meta' => [
+                'title' => $translation['title'] ?? config('app.name'),
+                'description' => $translation ? Str::limit(strip_tags($translation['description']), 160) : '',
+                'image' => $event['media']['paths']['thumbnail'] ?? '',
+                'url' => url()->current(),
+                'type' => 'article'
+            ]
+        ]);
+    }
+
 
 }

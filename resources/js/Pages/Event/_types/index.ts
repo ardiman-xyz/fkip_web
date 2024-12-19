@@ -1,4 +1,5 @@
 import * as z from "zod";
+import {MediaPaths} from "@/Pages/News/_types";
 
 export const eventFormSchema = z.object({
     id: z.object({
@@ -73,6 +74,7 @@ interface Media {
     created_at: string;
     updated_at: string;
     url: string;
+    paths: MediaPaths;
 }
 
 interface Category {

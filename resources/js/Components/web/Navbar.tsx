@@ -34,11 +34,10 @@ const NavLinks = () => (
 
 const Navbar = () => {
     return (
-        <header className="bg-green-800 text-white">
+        <header className="bg-white ">
             <div className="container mx-auto px-4 py-6 flex justify-between items-center">
                 <div className="flex items-center space-x-2">
-                    <GraduationCap size={32} />
-                    <h1 className="text-2xl font-bold">FKIP</h1>
+                    <img src="/images/faculty.webp" alt="Fakultas Keguruan dan Ilmu Pendidikan" className={"w-[400px]"}/>
                 </div>
                 <nav className="hidden md:flex space-x-4">
                     <NavLinks />

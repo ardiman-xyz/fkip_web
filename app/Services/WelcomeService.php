@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Event;
 use App\Models\News;
 use App\Models\Language;
 use App\Models\NewsTranslation;
@@ -130,4 +131,144 @@ class WelcomeService
             'updated_at' => $news->updated_at->format('Y-m-d H:i:s'),
         ];
     }
+
+
+    public function getLatestEvents(int $limit = 3)
+    {
+        $indonesianLanguage = Language::where('code', 'id')->first();
+
+        return Event::with([
+            'translations' => function($query) use ($indonesianLanguage) {
+                $query->where('language_id', $indonesianLanguage->id);
+            },
+            'media',
+            'category.translations' => function($query) use ($indonesianLanguage) {
+                $query->where('language_id', $indonesianLanguage->id);
+            },
+            'tags.translations' => function($query) use ($indonesianLanguage) {
+                $query->where('language_id', $indonesianLanguage->id);
+            }
+        ])
+//            ->where('status', 'published')
+//            ->where('end_date', '>=', now()) // Hanya event yang belum berakhir
+            ->orderBy('start_date', 'asc') // Urutkan berdasarkan tanggal mulai terdekat
+            ->limit($limit)
+            ->get()
+            ->map(function ($event) {
+                $translation = $event->translations->first();
+
+                return [
+                    'id' => $event->id,
+                    'translations' => [
+                        'id' => [
+                            'title' => $translation?->title,
+                            'slug' => $translation?->slug,
+                            'description' => $translation?->description,
+                        ]
+                    ],
+                    'formatted_date' => $event->start_date->format('d F Y'), // Format tanggal
+                    'event_status' => $event->end_date->isPast() ? 'Selesai' : 'Akan Datang',
+                    'category' => $event->category ? [
+                        'id' => $event->category->id,
+                        'translations' => [
+                            'id' => [
+                                'name' => $event->category->translations->first()?->name,
+                                'slug' => $event->category->translations->first()?->slug,
+                            ]
+                        ]
+                    ] : null,
+                    'media' => $event->media ? [
+                        'id' => $event->media->id,
+                        'path' => $event->media->path,
+                        'paths' => $event->media->paths,
+                    ] : null,
+                    'tags' => $event->tags->map(fn($tag) => [
+                        'value' => (string) $tag->id,
+                        'label' => $tag->translations->first()?->name
+                    ]),
+                    'status' => $event->status,
+                    'is_featured' => $event->is_featured,
+                    'start_date' => $event->start_date->format('Y-m-d H:i:s'),
+                    'end_date' => $event->end_date->format('Y-m-d H:i:s'),
+                    'location' => $event->location,
+                    'type' => $event->type,
+                    'platform' => $event->platform,
+                    'meeting_url' => $event->meeting_url,
+                    'registration_url' => $event->registration_url,
+                    'quota' => $event->quota,
+                    'is_free' => $event->is_free,
+                    'price' => $event->price,
+                    'created_at' => $event->created_at->format('Y-m-d H:i:s'),
+                ];
+            });
+    }
+
+    public function getEventDetail(string $slug)
+    {
+        $indonesianLanguage = Language::where('code', 'id')->first();
+
+        $event = Event::with([
+            'translations' => function($query) use ($indonesianLanguage) {
+                $query->where('language_id', $indonesianLanguage->id);
+            },
+            'media',
+            'category.translations' => function($query) use ($indonesianLanguage) {
+                $query->where('language_id', $indonesianLanguage->id);
+            },
+            'tags.translations' => function($query) use ($indonesianLanguage) {
+                $query->where('language_id', $indonesianLanguage->id);
+            }
+        ])
+            ->whereHas('translations', function($query) use ($slug, $indonesianLanguage) {
+                $query->where('slug', $slug)
+                    ->where('language_id', $indonesianLanguage->id);
+            })
+            ->firstOrFail();
+
+        $translation = $event->translations->first();
+
+                    return [
+                        'id' => $event->id,
+                        'translations' => [
+                            'id' => [
+                                'title' => $translation?->title,
+                                'slug' => $translation?->slug,
+                                'description' => $translation?->description,
+                            ]
+                        ],
+                        'formatted_date' => $event->start_date->format('d F Y'),
+                        'event_status' => $event->end_date->isPast() ? 'Selesai' : 'Akan Datang',
+                        'category' => $event->category ? [
+                            'id' => $event->category->id,
+                            'translations' => [
+                                'id' => [
+                                    'name' => $event->category->translations->first()?->name,
+                                    'slug' => $event->category->translations->first()?->slug,
+                                ]
+                            ]
+                        ] : null,
+                        'media' => $event->media ? [
+                            'id' => $event->media->id,
+                            'path' => $event->media->path,
+                            'paths' => $event->media->paths,
+                        ] : null,
+                        'tags' => $event->tags->map(fn($tag) => [
+                            'value' => (string) $tag->id,
+                            'label' => $tag->translations->first()?->name
+                        ]),
+                        'status' => $event->status,
+                        'is_featured' => $event->is_featured,
+                        'start_date' => $event->start_date->format('Y-m-d H:i:s'),
+                        'end_date' => $event->end_date->format('Y-m-d H:i:s'),
+                        'location' => $event->location,
+                        'type' => $event->type,
+                        'platform' => $event->platform,
+                        'meeting_url' => $event->meeting_url,
+                        'registration_url' => $event->registration_url,
+                        'quota' => $event->quota,
+                        'is_free' => $event->is_free,
+                        'price' => $event->price,
+                        'created_at' => $event->created_at->format('Y-m-d H:i:s'),
+                    ];
+                }
 }

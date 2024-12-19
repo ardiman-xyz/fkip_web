@@ -18,10 +18,6 @@ const Detail = ({ news }: Props)=> {
 
     if (!translation) return null;
 
-    const imageUrl = news.media?.paths?.thumbnail || "/placeholder.svg";
-    const title = translation.title || "FKIP";
-    const description = translation.title || "No description available";
-
     return (
         <Guest2>
 
@@ -29,7 +25,7 @@ const Detail = ({ news }: Props)=> {
                 <div className="container max-w-5xl mx-auto px-4">
                     <div className="mb-8">
                         <Link
-                            href="/berita"
+                            href={"/berita"}
                             className="text-green-600 hover:underline flex items-center"
                         >
                             <ChevronLeft className="w-4 h-4 mr-1"/>

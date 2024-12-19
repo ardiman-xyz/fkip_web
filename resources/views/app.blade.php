@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <link rel="icon" type="image/x-icon" href="/fkip_ic.ico">
     @if(isset($page['props']['meta']))
         <title>{{ $page['props']['meta']['title'] }}</title>
         <meta name="title" content="{{ $page['props']['meta']['title'] }}">
