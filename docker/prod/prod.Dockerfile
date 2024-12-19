@@ -43,9 +43,18 @@ RUN apk add --no-cache \
         libzip-dev \
         libexif-dev \
         linux-headers \
+        libpng-dev \
+        libjpeg-turbo-dev \
+        libwebp-dev \
+        freetype-dev \
     && apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
+    && docker-php-ext-configure gd \
+        --with-freetype \
+        --with-jpeg \
+        --with-webp \
     && docker-php-ext-install -j$(nproc) \
+        gd \
         pdo \
         pdo_mysql \
         zip \
@@ -65,6 +74,7 @@ RUN apk add --no-cache \
     && docker-php-source delete
 
 
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY docker/prod/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
@@ -74,8 +84,8 @@ RUN mkdir -p /var/log/supervisor /var/run/supervisor
 COPY docker/prod/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chmod -R 777 /var/log/supervisor /var/run/supervisor
 
-COPY --chown=www-data --from=composer-build /var/www/html/vendor/ /var/www/html/vendor/ 
-COPY --chown=www-data --from=npm-build /var/www/html/public/ /var/www/html/public/ 
+COPY --chown=www-data --from=composer-build /var/www/html/vendor/ /var/www/html/vendor/
+COPY --chown=www-data --from=npm-build /var/www/html/public/ /var/www/html/public/
 
 COPY --chown=www-data . /var/www/html/
 RUN composer dump-autoload -o \

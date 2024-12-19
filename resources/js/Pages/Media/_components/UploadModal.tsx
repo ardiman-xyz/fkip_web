@@ -7,7 +7,7 @@ import {
     Search,
     X,
     Upload as UploadIcon,
-    UploadCloud,
+    UploadCloud, Loader,
 } from "lucide-react";
 import {
     Dialog,
@@ -29,6 +29,7 @@ export const UploadModalMedia = ({
 }) => {
     const [dragActive, setDragActive] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
+    const[isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -63,32 +64,47 @@ export const UploadModalMedia = ({
     if (!isOpen) return null;
 
     const handleUpload = async () => {
+        setIsLoading(true);
         const formData = new FormData();
         files.forEach((file) => {
             formData.append("files[]", file);
         });
 
-        const response = await axios.post(
-            route("admin.media.storeBatch"),
-            formData,
-            {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            }
-        );
-
-        if (response.data.status) {
-            toast.success("All files uploaded successfully");
-            onClose();
-            setFiles([]);
-        } else if (response.data.status === "partial_success") {
-            toast.warning(
-                `${response.data.data.uploaded.length} files uploaded, ${response.data.data.failed.length} failed`
+        try {
+            const response = await axios.post(
+                route("admin.media.storeBatch"),
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
             );
-            response.data.data.failed.forEach((fail: any) => {
-                toast.error(`Failed to upload ${fail.file}: ${fail.error}`);
-            });
+
+            if (response.data.status) {
+                toast("All files are being uploaded ...");
+                onClose();
+                setFiles([]);
+            } else if (response.data.status === "partial_success") {
+                toast.warning(
+                    `${response.data.data.uploaded.length} files uploaded, ${response.data.data.failed.length} failed`
+                );
+                response.data.data.failed.forEach((fail: any) => {
+                    toast.error(`Failed to upload ${fail.file}: ${fail.error}`);
+                });
+            }
+        } catch (error: any) {
+            if (error.response) {
+                toast.error(
+                    `Server error: ${error.response.status} - ${error.response.data.message || "Something went wrong"}`
+                );
+            } else if (error.request) {
+                toast.error("No response from server. Please try again later.");
+            } else {
+                toast.error(`Error: ${error.message}`);
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -160,15 +176,19 @@ export const UploadModalMedia = ({
                 <DialogFooter>
                     <button
                         onClick={onClose}
+                        disabled={isLoading}
                         className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleUpload}
-                        disabled={files.length === 0}
-                        className="px-4 py-2 text-sm bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={files.length === 0 || isLoading}
+                        className="px-4 py-2 text-sm flex items-center  bg-black text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
+                        {isLoading && (
+                            <Loader className="mr-2 size-4 animate-spin" />
+                            )}
                         Upload Files
                     </button>
                 </DialogFooter>

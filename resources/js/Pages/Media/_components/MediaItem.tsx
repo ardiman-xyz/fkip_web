@@ -26,8 +26,10 @@ export const MediaItem = ({ item, onDelete, handleUpdate }: MediaItemProps) => {
     const [isModalDeleteOpen, setIsModalDeleteOpen] = useState<boolean>(false);
     const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
 
-    const handleDeleteSuccess = () => {
-        onDelete?.(item.id);
+    const handleDeleteSuccess = (success: boolean) => {
+        if (success) {
+            onDelete?.(item.id);
+        }
         setIsModalDeleteOpen(false);
     };
 
@@ -108,7 +110,7 @@ export const MediaItem = ({ item, onDelete, handleUpdate }: MediaItemProps) => {
             </div>
             {isModalDeleteOpen && (
                 <DeleteConfirm
-                    onClose={() => handleDeleteSuccess()}
+                    onClose={handleDeleteSuccess}
                     id={item.id}
                     routeAction="admin.media.destroy"
                 />

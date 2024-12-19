@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Models\Media;
+use App\Services\MediaService;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -28,15 +29,9 @@ class ProcessMediaUpload implements ShouldQueue
         private string $uploadId
     ) {}
 
-    public function handle(): void
+    public function handle(MediaService $mediaService): void
     {
         try {
-            // Generate unique filename
-            $randomFileName = Str::uuid() . '_' . time() . '.' . pathinfo($this->originalName, PATHINFO_EXTENSION);
-            
-            // Generate random subdirectory
-            $randomSubdirectory = 'media/' . date('Y') . '/' . date('m') . '/' . Str::random(10);
-            
             // Broadcast start
             broadcast(new MediaUploadProgress(
                 uploadId: $this->uploadId,
@@ -46,20 +41,19 @@ class ProcessMediaUpload implements ShouldQueue
                 media: null,
                 userId: $this->userId
             ));
-            
-            // Store file di public disk
-            $path = Storage::disk('public')->putFileAs(
-                $randomSubdirectory, 
-                new File($this->tempPath), 
-                $randomFileName
+
+            // Proses image dan generate semua versi
+            $paths = $mediaService->processAndUploadImage(
+                new File($this->tempPath)
             );
 
-            // Create media record
+            // Create media record dengan semua paths
             $media = Media::create([
                 'name' => pathinfo($this->originalName, PATHINFO_FILENAME),
-                'file_name' => $randomFileName,
+                'file_name' => basename($paths['original']),
                 'mime_type' => $this->mimeType,
-                'path' => $path,
+                'path' => $paths['original'],
+                'paths' => $paths,
                 'size' => $this->size,
             ]);
 

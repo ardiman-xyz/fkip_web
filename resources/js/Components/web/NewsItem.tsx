@@ -21,6 +21,7 @@ export const NewsItem = ({ news }: NewsItemProps) => {
                     alt={translation.title ?? "Gambar"}
                     width={400}
                     height={200}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                 />
             </div>

@@ -29,7 +29,7 @@ const TestConnection = () => {
     }, []);
 
     return (
-        <div className="fixed bottom-20 right-4 bg-white p-4 rounded-lg shadow-lg space-y-2">
+        <div className="fixed bottom-20 left-4 bg-white p-4 rounded-lg shadow-lg space-y-2">
             <h3 className="font-medium">Reverb Connection Status</h3>
             <div className="space-y-1 text-sm">
                 <p>

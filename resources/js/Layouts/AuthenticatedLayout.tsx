@@ -7,6 +7,8 @@ import { Toaster } from "@/Components/ui/sonner";
 import TestConnection from "@/Components/TestConnectionReverb";
 import { BroadcastTest } from "@/Components/BroadcastTest";
 import { UploadProgress } from "@/Components/UploadProgres";
+import {usePage} from "@inertiajs/react";
+import {PageProps} from "@/types";
 
 interface EventResponse {
     user_id: number;
@@ -18,21 +20,25 @@ export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
+
+    const { app_version } = usePage<PageProps>().props;
+
     return (
+
         <div className="relative min-h-dvh bg-gray-200 dark:bg-black">
-            <Toaster />
+            <Toaster richColors={true} />
             <div className="flex p-3 2xl:h-dvh">
                 <div className="flex w-full rounded-xl shadow-sm dark:bg-gray-900">
                     <div className="max-h-vh hidden h-full w-96 flex-col justify-between overflow-y-auto rounded-s-xl border border-gray-200 bg-white xl:flex dark:border-gray-800 dark:bg-gray-900">
                         <div className="flex flex-col">
                             <header className="flex h-20 shrink-0 items-center justify-center gap-2 border-b border-gray-200 dark:border-gray-800">
                                 <PiGraduationCapFill className="size-8" />
-                                <h1 className="font-bold">Web fkip v1.0</h1>
+                                <h1 className="font-bold">Web fkip</h1>
                             </header>
                             <Navigation />
                         </div>
                         <div className="flex justify-start p-4 text-xs text-gray-400 dark:text-gray-600">
-                            <span>Web fkip v1.0</span>
+                            <span>Web fkip {app_version}</span>
                         </div>
                     </div>
                     <div className="relative flex w-full flex-col overflow-hidden rounded-xl border-b border-e border-r border-t border-gray-200 bg-white xl:rounded-e-xl xl:rounded-s-none dark:border-gray-800 dark:bg-gray-900">

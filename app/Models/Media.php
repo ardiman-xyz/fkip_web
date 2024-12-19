@@ -11,7 +11,12 @@ class Media extends Model
         'file_name',
         'mime_type',
         'path',
+        'paths',
         'size'
+    ];
+
+    protected $casts = [
+        'paths' => 'json'
     ];
 
     protected $appends = ['url'];

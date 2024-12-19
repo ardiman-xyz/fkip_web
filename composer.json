@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "inertiajs/inertia-laravel": "^1.0",
+        "intervention/image": "^3.9",
         "laravel/breeze": "^2.2",
         "laravel/framework": "^11.31",
         "laravel/octane": "^2.6",

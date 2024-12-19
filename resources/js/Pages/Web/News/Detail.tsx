@@ -1,9 +1,10 @@
 // resources/js/Pages/Web/News/Detail.tsx
-import { Link } from "@inertiajs/react";
+import {Head, Link} from "@inertiajs/react";
 import { ChevronLeft } from "lucide-react";
 import { News } from "@/Pages/News/_types";
 import {formatDate} from "@/lib/utils";
 import Guest2 from "@/Layouts/GuestLayout2";
+import {ShareButtons} from "@/Components/web/ShareButtons";
 
 interface Props {
     news: News;
@@ -13,12 +14,11 @@ const Detail = ({ news }: Props)=> {
 
     const translation = news.translations.id || news.translations.en;
 
-    console.info(news)
-
     if (!translation) return null;
 
     return (
         <Guest2>
+            <Head title={translation.title ?? "FKIP"}  />
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="container max-w-5xl mx-auto px-4">
                     {/* Breadcrumb */}
@@ -79,6 +79,11 @@ const Detail = ({ news }: Props)=> {
                         <div
                             className="prose prose-lg max-w-none"
                             dangerouslySetInnerHTML={{__html: translation.content ?? ""}}
+                        />
+
+                        <ShareButtons
+                            url={window.location.href}
+                            title={translation.title ? translation.title : ""}
                         />
                     </div>
                 </div>

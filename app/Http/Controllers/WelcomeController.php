@@ -34,4 +34,6 @@ class WelcomeController extends Controller
             'news' => $news
         ]);
     }
+
+
 }

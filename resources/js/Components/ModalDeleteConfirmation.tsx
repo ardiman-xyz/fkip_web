@@ -8,7 +8,7 @@ import Modal from "@/Components/Modal";
 import { Button } from "@/Components/ui/button";
 
 interface IProps {
-    onClose: () => void;
+    onClose: (success: boolean) => void;
     id: number;
     routeAction?: string;
 }
@@ -27,7 +27,7 @@ export const DeleteConfirm = ({
             .then((data) => {
                 const { message } = data.data;
                 toast.success(`${message}`);
-                onClose();
+                onClose(true);
                 router.reload();
             })
             .catch((err) => {
@@ -35,6 +35,8 @@ export const DeleteConfirm = ({
                 toast.error(`${statusText} ${status}`, {
                     description: `${data.message}`,
                 });
+
+                onClose(false);
             })
             .finally(() => {
                 setIsLoading(false);
@@ -76,7 +78,7 @@ export const DeleteConfirm = ({
                     <Button
                         disabled={isLoading}
                         variant="outline"
-                        onClick={onClose}
+                        onClick={() => onClose(false)}
                     >
                         Batalkan
                     </Button>

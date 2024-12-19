@@ -1,6 +1,4 @@
 import {News as NewsType} from "@/Pages/News/_types";
-import {Link} from "@inertiajs/react";
-import {ChevronRight} from "lucide-react";
 import {NewsItem} from "@/Components/web/NewsItem";
 
 interface NewsProps {

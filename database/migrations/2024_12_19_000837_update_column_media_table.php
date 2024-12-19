@@ -11,14 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('media', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('file_name');
-            $table->string('mime_type');
-            $table->string('path')->nullable();
-            $table->integer('size');
-            $table->timestamps();
+        Schema::table('media', function (Blueprint $table) {
+            $table->json('paths')->nullable()->after('path');
         });
     }
 
@@ -27,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('media');
+        Schema::table('media', function (Blueprint $table) {
+            $table->dropColumn('paths');
+        });
     }
 };
