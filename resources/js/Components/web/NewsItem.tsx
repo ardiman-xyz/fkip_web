@@ -41,25 +41,25 @@ export const NewsItem = ({ news }: NewsItemProps) => {
             <div className="p-6 flex flex-col flex-grow">
                 <div className="flex items-center gap-2 mb-2">
                     {news.category && news.category.translations.id && (
-                        <Link
+                        <a
                             href={`/kategori/${news.category.translations.id.name}`}
                             className="text-sm text-green-600 hover:underline"
                         >
                             {news.category.translations.id.name}
-                        </Link>
+                        </a>
                     )}
                     {news.category && news.tags.length > 0 && (
                         <span className="text-gray-400">•</span>
                     )}
                     <div className="flex flex-wrap gap-2">
                         {news.tags.map(tag => (
-                            <Link
+                            <a
                                 key={tag.value}
                                 href={`/tag/${tag.value}`}
                                 className="text-sm text-gray-500 hover:text-green-600 hover:underline"
                             >
                                 #{tag.label}
-                            </Link>
+                            </a>
                         ))}
                     </div>
                 </div>
@@ -67,13 +67,13 @@ export const NewsItem = ({ news }: NewsItemProps) => {
                     {translation.title}
                 </h4>
 
-                <Link
+                <a
                     href={`/berita/${translation.slug}`}
                     className="text-green-600 font-semibold flex items-center hover:underline mt-auto"
                 >
                     Baca Selengkapnya{" "}
                     <ChevronRight className="w-4 h-4 ml-1"/>
-                </Link>
+                </a>
             </div>
         </div>
     );

@@ -14,9 +14,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet";
 import { Link } from "@inertiajs/react";
 const NavLinks = () => (
     <>
-        <Link href="/" className="hover:underline">
+        <a href="/" className="hover:underline">
             Beranda
-        </Link>
+        </a>
         <Link href="#" className="hover:underline">
             Program Studi
         </Link>

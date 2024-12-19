@@ -24,16 +24,7 @@ const Detail = ({ news }: Props)=> {
 
     return (
         <Guest2>
-            <Head title={translation.title ?? "FKIP"}  >
-                    <meta property="og:title" content={title} />
-                    <meta property="og:description" content={description} />
-                    <meta property="og:image" content={imageUrl} />
-                    <meta property="og:url" content={window.location.href} />
-                    <meta property="og:type" content="article" />
-                    <meta name="twitter:title" content={title} />
-                    <meta name="twitter:description" content={description} />
-                    <meta name="twitter:image" content={imageUrl} />
-            </Head>
+
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="container max-w-5xl mx-auto px-4">
                     <div className="mb-8">
