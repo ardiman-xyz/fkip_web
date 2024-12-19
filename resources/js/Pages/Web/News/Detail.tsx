@@ -1,4 +1,3 @@
-// resources/js/Pages/Web/News/Detail.tsx
 import {Head, Link} from "@inertiajs/react";
 import { ChevronLeft } from "lucide-react";
 import { News } from "@/Pages/News/_types";
@@ -19,12 +18,24 @@ const Detail = ({ news }: Props)=> {
 
     if (!translation) return null;
 
+    const imageUrl = news.media?.paths?.thumbnail || "/placeholder.svg";
+    const title = translation.title || "FKIP";
+    const description = translation.title || "No description available";
+
     return (
         <Guest2>
-            <Head title={translation.title ?? "FKIP"}  />
+            <Head title={translation.title ?? "FKIP"}  >
+                    <meta property="og:title" content={title} />
+                    <meta property="og:description" content={description} />
+                    <meta property="og:image" content={imageUrl} />
+                    <meta property="og:url" content={window.location.href} />
+                    <meta property="og:type" content="article" />
+                    <meta name="twitter:title" content={title} />
+                    <meta name="twitter:description" content={description} />
+                    <meta name="twitter:image" content={imageUrl} />
+            </Head>
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="container max-w-5xl mx-auto px-4">
-                    {/* Breadcrumb */}
                     <div className="mb-8">
                         <Link
                             href="/berita"
@@ -35,9 +46,7 @@ const Detail = ({ news }: Props)=> {
                         </Link>
                     </div>
 
-                    {/* Main Content */}
                     <div className="bg-white rounded-lg shadow-md p-8">
-                        {/* Header */}
                         <div className="mb-8">
                             <div className="flex items-center gap-4 mb-4">
                                 {news.category?.translations.id && (
@@ -54,7 +63,6 @@ const Detail = ({ news }: Props)=> {
                                 </time>
                             </div>
                             <h1 className="text-3xl font-bold mb-4">{translation.title}</h1>
-                            {/* Tags */}
                             <div className="flex flex-wrap gap-2">
                                 {news.tags.map(tag => (
                                     <Link
@@ -91,7 +99,6 @@ const Detail = ({ news }: Props)=> {
                             </div>
                         )}
 
-                        {/* Content */}
                         <div
                             className="prose prose-lg max-w-none"
                             dangerouslySetInnerHTML={{__html: translation.content ?? ""}}

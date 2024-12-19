@@ -29,27 +29,7 @@ export  const ShareButtons = ({ url, title }: ShareButtonsProps) => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-                {/* Facebook */}
-                <a
-                    href={shareLinks.facebook}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                >
-                    Facebook
-                </a>
 
-                {/* Twitter/X */}
-                <a
-                    href={shareLinks.twitter}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
-                >
-                    Twitter/X
-                </a>
-
-                {/* WhatsApp */}
                 <a
                     href={shareLinks.whatsapp}
                     target="_blank"
