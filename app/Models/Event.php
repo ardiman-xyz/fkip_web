@@ -11,7 +11,6 @@ class Event extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'is_free' => 'boolean',
-        'price' => 'decimal:2'
     ];
 
 
@@ -24,13 +23,6 @@ class Event extends Model
         ][$this->type] ?? $this->type;
     }
 
-    public function getFormattedPriceAttribute()
-    {
-        if ($this->is_free) {
-            return 'Free';
-        }
-        return 'Rp ' . number_format($this->price, 0, ',', '.');
-    }
 
     public function translations()
     {

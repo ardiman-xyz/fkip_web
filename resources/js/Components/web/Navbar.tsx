@@ -34,7 +34,7 @@ const NavLinks = () => (
 
 const Navbar = () => {
     return (
-        <header className="bg-white ">
+        <header className="bg-white border-b">
             <div className="container mx-auto px-4 py-6 flex justify-between items-center">
                 <div className="flex items-center space-x-2">
                     <img src="/images/faculty.webp" alt="Fakultas Keguruan dan Ilmu Pendidikan" className={"w-[400px]"}/>

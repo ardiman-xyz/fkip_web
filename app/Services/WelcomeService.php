@@ -234,6 +234,8 @@ class WelcomeService
                                 'title' => $translation?->title,
                                 'slug' => $translation?->slug,
                                 'description' => $translation?->description,
+                                'content' => $translation->content ?? null,
+
                             ]
                         ],
                         'formatted_date' => $event->start_date->format('d F Y'),

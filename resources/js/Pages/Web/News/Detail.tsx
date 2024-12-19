@@ -6,6 +6,15 @@ import Guest2 from "@/Layouts/GuestLayout2";
 import {ShareButtons} from "@/Components/web/ShareButtons";
 import {useState} from "react";
 
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/Components/ui/breadcrumb"
+
 interface Props {
     news: News;
 }
@@ -24,16 +33,24 @@ const Detail = ({ news }: Props)=> {
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="container max-w-5xl mx-auto px-4">
                     <div className="mb-8">
-                        <Link
-                            href={"/berita"}
-                            className="text-green-600 hover:underline flex items-center"
-                        >
-                            <ChevronLeft className="w-4 h-4 mr-1"/>
-                            Kembali ke Berita
-                        </Link>
+                        <Breadcrumb>
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink href="/">Beranda</BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator/>
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink href="/berita">Berita</BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator/>
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>{translation.title}</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-md p-8">
+                    <div className="bg-white  p-8">
                         <div className="mb-8">
                             <div className="flex items-center gap-4 mb-4">
                                 {news.category?.translations.id && (
