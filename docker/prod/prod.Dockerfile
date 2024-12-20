@@ -34,9 +34,8 @@ RUN npm ci && npm run build && \
     npm cache clean --force
 
 
-FROM php:8.2-fpm-alpine AS php
-
-WORKDIR /var/www/html
+FROM dunglas/frankenphp:1-alpine as app
+WORKDIR /app
 
 RUN apk add --no-cache \
         supervisor \
@@ -74,7 +73,6 @@ RUN apk add --no-cache \
     && docker-php-source delete
 
 
-
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY docker/prod/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
@@ -83,15 +81,33 @@ COPY docker/prod/php/php.ini /usr/local/etc/php/conf.d/php.ini
 RUN mkdir -p /var/log/supervisor /var/run/supervisor
 COPY docker/prod/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chmod -R 777 /var/log/supervisor /var/run/supervisor
+# Copy application
+COPY --chown=www-data . .
+COPY --chown=www-data --from=composer-build /var/www/html/vendor/ ./vendor/
+COPY --chown=www-data --from=npm-build /var/www/html/public/build ./public/build/
 
-COPY --chown=www-data --from=composer-build /var/www/html/vendor/ /var/www/html/vendor/
-COPY --chown=www-data --from=npm-build /var/www/html/public/ /var/www/html/public/
-
-COPY --chown=www-data . /var/www/html/
 RUN composer dump-autoload -o \
-    && composer check-platform-reqs \
-    && rm -f /usr/bin/composer
+   && php artisan storage:link \
+   && rm -rf \
+       .git \
+       .github \
+       .gitignore \
+       .gitattributes \
+       .env* \
+       docker \
+       tests \
+       phpunit.xml \
+       README.md \
+       node_modules \
+       package*.json \
+       webpack.mix.js \
+       yarn.lock \
+       *.log \
+   && chown -R www-data:www-data /app \
+   && chmod -R 775 storage bootstrap/cache
 
+ENV APP_RUNTIME="Laravel\Octane\Octane"
+ENV OCTANE_SERVER="frankenphp"
 
-EXPOSE 9000 8080
+EXPOSE 80 443 8080
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

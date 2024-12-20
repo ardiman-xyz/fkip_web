@@ -43,22 +43,6 @@ jobs:
           docker push ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }}
           docker push ghcr.io/ardiman-xyz/fkip_web_app:latest
 
-      - name: Extract Assets and Public Files
-        run: |
-          docker create --name temp_app ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }}
-          docker cp temp_app:/var/www/html/public ./public_files
-          docker rm temp_app
-
-      - name: Build Nginx Image
-        run: |
-          docker build \
-            --build-arg PUBLIC_FILES=./public_files \
-            -f docker/prod/nginx/prod.Dockerfile \
-            -t ghcr.io/ardiman-xyz/fkip_web_nginx:${{ env.VERSION }} \
-            -t ghcr.io/ardiman-xyz/fkip_web_nginx:latest .
-
-          docker push ghcr.io/ardiman-xyz/fkip_web_nginx:${{ env.VERSION }}
-          docker push ghcr.io/ardiman-xyz/fkip_web_nginx:latest
 
       - name: Deploy to staging
         uses: appleboy/ssh-action@master

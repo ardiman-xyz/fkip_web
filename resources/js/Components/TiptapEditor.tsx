@@ -86,7 +86,7 @@ export function TiptapEditor({
                 .chain()
                 .focus()
                 .setImage({
-                    src: `/storage/${media.path}`,
+                    src: media.path
                 })
                 .run();
         }
