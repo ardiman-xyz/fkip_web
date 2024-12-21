@@ -26,8 +26,8 @@ const Detail = ({ event }: Props) => {
 
     return (
         <Guest2>
-            <div className="min-h-screen bg-gray-50 py-12">
-                <div className="container max-w-7xl mx-auto px-4">
+            <div className="min-h-screen bg-[#F1F1F1] py-12">
+                <div className="containera max-w-6xl mx-auto px-4">
                     {/* Breadcrumb */}
                     <div className="mb-8">
                         <Breadcrumb>
@@ -47,7 +47,7 @@ const Detail = ({ event }: Props) => {
                         </Breadcrumb>
                     </div>
 
-                    <div className="w-full">
+                    <div className="w-full bg-white  p-8">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-20">
                             <div className="relative col-span-1">
                                 {event.media?.path && (

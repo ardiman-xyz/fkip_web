@@ -1,19 +1,35 @@
 version: "3.8"
 services:
     app:
-        image: fkip_web:latest  # Ganti dengan image yang sudah di build
+        build:
+            context: .
+            dockerfile: Dockerfile
         container_name: fkip_web_app
         restart: unless-stopped
+        working_dir: /var/www/html
+        volumes:
+            - ../../:/var/www/html/
         ports:
-            - "8009:80"      # Web
-            - "9091:9091"    # WebSocket
-            - "2019:2019"    # Admin port
+            - "9091:9091"
+            - "9010:9000"
         networks:
             fkip_web:
             rabbitmq_shared_network:
             minio_minionetwork:
+
+    nginx:
+        image: nginx:alpine
+        container_name: fkip_web_nginx
+        restart: unless-stopped
+        ports:
+            - "8007:80"
         volumes:
-            -   ../../.env:/app/.env
+            - ../../public:/var/www/html/public
+            - ./nginx/conf.d:/etc/nginx/conf.d
+        networks:
+            - fkip_web
+        depends_on:
+            - app
 
     db:
         image: mysql:8.0

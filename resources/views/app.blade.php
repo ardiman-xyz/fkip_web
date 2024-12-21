@@ -6,9 +6,9 @@
 
     <link rel="icon" type="image/x-icon" href="/fkip_ic.ico">
     @if(isset($page['props']['meta']))
-        <title>{{ $page['props']['meta']['title'] }}</title>
-        <meta name="title" content="{{ $page['props']['meta']['title'] }}">
-        <meta name="description" content="{{ $page['props']['meta']['description'] }}">
+        <title>{{ $page['props']['meta']['title'] ?? config('app.name') }}</title>
+        <meta name="title" content="{{ $page['props']['meta']['title'] ?? config('app.name') }}">
+        <meta name="description" content="{{ $page['props']['meta']['description'] ?? 'Default description' }}">
 
         <meta property="og:type" content="{{ $page['props']['meta']['type'] }}">
         <meta property="og:url" content="{{ $page['props']['meta']['url'] }}">

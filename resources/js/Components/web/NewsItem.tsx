@@ -17,8 +17,8 @@ export const NewsItem = ({ news }: NewsItemProps) => {
     }
 
     return (
-        <div className="bg-white rounded-lg overflow-hidden shadow-md h-[370px] flex flex-col">
-            <div className="w-full h-48 flex-shrink-0 relative">
+        <div className="bg-white  overflow-hidden h-[300px] flex flex-col">
+            <a href={`/berita/${translation.slug}`} className="w-full h-48 flex-shrink-0 relative overflow-hidden group cursor-pointer">
                 <img
                     src={news.media?.paths.blur || "/placeholder.svg"}
                     alt={translation.title ?? "Gambar"}
@@ -34,20 +34,23 @@ export const NewsItem = ({ news }: NewsItemProps) => {
                     width={400}
                     height={200}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-opacity duration-500"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     onLoad={() => setImageLoaded(true)}
                 />
-            </div>
-            <div className="p-6 flex flex-col flex-grow">
-                <div className="flex items-center gap-2 mb-2">
-                    {news.category && news.category.translations.id && (
-                        <a
-                            href={`/kategori/${news.category.translations.id.name}`}
-                            className="text-sm text-green-600 hover:underline"
-                        >
-                            {news.category.translations.id.name}
-                        </a>
-                    )}
+            </a>
+
+            <div className=" flex flex-col flex-grow">
+                <div className="flex items-center gap-2 my-2">
+                    <div>
+                        {news.category && news.category.translations.id && (
+                            <a
+                                href={`/kategori/${news.category.translations.id.name}`}
+                                className="text-sm text-green-600 hover:underline"
+                            >
+                                {news.category.translations.id.name}
+                            </a>
+                        )}
+                    </div>
                     {news.category && news.tags.length > 0 && (
                         <span className="text-gray-400">•</span>
                     )}
@@ -63,16 +66,9 @@ export const NewsItem = ({ news }: NewsItemProps) => {
                         ))}
                     </div>
                 </div>
-                <h4 className="text-xl font-semibold mb-2 line-clamp-2 min-h-[3.5rem]">
+                <a href={`/berita/${translation.slug}`}
+                   className="text-xl font-semibold mb-2 line-clamp-2 min-h-[3.5rem] hover:underline">
                     {translation.title}
-                </h4>
-
-                <a
-                    href={`/berita/${translation.slug}`}
-                    className="text-green-600 font-semibold flex items-center hover:underline mt-auto"
-                >
-                    Baca Selengkapnya{" "}
-                    <ChevronRight className="w-4 h-4 ml-1"/>
                 </a>
             </div>
         </div>

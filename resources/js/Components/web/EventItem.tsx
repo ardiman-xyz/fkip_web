@@ -11,7 +11,7 @@ export const EventItem = ({ event }: EventItemProps) => {
     if (!translation) return null;
 
     return (
-        <div className="bg-white rounded-lg overflow-hidden shadow-md">
+        <div className="overflow-hidden ">
             <img
                 src={event.media?.path || "/placeholder.svg"}
                 alt={translation.title}
@@ -19,7 +19,7 @@ export const EventItem = ({ event }: EventItemProps) => {
                 height={200}
                 className="w-full h-48 object-cover"
             />
-            <div className="p-6">
+            <div className="py-6">
                 <h4 className="text-xl font-semibold mb-2">
                     {translation.title}
                 </h4>

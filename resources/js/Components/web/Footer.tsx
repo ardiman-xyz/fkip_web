@@ -4,7 +4,7 @@ import React from "react";
 const Footer = () => {
     return (
         <footer className="bg-green-800 text-white py-8">
-            <div className="container mx-auto px-4">
+            <div className="container max-w-6xl mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
                         <h5 className="text-lg font-semibold mb-4">
@@ -22,24 +22,24 @@ const Footer = () => {
                         </h5>
                         <ul className="text-sm space-y-2">
                             <li>
-                                <Link href="#" className="hover:underline">
+                                <a href="https://admisi.umkendari.ac.id/" target={'_blank'} className="hover:underline">
                                     Penerimaan Mahasiswa Baru
-                                </Link>
+                                </a>
                             </li>
                             <li>
-                                <Link href="#" className="hover:underline">
+                                <a href="#" className="hover:underline">
                                     Kalender Akademik
-                                </Link>
+                                </a>
                             </li>
                             <li>
-                                <Link href="#" className="hover:underline">
+                                <a href="#" className="hover:underline">
                                     Perpustakaan
-                                </Link>
+                                </a>
                             </li>
                             <li>
-                                <Link href="#" className="hover:underline">
+                                <a href="#" className="hover:underline">
                                     Jurnal Ilmiah
-                                </Link>
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -48,16 +48,14 @@ const Footer = () => {
                             Hubungi Kami
                         </h5>
                         <address className="text-sm not-italic">
-                            Jl. Pendidikan No. 123
+                            Jati Mekar, Jl. KH. Muhammad Dahlan No.10
                             <br />
-                            Kota Universitas, 12345
+                            Wowawanggu, Kec. Kadia, Kota Kendari
                             <br />
                             Indonesia
                             <br />
                             <br />
-                            Email: info@fkip.ac.id
-                            <br />
-                            Telp: (021) 123-4567
+                            Email: fkip@umkendari.ac.id
                         </address>
                     </div>
                 </div>

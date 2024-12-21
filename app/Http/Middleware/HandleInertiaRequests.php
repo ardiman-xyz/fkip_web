@@ -35,6 +35,19 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'app_version' => env('APP_VERSION', 'v1.0.0'),
+            'meta' => $this->getDefaultMeta($request),
+        ];
+    }
+
+
+    private function getDefaultMeta(Request $request): array
+    {
+        return [
+            'title' => config('app.name', 'FKIP UMKendari'),
+            'description' => 'Fakultas Keguruan dan Ilmu Pendidikan Universitas Muhammadiyah Kendari',
+            'type' => 'website',
+            'url' => $request->url(),
+            'image' => asset('images/og.jpg'), // Sesuaikan dengan image default
         ];
     }
 }

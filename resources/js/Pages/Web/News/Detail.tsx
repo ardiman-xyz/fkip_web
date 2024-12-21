@@ -30,8 +30,8 @@ const Detail = ({ news }: Props)=> {
     return (
         <Guest2>
 
-            <div className="min-h-screen bg-gray-50 py-12">
-                <div className="container max-w-5xl mx-auto px-4">
+            <div className="min-h-screen bg-white py-12">
+                <div className="container max-w-6xl mx-auto px-4">
                     <div className="mb-8">
                         <Breadcrumb>
                             <BreadcrumbList>
@@ -50,7 +50,7 @@ const Detail = ({ news }: Props)=> {
                         </Breadcrumb>
                     </div>
 
-                    <div className="bg-white  p-8">
+                    <div className="bg-white ">
                         <div className="mb-8">
                             <div className="flex items-center gap-4 mb-4">
                                 {news.category?.translations.id && (
@@ -87,7 +87,7 @@ const Detail = ({ news }: Props)=> {
                                     alt={translation.title ?? "Gambar"}
                                     width={400}
                                     height={200}
-                                    className={`w-full h-[400px] object-cover rounded-lg absolute transition-opacity duration-500 ${
+                                    className={`w-full h-[400px] object-cover absolute transition-opacity duration-500 ${
                                         imageLoaded ? "opacity-0" : "opacity-100"
                                     }`}
                                 />
@@ -97,7 +97,7 @@ const Detail = ({ news }: Props)=> {
                                     width={400}
                                     height={200}
                                     loading="lazy"
-                                    className="w-full h-[400px] object-cover rounded-lg transition-opacity duration-500"
+                                    className="w-full h-[400px] object-cover  transition-opacity duration-500"
                                     onLoad={() => setImageLoaded(true)}
                                 />
                             </div>
