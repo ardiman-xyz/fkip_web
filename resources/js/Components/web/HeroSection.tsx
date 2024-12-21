@@ -1,27 +1,104 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+    type CarouselApi
+} from "@/Components/ui/carousel";
 
-type Props = {};
+const CarouselWithIndicators = () => {
+    const [api, setApi] = React.useState<CarouselApi>();
+    const [current, setCurrent] = React.useState(0);
+    const [isPaused, setIsPaused] = React.useState(false);
 
-const DefaultComponent: React.FC<Props> = () => {
+    useEffect(() => {
+        if (!api) return;
+
+        let intervalId: NodeJS.Timeout | null = null;
+
+        if (!isPaused) {
+            intervalId = setInterval(() => {
+                api.scrollNext();
+            }, 5000);
+        }
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [api, isPaused]);
+
+    useEffect(() => {
+        if (!api) return;
+
+        api.on('select', () => {
+            setCurrent(api.selectedScrollSnap());
+        });
+    }, [api]);
+
+    const slides = [
+        {
+            bg: "bg-green-700",
+            title: "Selamat Datang di Fakultas Keguruan dan Ilmu Pendidikan",
+            description: "Membentuk Pendidik Profesional untuk Masa Depan Bangsa"
+        },
+        {
+            bg: "bg-orange-700",
+            title: "Program Studi Unggulan",
+            description: "Berbagai Program Studi Terakreditasi untuk Masa Depan Anda"
+        },
+        {
+            bg: "bg-violet-700",
+            title: "Fasilitas Modern",
+            description: "Didukung Fasilitas Pembelajaran Terkini"
+        }
+    ];
+
     return (
-        <section className="bg-green-700 text-white md:py-32 py-20">
-            <div className="container mx-auto px-4 text-center">
-                <h2 className="md:text-4xl text-2xl font-bold mb-4">
-                    Selamat Datang di Fakultas Keguruan dan Ilmu Pendidikan
-                </h2>
-                <p className="md:text-xl text-base mb-8">
-                    Membentuk Pendidik Profesional untuk Masa Depan Bangsa
-                </p>
-                <a
-                    target="_blank"
-                    href="https://admisi.umkendari.ac.id/"
-                    className="bg-white text-green-600 px-6 py-3 rounded-sm font-semibold hover:bg-green-100 transition duration-300"
-                >
-                    Pelajari Lebih Lanjut
-                </a>
-            </div>
-        </section>
+        <div
+            className="relative w-full"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={() => setIsPaused(true)}
+            onTouchEnd={() => setIsPaused(false)}
+        >
+            <Carousel
+                setApi={setApi}
+                className="w-full"
+                opts={{
+                    align: "start",
+                    loop: true,
+                }}
+            >
+                <CarouselContent>
+                    {slides.map((slide, index) => (
+                        <CarouselItem key={index}>
+                            <img src={`/images/hero/hero${index+1}.jpg`} alt="gambar"/>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+
+                <div className="hidden md:block">
+                    <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
+                    <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
+                </div>
+
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {slides.map((_, index) => (
+                        <button
+                            key={index}
+                            className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
+                                current === index ? "bg-white scale-125" : "bg-white/50"
+                            }`}
+                            onClick={() => api?.scrollTo(index)}
+                            aria-label={`Go to slide ${index + 1}`}
+                        />
+                    ))}
+                </div>
+            </Carousel>
+        </div>
     );
 };
 
-export default DefaultComponent;
+export default CarouselWithIndicators;

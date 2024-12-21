@@ -1,5 +1,3 @@
-import { Link } from "@inertiajs/react";
-import { ChevronRight } from "lucide-react";
 import { News } from "@/Pages/News/_types";
 import {useState} from "react";
 
@@ -29,7 +27,7 @@ export const NewsItem = ({ news }: NewsItemProps) => {
                     }`}
                 />
                 <img
-                    src={news.media?.path || "/placeholder.svg"}
+                    src={news.media?.paths.thumbnail || "/placeholder.svg"}
                     alt={translation.title ?? "Gambar"}
                     width={400}
                     height={200}
