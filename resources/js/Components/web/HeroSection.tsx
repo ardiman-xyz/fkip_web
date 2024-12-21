@@ -49,11 +49,13 @@ const HeroSection = ({ featuredNews = [] }: HeroSectionProps) => { // Add defaul
             type: 'featured' as const,
             image: news.slider_image.path,
             title: news.translations.id.title,
-            slug: news.translations.id.slug
+            slug: news.translations.id.slug,
         })),
         ...defaultSlides.map(slide => ({
             type: 'default' as const,
-            ...slide
+            image: slide.image,
+            title: slide.title,
+            description: slide.description
         }))
     ];
 
@@ -100,19 +102,27 @@ const HeroSection = ({ featuredNews = [] }: HeroSectionProps) => { // Add defaul
                 <CarouselContent>
                     {allSlides.map((slide, index) => (
                         <CarouselItem key={index}>
-                            <div className="relative">
-                                <img
-                                    src={slide.image}
-                                    alt={slide.title}
-                                    className="w-full md:h-[694px] h-[400px] object-cover"
-                                />
+                            {slide.type === 'featured' ? (
+                                <a href={`/berita/${slide.slug}`} >
+                                    <img
+                                        src={slide.image}
+                                        alt={slide.title}
+                                        className="w-full md:h-[694px] h-[400px] object-cover"
+                                    />
 
-                            </div>
+                                </a>
+                            ) : (
+                                    <img
+                                        src={slide.image}
+                                        alt={slide.title}
+                                        className="w-full md:h-[694px] h-[400px] object-cover"
+                                    />
+
+                            )}
                         </CarouselItem>
                     ))}
                 </CarouselContent>
 
-                {/* Navigation Arrows - Hidden on Mobile */}
                 <div className="hidden md:block">
                     <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
                     <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
