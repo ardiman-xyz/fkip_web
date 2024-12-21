@@ -101,8 +101,6 @@ const Create = ({ categories, tags }: Props) => {
     });
 
 
-    console.info("feature image", form.getValues("is_featured"))
-
     const onSubmit = async (values: NewsFormValues) => {
         if (isSubmitting) return;
 

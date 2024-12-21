@@ -106,26 +106,7 @@ const HeroSection = ({ featuredNews = [] }: HeroSectionProps) => { // Add defaul
                                     alt={slide.title}
                                     className="w-full md:h-[694px] h-[400px] object-cover"
                                 />
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                                    <div className="container mx-auto px-4 text-center">
-                                        <h2 className="text-white md:text-4xl text-2xl font-bold mb-4">
-                                            {slide.title}
-                                        </h2>
-                                        {slide.type === 'default' && (
-                                            <p className="text-white md:text-xl text-base mb-8">
-                                                {slide.description}
-                                            </p>
-                                        )}
-                                        {slide.type === 'featured' && (
-                                            <a
-                                                href={"/berita/"+slide.slug}
-                                                className="bg-white text-green-600 md:px-6 px-4 md:py-3 py-2 rounded-sm font-semibold hover:bg-green-100 inline-block transition duration-300"
-                                            >
-                                                Baca Selengkapnya
-                                            </a>
-                                        )}
-                                    </div>
-                                </div>
+
                             </div>
                         </CarouselItem>
                     ))}
