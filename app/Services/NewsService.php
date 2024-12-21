@@ -14,8 +14,8 @@ class NewsService
     {
         return News::with(['translations.language', 'media', 'category', 'tags'])->orderBy("id", "desc")->get()
             ->map(function ($news) {
-               
-               
+
+
                 $newsTranslations = $news->translations->groupBy('language.code')
                     ->map(function ($items) {
                         return $items->first();
@@ -127,13 +127,15 @@ class NewsService
                 'media_id' => $data['featured_image'] ?? null,
                 'category_id' => $data['category_id'],
                 'is_featured' => $data['is_featured'],
+                'slider_image_id' => $data['is_featured'] ? $data['slider_image']['id'] : null,
+                'featured_expired_date' => $data['is_featured'] ? $data['featured_expired_date'] : null,
                 'status' => $data['status'],
                 'publish_date' => $data['publish_date']
             ]);
 
             foreach ($languages as $language) {
                 $langCode = $language->code;
-                
+
                 if (!empty($data[$langCode]['title'])) {
                     $news->translations()->create([
                         'language_id' => $language->id,
@@ -208,9 +210,9 @@ class NewsService
         DB::beginTransaction();
 
         $news->translations()->delete();
-        
+
         $news->tags()->detach();
-        
+
         $news->delete();
 
         DB::commit();

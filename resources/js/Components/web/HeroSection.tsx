@@ -7,11 +7,55 @@ import {
     CarouselPrevious,
     type CarouselApi
 } from "@/Components/ui/carousel";
+import {FeaturedNewsList} from "@/Pages/News/_types/featured-images";
 
-const CarouselWithIndicators = () => {
+interface HeroSectionProps {
+    featuredNews?: FeaturedNewsList;
+}
+
+const HeroSection = ({ featuredNews = [] }: HeroSectionProps) => { // Add default empty array
     const [api, setApi] = React.useState<CarouselApi>();
     const [current, setCurrent] = React.useState(0);
     const [isPaused, setIsPaused] = React.useState(false);
+
+    // Default slides
+    const defaultSlides = [
+        {
+            image: '/images/hero/hero1.jpg',
+            title: "Selamat Datang di Fakultas Keguruan dan Ilmu Pendidikan",
+            description: "Membentuk Pendidik Profesional untuk Masa Depan Bangsa"
+        },
+        {
+            image: '/images/hero/hero2.jpg',
+            title: "Program Studi Unggulan",
+            description: "Berbagai Program Studi Terakreditasi untuk Masa Depan Anda"
+        },
+        {
+            image: '/images/hero/hero3.jpg',
+            title: "Fasilitas Modern",
+            description: "Didukung Fasilitas Pembelajaran Terkini"
+        }
+    ];
+
+    const validFeaturedNews = featuredNews.filter(news => {
+        if (!news.featured_expired_date) return false;
+        const expiryDate = new Date(news.featured_expired_date);
+        return expiryDate > new Date();
+    });
+
+    // Combine featured news dan default slides
+    const allSlides = [
+        ...validFeaturedNews.map(news => ({
+            type: 'featured' as const,
+            image: news.slider_image.path,
+            title: news.translations.id.title,
+            slug: news.translations.id.slug
+        })),
+        ...defaultSlides.map(slide => ({
+            type: 'default' as const,
+            ...slide
+        }))
+    ];
 
     useEffect(() => {
         if (!api) return;
@@ -37,24 +81,6 @@ const CarouselWithIndicators = () => {
         });
     }, [api]);
 
-    const slides = [
-        {
-            bg: "bg-green-700",
-            title: "Selamat Datang di Fakultas Keguruan dan Ilmu Pendidikan",
-            description: "Membentuk Pendidik Profesional untuk Masa Depan Bangsa"
-        },
-        {
-            bg: "bg-orange-700",
-            title: "Program Studi Unggulan",
-            description: "Berbagai Program Studi Terakreditasi untuk Masa Depan Anda"
-        },
-        {
-            bg: "bg-violet-700",
-            title: "Fasilitas Modern",
-            description: "Didukung Fasilitas Pembelajaran Terkini"
-        }
-    ];
-
     return (
         <div
             className="relative w-full"
@@ -72,20 +98,48 @@ const CarouselWithIndicators = () => {
                 }}
             >
                 <CarouselContent>
-                    {slides.map((slide, index) => (
+                    {allSlides.map((slide, index) => (
                         <CarouselItem key={index}>
-                            <img src={`/images/hero/hero${index+1}.jpg`} alt="gambar"/>
+                            <div className="relative">
+                                <img
+                                    src={slide.image}
+                                    alt={slide.title}
+                                    className="w-full md:h-[694px] h-[400px] object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                    <div className="container mx-auto px-4 text-center">
+                                        <h2 className="text-white md:text-4xl text-2xl font-bold mb-4">
+                                            {slide.title}
+                                        </h2>
+                                        {slide.type === 'default' && (
+                                            <p className="text-white md:text-xl text-base mb-8">
+                                                {slide.description}
+                                            </p>
+                                        )}
+                                        {slide.type === 'featured' && (
+                                            <a
+                                                href={"/berita/"+slide.slug}
+                                                className="bg-white text-green-600 md:px-6 px-4 md:py-3 py-2 rounded-sm font-semibold hover:bg-green-100 inline-block transition duration-300"
+                                            >
+                                                Baca Selengkapnya
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                         </CarouselItem>
                     ))}
                 </CarouselContent>
 
+                {/* Navigation Arrows - Hidden on Mobile */}
                 <div className="hidden md:block">
                     <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2" />
                     <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2" />
                 </div>
 
+                {/* Indicators */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                    {slides.map((_, index) => (
+                    {allSlides.map((_, index) => (
                         <button
                             key={index}
                             className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
@@ -101,4 +155,4 @@ const CarouselWithIndicators = () => {
     );
 };
 
-export default CarouselWithIndicators;
+export default HeroSection;

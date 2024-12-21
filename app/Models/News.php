@@ -36,4 +36,9 @@ class News extends Model
         return $this->belongsToMany(Tag::class, 'news_tags');
     }
 
+    public function sliderImage(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'slider_image_id');
+    }
+
 }

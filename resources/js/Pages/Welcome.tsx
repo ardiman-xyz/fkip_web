@@ -1,5 +1,5 @@
 import Guest2 from "@/Layouts/GuestLayout2";
-import { Head, Link } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 import {News} from "@/Pages/News/_types";
 import {Event} from "@/Pages/Event/_types";
 import { NewsSection} from "@/Components/web/News";
@@ -7,18 +7,21 @@ import {EventSection} from "@/Components/web/EventSection";
 import { FeaturesSection} from "@/Components/web/Features";
 import HeroSection from "@/Components/web/HeroSection";
 import VideoSection from "@/Components/web/VideoSection";
+import {FeaturedNewsList} from "@/Pages/News/_types/featured-images";
 
 interface WelcomeProps {
     news : News[]
     events: Event[]
+    featuredNews: FeaturedNewsList
 }
 
-export default function Welcome({news, events}:  WelcomeProps) {
+export default function Welcome({news, events, featuredNews}:  WelcomeProps) {
+
 
     return (
         <Guest2>
             <Head title="Home" />
-            <HeroSection />
+            <HeroSection featuredNews={featuredNews} />
             <FeaturesSection />
             <NewsSection news={news} />
             <EventSection events={events} />

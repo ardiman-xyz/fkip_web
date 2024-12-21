@@ -63,6 +63,7 @@ import {
 } from "@/Components/ui/popover";
 
 import { MultiSelect } from "@/Components/MultiSelect";
+import FeaturedModal from "@/Pages/News/_components/FeaturedModal";
 
 interface Props {
     categories: CategoryLabelValues[];
@@ -73,6 +74,9 @@ const Create = ({ categories, tags }: Props) => {
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [isFeaturedModalOpen, setIsFeaturedModalOpen] = useState(false);
+    const [sliderImage, setSliderImage] = useState<Media | null>(null);
+    const [featuredExpiredDate, setFeaturedExpiredDate] = useState('');
 
     const form = useForm<NewsFormValues>({
         resolver: zodResolver(newsFormSchema),
@@ -91,8 +95,13 @@ const Create = ({ categories, tags }: Props) => {
             status: "draft",
             publish_date: new Date().toISOString().split("T")[0],
             tags: [],
+            featured_expired_date: new Date().toISOString().split("T")[0],
+            slider_image: null,
         },
     });
+
+
+    console.info("feature image", form.getValues("is_featured"))
 
     const onSubmit = async (values: NewsFormValues) => {
         if (isSubmitting) return;
@@ -491,35 +500,41 @@ const Create = ({ categories, tags }: Props) => {
                                             control={form.control}
                                             name="is_featured"
                                             render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={
-                                                                field.value
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                <FormControl>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={field.value}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setIsFeaturedModalOpen(true);
+                                                            } else {
+                                                                field.onChange(false);
+                                                                setSliderImage(null);
+                                                                setFeaturedExpiredDate('');
                                                             }
-                                                            onChange={(e) =>
-                                                                field.onChange(
-                                                                    e.target
-                                                                        .checked
-                                                                )
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Featured Article
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            This article will
-                                                            appear in the
-                                                            featured section
-                                                        </FormDescription>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <FormLabel>Featured Article</FormLabel>
+                                                    <FormDescription>
+                                                        This article will appear in the slider section
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                            />
+                                        {
+                                            sliderImage && (
+                                                <div className="flex justify-between items-center text-sm text-gray-500">
+                                                    <span>Featured until: {new Date(featuredExpiredDate).toLocaleDateString()}</span>
+                                                    <span>Size: 1920x694</span>
+                                                </div>
+                                            )
+                                        }
                                     </div>
+
                                 </div>
                             </div>
                         </CardContent>
@@ -534,6 +549,21 @@ const Create = ({ categories, tags }: Props) => {
                     form.setValue("featured_image", media);
                     setIsMediaModalOpen(false);
                 }}
+            />
+            <FeaturedModal
+                isOpen={isFeaturedModalOpen}
+                onClose={() => {
+                    setIsFeaturedModalOpen(false);
+                }}
+                onConfirm={({ image, expiredDate }) => {
+                    setSliderImage(image);
+                    setFeaturedExpiredDate(expiredDate);
+                    form.setValue('is_featured', true);
+                    form.setValue('slider_image', image);
+                    form.setValue('featured_expired_date', expiredDate);
+                }}
+                defaultImage={sliderImage}
+                defaultExpiredDate={featuredExpiredDate}
             />
         </Authenticated>
     );

@@ -29,6 +29,19 @@ class StoreNewsRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'featured_image' => 'nullable|exists:media,id',
             'is_featured' => 'boolean',
+            'slider_image' => [
+                'required_if:is_featured,true',
+                'array'
+            ],
+            'slider_image.id' => [
+                'required_if:is_featured,true',
+                'exists:media,id'
+            ],
+            'featured_expired_date' => [
+                'required_if:is_featured,true',
+                'date',
+                'after:today'
+            ],
             'status' => 'required|in:draft,published',
             'publish_date' => 'required|date',
             'tags' => 'array',
@@ -42,6 +55,9 @@ class StoreNewsRequest extends FormRequest
             'id.title.required' => 'Judul dalam bahasa Indonesia wajib diisi',
             'id.content.required' => 'Konten dalam bahasa Indonesia wajib diisi',
             'category_id.required' => 'Kategori wajib dipilih',
+            'slider_image.required_if' => 'Gambar slider wajib dipilih jika artikel featured',
+            'featured_expired_date.required_if' => 'Tanggal expired wajib diisi jika artikel featured',
+            'featured_expired_date.after' => 'Tanggal expired harus setelah hari ini'
         ];
     }
 }

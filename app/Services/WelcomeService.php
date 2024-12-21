@@ -73,6 +73,38 @@ class WelcomeService
             });
     }
 
+    public function getFeaturedNews()
+    {
+        return News::with([
+            'translations.language',
+            'sliderImage'
+        ])
+            ->where('is_featured', true)
+            ->whereDate('featured_expired_date', '>=', now())
+            ->whereNotNull('slider_image_id')
+            ->orderBy('publish_date', 'desc')
+            ->get()
+            ->map(function ($news) {
+                return [
+                    'id' => $news->id,
+                    'translations' => $news->translations->reduce(function ($acc, $translation) {
+                        $langCode = $translation->language->code;
+                        $acc[$langCode] = [
+                            'title' => $translation->title,
+                            'slug' => $translation->slug,
+                        ];
+                        return $acc;
+                    }, []),
+                    'slider_image' => $news->sliderImage ? [
+                        'id' => $news->sliderImage->id,
+                        'path' => $news->sliderImage->path,
+                    ] : null,
+                    'is_featured' => true,
+                    'featured_expired_date' => $news->featured_expired_date,
+                ];
+            });
+    }
+
     public function getNewsDetail(string $slug): array
     {
         $newsTranslation = NewsTranslation::where('slug', $slug)

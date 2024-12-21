@@ -21,10 +21,20 @@ export const newsFormSchema = z.object({
     }),
     category_id: z.string().min(1, "Category is required"),
     featured_image: z.any().optional(),
-    is_featured: z.boolean().default(false),
     status: z.enum(["draft", "published"]).default("draft"),
     publish_date: z.string().min(1, "Publish date is required"),
     tags: z.array(z.string()).default([]),
+    is_featured: z.boolean().default(false),
+    slider_image: z.object({
+        id: z.number(),
+        path: z.string(),
+    }).nullable().optional(),
+    featured_expired_date: z.string().optional().refine((date) => {
+        if (!date) return true;
+        const today = new Date();
+        const expiryDate = new Date(date);
+        return expiryDate >= today;
+    }, "Expiry date must be in the future"),
 });
 
 export type NewsFormValues = z.infer<typeof newsFormSchema>;
@@ -74,6 +84,11 @@ export type News = {
     status: string;
     path: string;
     is_featured: boolean;
+    slider_image: {
+        id: number;
+        path: string;
+    } | null;
+    featured_expired_date: string | null;
     publish_date: string | null;
     created_at: string;
     updated_at: string;
