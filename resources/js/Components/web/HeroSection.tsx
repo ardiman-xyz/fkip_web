@@ -8,34 +8,18 @@ import {
     type CarouselApi
 } from "@/Components/ui/carousel";
 import {FeaturedNewsList} from "@/Pages/News/_types/featured-images";
+import {Slider} from "@/Pages/Slider/_types";
+import {CarouselSlide} from "@/Components/web/CarouselSlide";
 
 interface HeroSectionProps {
     featuredNews?: FeaturedNewsList;
+    defaultSliders: Slider[];
 }
-
-const HeroSection = ({ featuredNews = [] }: HeroSectionProps) => { // Add default empty array
+const HeroSection = ({ featuredNews = [], defaultSliders = [] }: HeroSectionProps) => { // Add default empty array
     const [api, setApi] = React.useState<CarouselApi>();
     const [current, setCurrent] = React.useState(0);
     const [isPaused, setIsPaused] = React.useState(false);
-
-    // Default slides
-    const defaultSlides = [
-        {
-            image: '/images/hero/hero1.jpg',
-            title: "Selamat Datang di Fakultas Keguruan dan Ilmu Pendidikan",
-            description: "Membentuk Pendidik Profesional untuk Masa Depan Bangsa"
-        },
-        {
-            image: '/images/hero/hero2.jpg',
-            title: "Program Studi Unggulan",
-            description: "Berbagai Program Studi Terakreditasi untuk Masa Depan Anda"
-        },
-        {
-            image: '/images/hero/hero3.jpg',
-            title: "Fasilitas Modern",
-            description: "Didukung Fasilitas Pembelajaran Terkini"
-        }
-    ];
+    const [isTabActive, setIsTabActive] = React.useState(true);
 
     const validFeaturedNews = featuredNews.filter(news => {
         if (!news.featured_expired_date) return false;
@@ -43,28 +27,36 @@ const HeroSection = ({ featuredNews = [] }: HeroSectionProps) => { // Add defaul
         return expiryDate > new Date();
     });
 
-    // Combine featured news dan default slides
     const allSlides = [
         ...validFeaturedNews.map(news => ({
             type: 'featured' as const,
-            image: news.slider_image.path,
-            title: news.translations.id.title,
-            slug: news.translations.id.slug,
+            data: news
         })),
-        ...defaultSlides.map(slide => ({
+        ...defaultSliders.map(slider => ({
             type: 'default' as const,
-            image: slide.image,
-            title: slide.title,
-            description: slide.description
+            data: slider
         }))
     ];
+
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            setIsTabActive(!document.hidden);
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
 
     useEffect(() => {
         if (!api) return;
 
         let intervalId: NodeJS.Timeout | null = null;
 
-        if (!isPaused) {
+        // Hanya jalankan interval jika tidak dipause dan tab aktif
+        if (!isPaused && isTabActive) {
             intervalId = setInterval(() => {
                 api.scrollNext();
             }, 5000);
@@ -73,7 +65,7 @@ const HeroSection = ({ featuredNews = [] }: HeroSectionProps) => { // Add defaul
         return () => {
             if (intervalId) clearInterval(intervalId);
         };
-    }, [api, isPaused]);
+    }, [api, isPaused, isTabActive]);
 
     useEffect(() => {
         if (!api) return;
@@ -82,6 +74,8 @@ const HeroSection = ({ featuredNews = [] }: HeroSectionProps) => { // Add defaul
             setCurrent(api.selectedScrollSnap());
         });
     }, [api]);
+
+    console.log(allSlides);
 
     return (
         <div
@@ -102,23 +96,10 @@ const HeroSection = ({ featuredNews = [] }: HeroSectionProps) => { // Add defaul
                 <CarouselContent>
                     {allSlides.map((slide, index) => (
                         <CarouselItem key={index}>
-                            {slide.type === 'featured' ? (
-                                <a href={`/berita/${slide.slug}`} >
-                                    <img
-                                        src={slide.image}
-                                        alt={slide.title}
-                                        className="w-full md:h-[694px] h-[400px] object-cover"
-                                    />
-
-                                </a>
-                            ) : (
-                                    <img
-                                        src={slide.image}
-                                        alt={slide.title}
-                                        className="w-full md:h-[694px] h-[400px] object-cover"
-                                    />
-
-                            )}
+                            <CarouselSlide
+                                slide={slide.data}
+                                type={slide.type}
+                            />
                         </CarouselItem>
                     ))}
                 </CarouselContent>

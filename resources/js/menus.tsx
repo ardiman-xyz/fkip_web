@@ -8,7 +8,7 @@ import {
     PiUserCircleDuotone,
     PiChartLineDuotone,
     PiGearDuotone,
-    PiCalendarDuotone,
+    PiCalendarDuotone, PiSlideshowDuotone,
 } from "react-icons/pi";
 
 type MenuItem = {
@@ -22,6 +22,20 @@ const menuItems: MenuItem[] = [
         label: "Dashboard",
         icon: <PiLayoutDuotone className="size-5" />,
         href: "/dashboard",
+    },
+    {
+        label: "Analytics",
+        icon: <PiChartLineDuotone className="size-5" />,
+        href: "/analytics",
+    },
+    {
+        label: "separator",
+        icon: null,
+    },
+    {
+        label: "Slider",
+        icon: <PiSlideshowDuotone className="size-5" />,
+        href: "/admin/slider",
     },
     {
         label: "News",
@@ -46,7 +60,6 @@ const menuItems: MenuItem[] = [
     {
         label: "separator",
         icon: null,
-        // href: undefined
     },
     {
         label: "Media Library",
@@ -58,11 +71,7 @@ const menuItems: MenuItem[] = [
         icon: <PiUserCircleDuotone className="size-5" />,
         href: "/authors",
     },
-    {
-        label: "Analytics",
-        icon: <PiChartLineDuotone className="size-5" />,
-        href: "/analytics",
-    },
+
     {
         label: "separator",
         icon: null,

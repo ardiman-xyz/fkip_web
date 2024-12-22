@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\DefaultSlider;
 use App\Models\Event;
 use App\Models\News;
 use App\Models\Language;
@@ -259,50 +260,81 @@ class WelcomeService
 
         $translation = $event->translations->first();
 
-                    return [
-                        'id' => $event->id,
-                        'translations' => [
-                            'id' => [
-                                'title' => $translation?->title,
-                                'slug' => $translation?->slug,
-                                'description' => $translation?->description,
-                                'content' => $translation->content ?? null,
+        return [
+            'id' => $event->id,
+            'translations' => [
+                'id' => [
+                    'title' => $translation?->title,
+                    'slug' => $translation?->slug,
+                    'description' => $translation?->description,
+                    'content' => $translation->content ?? null,
 
-                            ]
-                        ],
-                        'formatted_date' => $event->start_date->format('d F Y'),
-                        'event_status' => $event->end_date->isPast() ? 'Selesai' : 'Akan Datang',
-                        'category' => $event->category ? [
-                            'id' => $event->category->id,
-                            'translations' => [
-                                'id' => [
-                                    'name' => $event->category->translations->first()?->name,
-                                    'slug' => $event->category->translations->first()?->slug,
-                                ]
-                            ]
-                        ] : null,
-                        'media' => $event->media ? [
-                            'id' => $event->media->id,
-                            'path' => $event->media->path,
-                            'paths' => $event->media->paths,
-                        ] : null,
-                        'tags' => $event->tags->map(fn($tag) => [
-                            'value' => (string) $tag->id,
-                            'label' => $tag->translations->first()?->name
-                        ]),
-                        'status' => $event->status,
-                        'is_featured' => $event->is_featured,
-                        'start_date' => $event->start_date->format('Y-m-d H:i:s'),
-                        'end_date' => $event->end_date->format('Y-m-d H:i:s'),
-                        'location' => $event->location,
-                        'type' => $event->type,
-                        'platform' => $event->platform,
-                        'meeting_url' => $event->meeting_url,
-                        'registration_url' => $event->registration_url,
-                        'quota' => $event->quota,
-                        'is_free' => $event->is_free,
-                        'price' => $event->price,
-                        'created_at' => $event->created_at->format('Y-m-d H:i:s'),
-                    ];
-                }
+                ]
+            ],
+            'formatted_date' => $event->start_date->format('d F Y'),
+            'event_status' => $event->end_date->isPast() ? 'Selesai' : 'Akan Datang',
+            'category' => $event->category ? [
+                'id' => $event->category->id,
+                'translations' => [
+                    'id' => [
+                        'name' => $event->category->translations->first()?->name,
+                        'slug' => $event->category->translations->first()?->slug,
+                    ]
+                ]
+            ] : null,
+            'media' => $event->media ? [
+                'id' => $event->media->id,
+                'path' => $event->media->path,
+                'paths' => $event->media->paths,
+            ] : null,
+            'tags' => $event->tags->map(fn($tag) => [
+                'value' => (string) $tag->id,
+                'label' => $tag->translations->first()?->name
+            ]),
+            'status' => $event->status,
+            'is_featured' => $event->is_featured,
+            'start_date' => $event->start_date->format('Y-m-d H:i:s'),
+            'end_date' => $event->end_date->format('Y-m-d H:i:s'),
+            'location' => $event->location,
+            'type' => $event->type,
+            'platform' => $event->platform,
+            'meeting_url' => $event->meeting_url,
+            'registration_url' => $event->registration_url,
+            'quota' => $event->quota,
+            'is_free' => $event->is_free,
+            'price' => $event->price,
+            'created_at' => $event->created_at->format('Y-m-d H:i:s'),
+        ];
+    }
+
+    public function getActiveSliders(int $limit = 3)
+    {
+        return DefaultSlider::with('media')
+            ->where('is_active', true)
+            ->orderBy('order')
+            ->limit($limit)
+            ->get()
+            ->map(function ($slide) {
+                return [
+                    'id' => $slide->id,
+                    'media' => [
+                        'id' => $slide->media->id,
+                        'file_name' => $slide->media->file_name,
+                        'mime_type' => $slide->media->mime_type,
+                        'path' => $slide->media->path,
+                        'size' => $slide->media->size,
+                        'url' => $slide->media->url,
+                        'paths' => [
+                            'blur' => $slide->media->paths['blur'],
+                            'original' => $slide->media->paths['original'],
+                            'thumbnail' => $slide->media->paths['thumbnail']
+                        ]
+                    ],
+                    'url' => $slide->url,
+                    'order' => $slide->order,
+                    'is_active' => (bool) $slide->is_active
+                ];
+            });
+    }
+
 }

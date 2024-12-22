@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DefaultSliderController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\NewsController;
@@ -115,6 +116,15 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('uploadBatch', 'storeBatch')->name('storeBatch');
         Route::put('/{media}', 'update')->name('update');
         Route::delete('/{media}', 'destroy')->name('destroy');
+    });
+
+    Route::controller(DefaultSliderController::class)->prefix('slider')->name('slider.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::get('/slides', 'getSlides')->name('get');
+        Route::post('/', 'store')->name('store');
+        Route::delete('/{slide}', 'destroy')->name('destroy');
+        Route::post('/{slide}/move-up', 'moveUp')->name('move-up');
+        Route::post('/{slide}/move-down', 'moveDown')->name('move-down');
     });
 });
 

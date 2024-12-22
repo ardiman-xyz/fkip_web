@@ -22,11 +22,13 @@ class WelcomeController extends Controller
         $news = $this->welcomeService->getLatestNews();
         $events = $this->welcomeService->getLatestEvents();
         $featuredNews = $this->welcomeService->getFeaturedNews();
+        $defaultSliders = $this->welcomeService->getActiveSliders();
 
         return Inertia::render('Welcome', [
             "news" => $news,
             "events" => $events,
             "featuredNews" => $featuredNews,
+            "defaultSliders" => $defaultSliders
         ]);
     }
 

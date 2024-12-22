@@ -15,10 +15,16 @@ export default function Guest2({ children }: Props) {
 
         <div className="font-jakarta">
             <div className="flex flex-col min-h-screen">
-                <TopBar />
-                <Navbar />
-                    <main className="flex-grow bg-gray-100">{children}</main>
-                <Footer />
+                <div className="fixed top-0 left-0 right-0 z-50">
+                    <TopBar/>
+                </div>
+                <div className="fixed top-[36px] left-0 right-0 z-40">
+                    <Navbar/>
+                </div>
+                <main className="flex-grow bg-gray-100 pt-[116px]">
+                    {children}
+                </main>
+                <Footer/>
             </div>
         </div>
     );

@@ -61,7 +61,7 @@ export type MediaPaths = {
     thumbnail: string;
 };
 
-type Media = {
+export type Media = {
     id: number;
     file_name: string;
     mime_type: string;
