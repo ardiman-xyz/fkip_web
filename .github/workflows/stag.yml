@@ -37,7 +37,7 @@ jobs:
 
       - name: Build Application Image
         run: |
-          docker build -f docker/prod/prod.Dockerfile \
+          docker build -f docker/staging/prod.Dockerfile \
            -t ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }} \
            -t ghcr.io/ardiman-xyz/fkip_web_app:staging .
 

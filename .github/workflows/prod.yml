@@ -70,4 +70,3 @@ jobs:
             sleep 10
             docker compose exec -T app php artisan migrate --force
             docker compose exec -T app php artisan db:seed --force
-            docker compose exec -T app php artisan optimize:clear
