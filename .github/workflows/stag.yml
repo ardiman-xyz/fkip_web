@@ -1,0 +1,71 @@
+name: Deploy Staging
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
+
+permissions:
+  contents: read
+  packages: write
+  actions: write # Tambahkan ini
+  id-token: write # Dan ini
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Get version from tag
+        id: get_version
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+            echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          else
+            echo "Error: No valid tag found!" >&2
+            exit 1
+          fi
+
+      - name: Build Application Image
+        run: |
+          docker build -f docker/prod/prod.Dockerfile \
+           -t ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }} \
+           -t ghcr.io/ardiman-xyz/fkip_web_app:staging .
+
+          docker push ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }}
+          docker push ghcr.io/ardiman-xyz/fkip_web_app:staging
+
+      - name: Deploy to staging
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /var/www/html/docker/web-fkip
+
+             if grep -q "APP_VERSION=" .env; then
+              sed -i "s/APP_VERSION=.*/APP_VERSION=${{ env.VERSION }}/" .env
+            else
+              echo "APP_VERSION=${{ env.VERSION }}" >> .env
+            fi
+
+            docker compose pull
+
+            docker image prune -f
+
+            docker compose down
+            docker compose up -d
+
+            sleep 10
+            docker compose exec -T app php artisan migrate --force
+            docker compose exec -T app php artisan db:seed --force

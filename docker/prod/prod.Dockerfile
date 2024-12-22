@@ -26,7 +26,7 @@ COPY resources/ ./resources/
 
 ENV VITE_REVERB_APP_KEY=xryckfivmpyxvl3qfzit \
     REVERB_APP_SECRET=jhfdpgblex6up6cemwp8 \
-    VITE_REVERB_HOST=web-stag.fkip.umkendari.ac.id \
+    VITE_REVERB_HOST=fkip.umkendari.ac.id \
     VITE_REVERB_PORT=443 \
     VITE_REVERB_SCHEME=https
 
