@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Jobs\UserLoginLog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -32,6 +34,26 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        $logData = [
+            'Name' => Auth::user()->name,
+            'Email' => Auth::user()->email,
+            'Time' => now()->format('Y-m-d H:i:s'),
+            'IP' => $request->ip(),
+            'Device' => $request->userAgent(),
+            'Environment' => app()->environment(),
+            'Location' => $request->header('CF-IPCountry', 'Unknown'),
+            'Login Method' => $request->hasHeader('Authorization') ? 'API' : 'Web',
+            'Previous URL' => url()->previous(),
+            'Session ID' => session()->getId(),
+            'Request Method' => $request->method(),
+            'App Version' => config('app.version', '1.0.0'),
+            'Browser Language' => $request->getPreferredLanguage(),
+            'Is Secure' => $request->secure() ? 'Yes' : 'No',
+            'Server IP' => $_SERVER['SERVER_ADDR'] ?? 'Unknown'
+        ];
+
+        UserLoginLog::dispatch($logData);
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

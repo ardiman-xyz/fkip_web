@@ -1,5 +1,6 @@
 
 import React from 'react';
+import {Link} from "@inertiajs/react";
 
 const DefaultComponent: React.FC = () => {
     return (
@@ -23,7 +24,8 @@ const DefaultComponent: React.FC = () => {
                         <a href="#">Jurnal</a>
                     </li>
                     <li className={'ml-10'}>
-                        <a href="https://auth.fkip.umkendari.ac.id/" target={'_blank'} className={'underline'}>Login sso</a>
+                        {/*<a href="https://auth.fkip.umkendari.ac.id/" target={'_blank'} className={'underline'}>Login sso</a>*/}
+                        <Link href={"/login"} target={'_blank'} className={'underline'}>Login sso</Link>
                     </li>
                 </ul>
             </div>

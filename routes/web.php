@@ -17,6 +17,7 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 
+
 Route::get("/berita", [WelcomeController::class, "detailBerita"]);
 
 //Route::get('/test-rabbitmq', function() {
