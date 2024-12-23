@@ -15,13 +15,11 @@ const TestConnection = () => {
         const channel = echoInstance.channel(`ods-notifications`);
 
         channel.subscribed(() => {
-            console.log("Successfully subscribed to private channel");
             setStatus("Subscribed to private channel");
         });
 
         channel.listen(".ods.notification", (data: any) => {
             // Tambahkan titik di depan
-            console.log("New notification:", data);
             toast.info("New notification from ODS!", {
                 description: data.message,
             });

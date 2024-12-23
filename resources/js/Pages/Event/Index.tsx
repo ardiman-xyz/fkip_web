@@ -19,8 +19,6 @@ interface IndexProps {
 }
 
 const Index = ({ events }: IndexProps) => {
-    console.info(events);
-
     return (
         <Authenticated
             header={<h2 className="text-2xl font-black">Event Management</h2>}

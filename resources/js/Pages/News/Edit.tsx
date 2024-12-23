@@ -76,8 +76,6 @@ interface Props {
 }
 
 const Edit = ({ categories, tags, news }: Props) => {
-    console.info(news);
-
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 

@@ -40,9 +40,6 @@ export function MultiSelect({
     disabled = false,
     emptyMessage = "No items found.",
 }: MultiSelectProps) {
-    console.log("Options:", options);
-    console.log("Value:", value);
-
     return (
         <Popover>
             <PopoverTrigger asChild>

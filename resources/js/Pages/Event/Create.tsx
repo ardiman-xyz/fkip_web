@@ -90,7 +90,6 @@ const Create = ({ categories, tags }: Props) => {
     const onSubmit = async (values: EventFormValues) => {
         const formattedStartDate = getAdjustedDate(values.start_date);
         const formattedEndDate = getAdjustedDate(values.end_date);
-        console.info(formattedStartDate, formattedEndDate);
         try {
             setIsSubmitting(true);
 

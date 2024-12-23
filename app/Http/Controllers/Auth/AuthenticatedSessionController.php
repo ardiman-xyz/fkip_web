@@ -35,7 +35,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if (env('APP_ENV') === 'production') {
+        if (env('APP_ENV') === 'production' || env('APP_ENV') === 'staging') {
             $logData = [
                 'Name' => Auth::user()->name,
                 'Email' => Auth::user()->email,

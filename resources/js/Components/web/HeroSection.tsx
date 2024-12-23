@@ -1,41 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
     Carousel,
     CarouselContent,
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
-    type CarouselApi
+    type CarouselApi,
 } from "@/Components/ui/carousel";
-import {FeaturedNewsList} from "@/Pages/News/_types/featured-images";
-import {Slider} from "@/Pages/Slider/_types";
-import {CarouselSlide} from "@/Components/web/CarouselSlide";
+import { FeaturedNewsList } from "@/Pages/News/_types/featured-images";
+import { Slider } from "@/Pages/Slider/_types";
+import { CarouselSlide } from "@/Components/web/CarouselSlide";
 
 interface HeroSectionProps {
     featuredNews?: FeaturedNewsList;
     defaultSliders: Slider[];
 }
-const HeroSection = ({ featuredNews = [], defaultSliders = [] }: HeroSectionProps) => { // Add default empty array
+const HeroSection = ({
+    featuredNews = [],
+    defaultSliders = [],
+}: HeroSectionProps) => {
+    // Add default empty array
     const [api, setApi] = React.useState<CarouselApi>();
     const [current, setCurrent] = React.useState(0);
     const [isPaused, setIsPaused] = React.useState(false);
     const [isTabActive, setIsTabActive] = React.useState(true);
 
-    const validFeaturedNews = featuredNews.filter(news => {
+    const validFeaturedNews = featuredNews.filter((news) => {
         if (!news.featured_expired_date) return false;
         const expiryDate = new Date(news.featured_expired_date);
         return expiryDate > new Date();
     });
 
     const allSlides = [
-        ...validFeaturedNews.map(news => ({
-            type: 'featured' as const,
-            data: news
+        ...validFeaturedNews.map((news) => ({
+            type: "featured" as const,
+            data: news,
         })),
-        ...defaultSliders.map(slider => ({
-            type: 'default' as const,
-            data: slider
-        }))
+        ...defaultSliders.map((slider) => ({
+            type: "default" as const,
+            data: slider,
+        })),
     ];
 
     useEffect(() => {
@@ -43,10 +47,13 @@ const HeroSection = ({ featuredNews = [], defaultSliders = [] }: HeroSectionProp
             setIsTabActive(!document.hidden);
         };
 
-        document.addEventListener('visibilitychange', handleVisibilityChange);
+        document.addEventListener("visibilitychange", handleVisibilityChange);
 
         return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            document.removeEventListener(
+                "visibilitychange",
+                handleVisibilityChange
+            );
         };
     }, []);
 
@@ -70,12 +77,10 @@ const HeroSection = ({ featuredNews = [], defaultSliders = [] }: HeroSectionProp
     useEffect(() => {
         if (!api) return;
 
-        api.on('select', () => {
+        api.on("select", () => {
             setCurrent(api.selectedScrollSnap());
         });
     }, [api]);
-
-    console.log(allSlides);
 
     return (
         <div
@@ -115,7 +120,9 @@ const HeroSection = ({ featuredNews = [], defaultSliders = [] }: HeroSectionProp
                         <button
                             key={index}
                             className={`w-2 h-2 md:w-3 md:h-3 rounded-full transition-all duration-300 ${
-                                current === index ? "bg-white scale-125" : "bg-white/50"
+                                current === index
+                                    ? "bg-white scale-125"
+                                    : "bg-white/50"
                             }`}
                             onClick={() => api?.scrollTo(index)}
                             aria-label={`Go to slide ${index + 1}`}
