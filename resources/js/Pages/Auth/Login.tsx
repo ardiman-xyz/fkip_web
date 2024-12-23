@@ -8,9 +8,9 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 export default function Login({
-    status,
-    canResetPassword,
-}: {
+                                  status,
+                                  canResetPassword,
+                              }: {
     status?: string;
     canResetPassword: boolean;
 }) {
@@ -48,7 +48,7 @@ export default function Login({
                         name="email"
                         value={data.email}
                         className="mt-1 block w-full"
-                        autoComplete="username"
+                        autoComplete="off"
                         isFocused={true}
                         onChange={(e) => setData('email', e.target.value)}
                     />
@@ -65,7 +65,7 @@ export default function Login({
                         name="password"
                         value={data.password}
                         className="mt-1 block w-full"
-                        autoComplete="current-password"
+                        autoComplete="off"
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
@@ -87,17 +87,17 @@ export default function Login({
                     </label>
                 </div>
 
-                <div className="mt-4 flex items-center justify-end">
-                    {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        >
-                            Forgot your password?
-                        </Link>
-                    )}
+                <div className="mt-6 flex">
+                    {/*{canResetPassword && (*/}
+                    {/*    <Link*/}
+                    {/*        href={route('password.request')}*/}
+                    {/*        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"*/}
+                    {/*    >*/}
+                    {/*        Forgot your password?*/}
+                    {/*    </Link>*/}
+                    {/*)}*/}
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <PrimaryButton  disabled={processing}>
                         Log in
                     </PrimaryButton>
                 </div>
@@ -105,3 +105,4 @@ export default function Login({
         </GuestLayout>
     );
 }
+
