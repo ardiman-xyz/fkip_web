@@ -44,7 +44,9 @@ const UserDropdownMenu = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" collisionPadding={25}>
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.get("/profile")}>
+                        Profile
+                    </DropdownMenuItem>
                     <DropdownMenuItem>Settings</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />

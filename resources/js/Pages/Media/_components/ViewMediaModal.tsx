@@ -56,7 +56,7 @@ export const ViewMediaModal = ({
 
     const toggleFullscreen = () => {
         if (media.mime_type?.includes("image")) {
-            window.open(media.url, "_blank");
+            window.open(media.path, "_blank");
         }
     };
 

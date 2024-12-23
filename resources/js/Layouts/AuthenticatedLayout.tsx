@@ -7,8 +7,8 @@ import { Toaster } from "@/Components/ui/sonner";
 import TestConnection from "@/Components/TestConnectionReverb";
 import { BroadcastTest } from "@/Components/BroadcastTest";
 import { UploadProgress } from "@/Components/UploadProgres";
-import {usePage} from "@inertiajs/react";
-import {PageProps} from "@/types";
+import { usePage } from "@inertiajs/react";
+import { PageProps } from "@/types";
 
 interface EventResponse {
     user_id: number;
@@ -20,11 +20,9 @@ export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-
     const { app_version } = usePage<PageProps>().props;
 
     return (
-
         <div className="relative min-h-dvh bg-gray-200 dark:bg-black">
             <Toaster richColors={true} />
             <div className="flex p-3 2xl:h-dvh">

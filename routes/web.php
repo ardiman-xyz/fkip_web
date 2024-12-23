@@ -99,7 +99,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('/{news}', 'destroy')->name('destroy');
     });
 
-    // // Events Management
+    // Events Management
     Route::controller(EventController::class)->prefix('events')->name('events.')->group(function() {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
@@ -109,6 +109,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('/{event}', 'destroy')->name('destroy');
     });
 
+     // Media Management
     Route::controller(MediaController::class)->prefix('media')->name('media.')->group(function() {
         Route::get('/', 'index')->name('index');
         Route::get('view', 'indexView')->name('indexView');
@@ -118,6 +119,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('/{media}', 'destroy')->name('destroy');
     });
 
+     // Events Slider
     Route::controller(DefaultSliderController::class)->prefix('slider')->name('slider.')->group(function() {
         Route::get('/', 'index')->name('index');
         Route::get('/slides', 'getSlides')->name('get');

@@ -9,10 +9,10 @@ const AppHeader = ({ header }: { header?: ReactNode }) => {
         <div className="flex h-20 w-full shrink-0 items-center justify-between border-b border-gray-200 px-8 dark:border-gray-800">
             {header}
             <div className="flex w-96 items-center">
-                <SearchButton className="w-full" />
+                {/* <SearchButton className="w-full" /> */}
             </div>
             <div className="flex items-center gap-2">
-                <div className="mr-4 flex gap-2">
+                {/* <div className="mr-4 flex gap-2">
                     <Button
                         variant="ghost"
                         size="icon"
@@ -33,7 +33,7 @@ const AppHeader = ({ header }: { header?: ReactNode }) => {
                         </span>
                         <PiBellFill className="size-8" />
                     </Button>
-                </div>{" "}
+                </div>{" "} */}
                 <UserDropdownMenu />
             </div>
         </div>

@@ -11,17 +11,17 @@ const Footer = () => {
             <div className="absolute -top-4 left-0 h-4 w-full border-b border-gray-200 bg-gradient-to-t from-white dark:border-gray-800 dark:from-gray-900"></div>
 
             <div className="flex items-center gap-2">
-                <PiUsersFourDuotone className="size-4" />
+                {/* <PiUsersFourDuotone className="size-4" />
                 <span className="font-mono text-xs font-medium">
                     Users Online: <span className="font-bold">1,455</span>
-                </span>
+                </span> */}
             </div>
 
             <div className="flex items-center gap-2">
-                <PiCurrencyCircleDollarDuotone className="size-4" />
+                {/* <PiCurrencyCircleDollarDuotone className="size-4" />
                 <span className="font-mono text-xs font-medium">
                     Today's Sale: <span className="font-bold">$3,298.75</span>
-                </span>
+                </span> */}
             </div>
 
             <div className="flex items-center gap-2">

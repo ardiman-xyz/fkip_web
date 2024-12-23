@@ -4,9 +4,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Media } from "@/types/app";
 import { Head, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
-import {
-    PiUploadSimpleDuotone,
-} from "react-icons/pi";
+import { PiUploadSimpleDuotone } from "react-icons/pi";
 import { UploadModalMedia } from "./_components/UploadModal";
 import { ChevronDown, LayoutGrid, List } from "lucide-react";
 import { MediaItem } from "./_components/MediaItem";
@@ -76,7 +74,7 @@ const MediaLibrary = ({ media: initialMedia }: Props) => {
                         >
                             <LayoutGrid className="size-4" />
                         </Button>
-                        <Button
+                        {/* <Button
                             onClick={() => setViewType("list")}
                             variant={
                                 viewType === "list" ? "secondary" : "ghost"
@@ -84,15 +82,15 @@ const MediaLibrary = ({ media: initialMedia }: Props) => {
                             size="icon"
                         >
                             <List className="size-4" />
-                        </Button>
+                        </Button> */}
                     </div>
 
                     <div className="flex items-center gap-x-3">
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" disabled>
                             Type
                             <ChevronDown className="ml-2 size-4" />
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" disabled>
                             Date Modified
                             <ChevronDown className="ml-2 size-4" />
                         </Button>
