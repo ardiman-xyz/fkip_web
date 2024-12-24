@@ -1,10 +1,11 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { Head, router, usePage } from "@inertiajs/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
+
 import { VisiMisi } from "./Tabs/VisiMisi";
 import { Accreditation } from "./Tabs/Akreditasi";
-import { Struktur } from "./Tabs/Struktur";
 import { Dekan } from "./Tabs/Dekan";
+import { OrganizationStructure } from "./Tabs/OrganizationStructure";
 
 const AboutUs = () => {
     const { url } = usePage();
@@ -33,7 +34,7 @@ const AboutUs = () => {
         {
             id: "struktur",
             title: "Struktur Organisasi",
-            component: <Struktur />,
+            component: <OrganizationStructure />,
         },
         { id: "dekan", title: "Profil Dekan", component: <Dekan /> },
     ];

@@ -9,6 +9,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/', 'index')->name('index');
         Route::get('/vision-mission', 'show')->name('vision-mission.show');
         Route::post('/vision-mission', 'updateVisionMission')->name('vision-mission.update');
+        Route::get('/structure', 'getStructure')->name('structure.get');
+        Route::post('/structure', 'updateStructure')->name('structure.update');
     });
 
     Route::controller(AccreditationController::class)->prefix('accreditation')->name('accreditation.')->group(function() {
@@ -17,5 +19,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('/{accreditation}','destroy')->name('destroy');
         Route::put('/{accreditation}', 'update')->name('update');
         Route::post('/{accreditation}/order','updateOrder')->name('update-order');
+
     });
 });

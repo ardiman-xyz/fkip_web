@@ -57,26 +57,40 @@ export const Accreditation = () => {
         );
     };
 
-    const handleMoveUp = async (id: number) => {
-        try {
-            await axios.post(route("admin.slider.move-up", id));
-            await fetchContent();
-            toast.success("Slide order updated");
-        } catch (error) {
-            toast.error("Failed to update slide order");
-        }
+    const handleMoveUp = (id: number) => {
+        setAccreditations((prevAccreditations) => {
+            const index = prevAccreditations.findIndex(
+                (item) => item.id === id
+            );
+            if (index <= 0) return prevAccreditations;
+
+            const newAccreditations = [...prevAccreditations];
+            [newAccreditations[index], newAccreditations[index - 1]] = [
+                newAccreditations[index - 1],
+                newAccreditations[index],
+            ];
+
+            return newAccreditations;
+        });
     };
 
-    const handleMoveDown = async (id: number) => {
-        try {
-            await axios.post(route("admin.slider.move-down", id));
-            await fetchContent();
-            toast.success("Slide order updated");
-        } catch (error) {
-            toast.error("Failed to update slide order");
-        }
-    };
+    const handleMoveDown = (id: number) => {
+        setAccreditations((prevAccreditations) => {
+            const index = prevAccreditations.findIndex(
+                (item) => item.id === id
+            );
+            if (index === -1 || index === prevAccreditations.length - 1)
+                return prevAccreditations;
 
+            const newAccreditations = [...prevAccreditations];
+            [newAccreditations[index], newAccreditations[index + 1]] = [
+                newAccreditations[index + 1],
+                newAccreditations[index],
+            ];
+
+            return newAccreditations;
+        });
+    };
     return (
         <>
             <Card>
@@ -120,15 +134,8 @@ export const Accreditation = () => {
                                     onStatusChange={(id, status) => {
                                         // Handle status change logic
                                     }}
-                                    onMoveUp={(id) => {
-                                        // Handle move up logic
-                                    }}
-                                    onMoveDown={(id) => {
-                                        // Handle move down logic
-                                    }}
-                                    onEdit={(id) => {
-                                        // Handle edit logic
-                                    }}
+                                    onMoveUp={handleMoveUp}
+                                    onMoveDown={handleMoveDown}
                                     onDelete={(id) => handleDeleteSuccess(id)}
                                     fetchData={fetchContent}
                                 />

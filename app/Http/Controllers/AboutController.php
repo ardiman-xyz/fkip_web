@@ -59,5 +59,44 @@ class AboutController extends Controller
            ], 500);
        }
    }
+
+
+   public function getStructure()
+   {
+       try {
+           $structure = $this->aboutService->getStructure();
+           
+           return response()->json([
+               'status' => true,
+               'data' => $structure
+           ]);
+       } catch (\Exception $e) {
+           return response()->json([
+               'status' => false,
+               'message' => 'Gagal mengambil data struktur organisasi'
+           ], 500);
+       }
+   }
+
+   public function updateStructure(Request $request)
+   {
+       $request->validate([
+           'organization_structure_id' => 'required|exists:media,id'
+       ]);
+
+       try {
+           $this->aboutService->updateStructure($request->organization_structure_id);
+           
+           return response()->json([
+               'status' => true,
+               'message' => 'Berhasil memperbarui struktur organisasi'
+           ]);
+       } catch (\Exception $e) {
+           return response()->json([
+               'status' => false,
+               'message' => 'Gagal memperbarui struktur organisasi'
+           ], 500);
+       }
+   }
 }
 

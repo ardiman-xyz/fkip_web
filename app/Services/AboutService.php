@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\About;
+use App\Models\Media;
 use Illuminate\Support\Facades\DB;
 
 class AboutService
@@ -65,6 +66,25 @@ class AboutService
                     ?->mission ?? ''
             ]
         ];
+   }
+
+
+   public function updateStructure(int $mediaId): bool
+   {
+       try {
+           $about = About::firstOrFail();
+           
+           return $about->update([
+               'organization_structure_id' => $mediaId
+           ]);
+       } catch (\Exception $e) {
+           throw $e;
+       }
+   }
+
+   public function getStructure(): ?Media
+   {
+       return About::firstOrFail()->organizationStructure;
    }
 
  

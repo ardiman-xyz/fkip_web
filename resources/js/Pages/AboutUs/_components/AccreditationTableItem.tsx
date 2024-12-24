@@ -7,16 +7,17 @@ import { useState } from "react";
 import { DeleteConfirm } from "@/Components/DeleteConfirmation";
 import { Portal } from "@headlessui/react";
 import { AccreditationFormModal } from "./ccreditationFormModal";
+import axios from "axios";
+import { toast } from "sonner";
 
 interface AccreditationTableItemProps {
     accreditation: AccreditationType;
     index: number;
     totalItems: number;
     onStatusChange: (id: number, status: boolean) => void;
+    onDelete: (id: number) => void;
     onMoveUp: (id: number) => void;
     onMoveDown: (id: number) => void;
-    onEdit: (id: number) => void;
-    onDelete: (id: number) => void;
     fetchData: () => void;
 }
 
@@ -25,11 +26,10 @@ export const AccreditationTableItem = ({
     index,
     totalItems,
     onStatusChange,
-    onMoveUp,
-    onMoveDown,
-    onEdit,
     onDelete,
     fetchData,
+    onMoveUp,
+    onMoveDown,
 }: AccreditationTableItemProps) => {
     const [isModalDeleteOpen, setIsModalDeleteOpen] = useState<boolean>(false);
     const [isModalEditOpen, setIsModalEditOpen] = useState<boolean>(false);
@@ -42,6 +42,30 @@ export const AccreditationTableItem = ({
     const handleCloseModalEdit = () => {
         setIsModalEditOpen(false);
         fetchData();
+    };
+
+    const handleMoveUp = async (id: number) => {
+        try {
+            await axios.post(route("admin.accreditation.update-order", id), {
+                direction: "up",
+            });
+            onMoveUp(id);
+            toast.success("Sukses mengubah urutan");
+        } catch (error) {
+            toast.error("Gagal mengubah urutan");
+        }
+    };
+
+    const handleMoveDown = async (id: number) => {
+        try {
+            await axios.post(route("admin.accreditation.update-order", id), {
+                direction: "down",
+            });
+            toast.success("Sukses mengubah urutan");
+            onMoveDown(id);
+        } catch (error) {
+            toast.error("Gagal mengubah urutan");
+        }
     };
 
     return (
@@ -90,7 +114,7 @@ export const AccreditationTableItem = ({
                         variant="outline"
                         size="icon"
                         disabled={index === 0}
-                        onClick={() => onMoveUp(accreditation.id)}
+                        onClick={() => handleMoveUp(accreditation.id)}
                     >
                         <ArrowUp className="size-4" />
                     </Button>
@@ -98,7 +122,7 @@ export const AccreditationTableItem = ({
                         variant="outline"
                         size="icon"
                         disabled={index === totalItems - 1}
-                        onClick={() => onMoveDown(accreditation.id)}
+                        onClick={() => handleMoveDown(accreditation.id)}
                     >
                         <ArrowDown className="size-4" />
                     </Button>
