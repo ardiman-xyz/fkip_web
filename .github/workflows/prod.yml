@@ -1,4 +1,4 @@
-name:  Deploy Production
+name: Deploy Production
 on:
   push:
     tags:
@@ -44,7 +44,6 @@ jobs:
           docker push ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }}
           docker push ghcr.io/ardiman-xyz/fkip_web_app:stable
 
-
       - name: Deploy to production
         uses: appleboy/ssh-action@master
         with:
@@ -61,7 +60,7 @@ jobs:
             fi
 
             if grep -q "APP_ENV=" .env; then
-              sed -i "s/APP_ENV=.*/APP_ENV=staging/" .env
+              sed -i "s/APP_ENV=.*/APP_ENV=production/" .env
             else
               echo "APP_ENV=production" >> .env
             fi

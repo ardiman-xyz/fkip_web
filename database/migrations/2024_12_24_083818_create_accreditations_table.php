@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('abouts', function (Blueprint $table) {
+        Schema::create('accreditations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_structure_id')->nullable()->constrained('media')->nullOnDelete();
-            $table->foreignId('dean_image_id')->nullable()->constrained('media')->nullOnDelete();
+            $table->foreignId('media_id')->nullable()->constrained()->nullOnDelete();
+            $table->year('year');
+            $table->boolean('is_active')->default(true);
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('abouts');
+        Schema::dropIfExists('accreditations');
     }
 };

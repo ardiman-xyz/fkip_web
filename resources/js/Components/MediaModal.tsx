@@ -25,7 +25,7 @@ interface MediaModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSelect?: (media: Media) => void;
-    selectedMedia?: Media | null; // Tambahkan ini
+    selectedMedia?: Media | null;
 }
 
 export const MediaModal = ({

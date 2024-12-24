@@ -16,7 +16,7 @@ const Navigation = () => {
                         key={`menu-${index}`}
                         href={menu.href ?? "#"}
                         className={`mx-3 flex items-center gap-2 rounded-lg px-3 py-2 ${
-                            url === menu.href
+                            url.startsWith(menu.href ?? "")
                                 ? "bg-black text-white dark:border-gray-800 dark:hover:bg-black"
                                 : "hover:bg-gray-100 dark:hover:bg-gray-700"
                         }`}

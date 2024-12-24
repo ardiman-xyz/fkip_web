@@ -1,34 +1,39 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import {Head} from "@inertiajs/react";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/Components/ui/card";
-import {PiNewspaperDuotone} from "react-icons/pi";
-import {Button} from "@/Components/ui/button";
-import {CreateSlideModal} from "@/Pages/Slider/_components/CreateSlideModal";
-import {Slider} from "@/Pages/Slider/_types";
-import {SlideItem} from "@/Pages/News/_components/SlideItem";
-import {toast} from "sonner";
+import { Head } from "@inertiajs/react";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/Components/ui/card";
+import { PiNewspaperDuotone } from "react-icons/pi";
+import { Button } from "@/Components/ui/button";
+import { CreateSlideModal } from "@/Pages/Slider/_components/CreateSlideModal";
+import { Slider } from "@/Pages/Slider/_types";
+import { SlideItem } from "@/Pages/News/_components/SlideItem";
+import { toast } from "sonner";
 import axios from "axios";
-import {Loader, } from "lucide-react";
+import { Loader } from "lucide-react";
 
 interface IndexProps {
-    sliders: Slider[]
+    sliders: Slider[];
 }
 
-const DefaultComponent = ({sliders }: IndexProps) => {
-
-    const [slides, setSlides] = React.useState<Slider[]>(sliders ||[]);
+const DefaultComponent = ({ sliders }: IndexProps) => {
+    const [slides, setSlides] = React.useState<Slider[]>(sliders || []);
     const [isModalAddOpen, setIsModalAddOpen] = React.useState(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     const fetchSlides = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get(route('admin.slider.get'));
+            const response = await axios.get(route("admin.slider.get"));
             setSlides(response.data.data);
         } catch (error) {
-            toast.error('Failed to fetch slides');
-        }finally {
+            toast.error("Failed to fetch slides");
+        } finally {
             setIsLoading(false);
         }
     };
@@ -42,37 +47,39 @@ const DefaultComponent = ({sliders }: IndexProps) => {
         setIsModalAddOpen(false);
     };
 
-
     const handleMoveUp = async (id: number) => {
         try {
-            await axios.post(route('admin.slider.move-up', id));
+            await axios.post(route("admin.slider.move-up", id));
             await fetchSlides();
-            toast.success('Slide order updated');
+            toast.success("Slide order updated");
         } catch (error) {
-            toast.error('Failed to update slide order');
+            toast.error("Failed to update slide order");
         }
     };
 
     const handleMoveDown = async (id: number) => {
         try {
-            await axios.post(route('admin.slider.move-down', id));
+            await axios.post(route("admin.slider.move-down", id));
             await fetchSlides();
-            toast.success('Slide order updated');
+            toast.success("Slide order updated");
         } catch (error) {
-            toast.error('Failed to update slide order');
+            toast.error("Failed to update slide order");
         }
     };
 
-
-
     const handleDelete = (id: number) => {
-        setSlides((prevSlides) => prevSlides.filter((slide) => slide.id !== id));
+        setSlides((prevSlides) =>
+            prevSlides.filter((slide) => slide.id !== id)
+        );
     };
-
 
     return (
         <Authenticated
-            header={<h2 className="text-2xl font-black">Slide Content Management</h2>}
+            header={
+                <h2 className="text-2xl font-black">
+                    Slide Content Management
+                </h2>
+            }
         >
             <Head title="News Management" />
             <div className="flex flex-col gap-4 overflow-y-auto scroll-smooth p-4">
@@ -86,7 +93,9 @@ const DefaultComponent = ({sliders }: IndexProps) => {
                                     <span>Content Slide</span>
                                 </div>
                                 <div>
-                                    <Button onClick={() => setIsModalAddOpen(true)}>
+                                    <Button
+                                        onClick={() => setIsModalAddOpen(true)}
+                                    >
                                         Add slide
                                     </Button>
                                 </div>

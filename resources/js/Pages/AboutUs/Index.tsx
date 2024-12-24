@@ -1,9 +1,8 @@
-// pages/Admin/AboutUs/index.tsx
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { Head, router, usePage } from "@inertiajs/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { VisiMisi } from "./Tabs/VisiMisi";
-import { Akreditasi } from "./Tabs/Akreditasi";
+import { Accreditation } from "./Tabs/Akreditasi";
 import { Struktur } from "./Tabs/Struktur";
 import { Dekan } from "./Tabs/Dekan";
 
@@ -29,7 +28,7 @@ const AboutUs = () => {
         {
             id: "akreditasi",
             title: "Sertifikat Akreditasi",
-            component: <Akreditasi />,
+            component: <Accreditation />,
         },
         {
             id: "struktur",
