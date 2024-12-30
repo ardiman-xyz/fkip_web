@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import {
     Card,
     CardContent,

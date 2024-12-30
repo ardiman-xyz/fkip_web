@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AccreditationController;
+use App\Http\Controllers\LeaderController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
@@ -20,5 +21,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::put('/{accreditation}', 'update')->name('update');
         Route::post('/{accreditation}/order','updateOrder')->name('update-order');
 
+    });
+
+    Route::controller(LeaderController::class)->prefix('leaders')->name('leaders.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::get('/data', 'getData')->name('get');
+        Route::post('/', 'store')->name('store');
+        Route::put('/{leader}', 'update')->name('update');
+        Route::delete('/{leader}', 'destroy')->name('destroy');
+        Route::post('/{leader}/order', 'updateOrder')->name('update-order');
     });
 });

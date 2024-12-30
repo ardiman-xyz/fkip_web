@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 
 import { VisiMisi } from "./Tabs/VisiMisi";
 import { Accreditation } from "./Tabs/Akreditasi";
-import { Dekan } from "./Tabs/Dekan";
+import { Leaders } from "./Tabs/Leader";
 import { OrganizationStructure } from "./Tabs/OrganizationStructure";
 
 const AboutUs = () => {
@@ -36,7 +36,7 @@ const AboutUs = () => {
             title: "Struktur Organisasi",
             component: <OrganizationStructure />,
         },
-        { id: "dekan", title: "Profil Dekan", component: <Dekan /> },
+        { id: "leader", title: "Pimpinan", component: <Leaders /> },
     ];
 
     return (

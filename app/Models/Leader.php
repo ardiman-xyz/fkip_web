@@ -15,7 +15,7 @@ class Leader extends Model
         return $this->hasMany(LeaderTranslation::class);
     }
 
-    public function photo()
+    public function media()
     {
         return $this->belongsTo(Media::class, 'photo_id');
     }

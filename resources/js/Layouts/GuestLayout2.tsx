@@ -1,8 +1,5 @@
-import { PropsWithChildren } from "react";
-
 import Footer from "@/Components/web/Footer";
 import Navbar from "@/Components/web/Navbar";
-import { Head } from "@inertiajs/react";
 import TopBar from "@/Components/web/TopBar";
 
 interface Props {

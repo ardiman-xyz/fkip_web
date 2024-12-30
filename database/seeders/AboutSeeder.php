@@ -13,7 +13,6 @@ class AboutSeeder extends Seeder
         $about = About::create([
             'organization_structure_id' => null,
             'dean_image_id' => null,
-            'accreditation_certificate_id' => null
         ]);
 
         $about->translations()->create([
