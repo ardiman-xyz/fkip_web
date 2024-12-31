@@ -72,7 +72,8 @@ jobs:
             docker image prune -f
 
             docker compose down
-            docker compose up -d
+            docker compose -p fkip up -d --no-deps
 
             sleep 10
+
             docker compose exec -T app php artisan migrate --force

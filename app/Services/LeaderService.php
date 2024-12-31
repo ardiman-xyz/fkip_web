@@ -161,9 +161,47 @@ public function getAll()
                    'biography' => $data['translations']['en']['biography']
                ]);
 
-           DB::commit();
-           
-           return $leader->load(['media', 'translations']);
+               $leader->load(['media', 'translations']);
+
+               // Transform data untuk frontend
+               $transformedData = [
+                    'id' => $leader->id,
+                    'photo_id' => $leader->photo_id,
+                    'nip' => $leader->nip,
+                    'nidn' => $leader->nidn,
+                    'email' => $leader->email,
+                    'phone' => $leader->phone,
+                    'academic_title' => $leader->academic_title,
+                    'order' => $leader->order,
+                    'is_active' => $leader->is_active,
+                    'created_at' => $leader->created_at,
+                    'updated_at' => $leader->updated_at,
+                    'media' => $leader->media ? [
+                        'id' => $leader->media->id,
+                        'path' => $leader->media->paths['original'] ?? $leader->media->path
+                    ] : null,
+                   'translations' => [
+                       'id' => $leader->translations->where('language_id', 1)->first()->only([
+                           'language_id',
+                           'full_name',
+                           'position',
+                           'education_history',
+                           'research_interests',
+                           'biography'
+                       ]),
+                       'en' => $leader->translations->where('language_id', 2)->first()->only([
+                           'language_id',
+                           'full_name',
+                           'position',
+                           'education_history',
+                           'research_interests',
+                           'biography'
+                       ])
+                   ]
+               ];
+       
+               DB::commit();
+            return $transformedData;
        } catch (\Exception $e) {
            DB::rollBack();
            throw $e;
