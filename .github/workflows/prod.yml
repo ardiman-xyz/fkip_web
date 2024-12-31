@@ -71,9 +71,15 @@ jobs:
 
             docker image prune -f
 
-            docker compose down
+            docker compose -p fkip down
             docker compose -p fkip up -d --no-deps
 
-            sleep 10
+            echo "Waiting for container to be ready..."
+            sleep 20
 
-            docker compose exec -T app php artisan migrate --force
+            if docker compose -p fkip ps | grep -q "app.*running"; then
+                docker compose -p fkip exec -T app php artisan migrate --force
+            else
+                echo "Container app is not running"
+                exit 1
+            fi

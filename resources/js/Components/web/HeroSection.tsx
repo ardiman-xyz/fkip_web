@@ -66,7 +66,7 @@ const HeroSection = ({
         if (!isPaused && isTabActive) {
             intervalId = setInterval(() => {
                 api.scrollNext();
-            }, 5000);
+            }, 8000);
         }
 
         return () => {

@@ -1,5 +1,5 @@
 import { News } from "@/Pages/News/_types";
-import {useState} from "react";
+import { useState } from "react";
 
 interface NewsItemProps {
     news: News;
@@ -16,7 +16,10 @@ export const NewsItem = ({ news }: NewsItemProps) => {
 
     return (
         <div className="bg-white  overflow-hidden h-[300px] flex flex-col">
-            <a href={`/berita/${translation.slug}`} className="w-full h-48 flex-shrink-0 relative overflow-hidden group cursor-pointer">
+            <a
+                href={`/berita/${translation.slug}`}
+                className="w-full h-48 flex-shrink-0 relative overflow-hidden group cursor-pointer"
+            >
                 <img
                     src={news.media?.paths.blur || "/placeholder.svg"}
                     alt={translation.title ?? "Gambar"}
@@ -53,7 +56,7 @@ export const NewsItem = ({ news }: NewsItemProps) => {
                         <span className="text-gray-400">•</span>
                     )}
                     <div className="flex flex-wrap gap-2">
-                        {news.tags.map(tag => (
+                        {news.tags.map((tag) => (
                             <a
                                 key={tag.value}
                                 href={`/tag/${tag.value}`}
@@ -64,8 +67,10 @@ export const NewsItem = ({ news }: NewsItemProps) => {
                         ))}
                     </div>
                 </div>
-                <a href={`/berita/${translation.slug}`}
-                   className="text-xl font-semibold mb-2 line-clamp-2 min-h-[3.5rem] hover:underline">
+                <a
+                    href={`/berita/${translation.slug}`}
+                    className="text-xl font-semibold mb-2 line-clamp-2 min-h-[3.5rem] hover:underline"
+                >
                     {translation.title}
                 </a>
             </div>

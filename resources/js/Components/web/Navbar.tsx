@@ -1,18 +1,8 @@
-// components/web/Navbar.tsx
-import {
-    Book,
-    GraduationCap,
-    Users,
-    Calendar,
-    ChevronRight,
-    Clock,
-    Menu,
-    X,
-} from "lucide-react";
-import { useState } from "react";
+import { Menu } from "lucide-react";
+import { Link } from "@inertiajs/react";
+
 import { Button } from "@/Components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/Components/ui/sheet";
-import { Link } from "@inertiajs/react";
 import {
     NavigationMenu,
     NavigationMenuContent,
@@ -22,69 +12,12 @@ import {
     NavigationMenuTrigger,
 } from "@/Components/ui/navigation-menu";
 
-const menus = {
-    "Program Studi": {
-        Program: [
-            { title: "Sarjana", icon: <GraduationCap className="w-4 h-4" /> },
-            { title: "Magister", icon: <GraduationCap className="w-4 h-4" /> },
-            { title: "Doktor", icon: <GraduationCap className="w-4 h-4" /> },
-        ],
-        "Layanan Akademik": [
-            {
-                title: "Kalender Akademik",
-                icon: <Calendar className="w-4 h-4" />,
-            },
-            { title: "E-Learning", icon: <Book className="w-4 h-4" /> },
-            {
-                title: "Sistem Informasi Akademik",
-                icon: <Book className="w-4 h-4" />,
-            },
-        ],
-    },
-    Penelitian: {
-        Riset: [
-            { title: "Grup Riset", icon: <Users className="w-4 h-4" /> },
-            { title: "Publikasi", icon: <Book className="w-4 h-4" /> },
-            { title: "Laboratorium", icon: <Book className="w-4 h-4" /> },
-        ],
-        "Pusat Studi": [
-            {
-                title: "Pusat Kajian Pendidikan",
-                icon: <Book className="w-4 h-4" />,
-            },
-            {
-                title: "Pusat Studi Teknologi",
-                icon: <Book className="w-4 h-4" />,
-            },
-        ],
-    },
-    Kemahasiswaan: {
-        "Layanan Mahasiswa": [
-            { title: "Beasiswa", icon: <GraduationCap className="w-4 h-4" /> },
-            { title: "UKM", icon: <Users className="w-4 h-4" /> },
-            { title: "Prestasi", icon: <GraduationCap className="w-4 h-4" /> },
-        ],
-        Fasilitas: [
-            { title: "Perpustakaan", icon: <Book className="w-4 h-4" /> },
-            { title: "Laboratorium", icon: <Book className="w-4 h-4" /> },
-            { title: "Ruang Diskusi", icon: <Users className="w-4 h-4" /> },
-        ],
-    },
-};
+import { navigationMenus } from "@/lib/navigation";
 
 const DesktopNav = () => (
     <NavigationMenu className="hidden md:flex">
         <NavigationMenuList>
-            <NavigationMenuItem>
-                <Link
-                    href="/"
-                    className="px-4 py-2 hover:text-primary transition-colors"
-                >
-                    Tentang Kami
-                </Link>
-            </NavigationMenuItem>
-
-            {Object.entries(menus).map(([key, sections]) => (
+            {Object.entries(navigationMenus).map(([key, sections]) => (
                 <NavigationMenuItem key={key}>
                     <NavigationMenuTrigger>{key}</NavigationMenuTrigger>
                     <NavigationMenuContent>
@@ -103,7 +36,7 @@ const DesktopNav = () => (
                                                             href="#"
                                                             className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
                                                         >
-                                                            {item.icon}
+                                                            <item.icon className="w-4 h-4" />
                                                             {item.title}
                                                         </a>
                                                     </NavigationMenuLink>
@@ -117,15 +50,6 @@ const DesktopNav = () => (
                     </NavigationMenuContent>
                 </NavigationMenuItem>
             ))}
-
-            <NavigationMenuItem>
-                <Link
-                    href="#"
-                    className="px-4 py-2 hover:text-primary transition-colors"
-                >
-                    Kontak
-                </Link>
-            </NavigationMenuItem>
         </NavigationMenuList>
     </NavigationMenu>
 );
@@ -140,10 +64,7 @@ const MobileNav = () => (
         </SheetTrigger>
         <SheetContent side="right" className="w-[300px]">
             <nav className="flex flex-col space-y-4 mt-6">
-                <Link href="/" className="hover:text-primary transition-colors">
-                    Tentang Kami
-                </Link>
-                {Object.entries(menus).map(([key, sections]) => (
+                {Object.entries(navigationMenus).map(([key, sections]) => (
                     <div key={key} className="space-y-2">
                         <h3 className="font-medium text-lg">{key}</h3>
                         {Object.entries(sections).map(
@@ -158,7 +79,7 @@ const MobileNav = () => (
                                             href="#"
                                             className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
                                         >
-                                            {item.icon}
+                                            <item.icon className="w-4 h-4" />
                                             {item.title}
                                         </a>
                                     ))}
@@ -184,7 +105,7 @@ const Navbar = () => {
                         <img
                             src="/images/faculty.webp"
                             alt="Fakultas Keguruan dan Ilmu Pendidikan"
-                            className="w-[400px]"
+                            className="w-[300px] pl-2 md:pl-0"
                         />
                     </a>
                 </div>

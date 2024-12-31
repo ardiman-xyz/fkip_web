@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AccreditationController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LeaderController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,4 +32,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('/{leader}', 'destroy')->name('destroy');
         Route::post('/{leader}/order', 'updateOrder')->name('update-order');
     });
+
+    Route::controller(HistoryController::class)->prefix('histories')->name('histories.')->group(function() {
+        Route::get('/data', 'getData')->name('get');
+        Route::post('/', 'store')->name('store');
+        Route::put('/{history}', 'update')->name('update');
+     });
 });

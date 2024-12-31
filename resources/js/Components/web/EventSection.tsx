@@ -1,4 +1,4 @@
-import {Event} from "@/Pages/Event/_types";
+import { Event } from "@/Pages/Event/_types";
 import { EventItem } from "./EventItem";
 
 interface EventSectionProps {
@@ -6,14 +6,11 @@ interface EventSectionProps {
 }
 
 export const EventSection = ({ events }: EventSectionProps) => {
-
     return (
         <section className="py-10 bg-white">
-            <div className="container max-w-6xl mx-auto ">
+            <div className="container max-w-6xl mx-auto pl-4">
                 <div className="">
-                    <h3 className="text-2xl font-bold">
-                        Agenda
-                    </h3>
+                    <h3 className="text-2xl font-bold">Agenda</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
                     {events.map((event) => (

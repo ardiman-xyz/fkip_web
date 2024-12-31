@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ContactInfoController;
 use App\Http\Controllers\DefaultSliderController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MediaController;
@@ -128,6 +129,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/{slide}/move-up', 'moveUp')->name('move-up');
         Route::post('/{slide}/move-down', 'moveDown')->name('move-down');
     });
+
+    Route::controller(ContactInfoController::class)->prefix('contact-info')->name('contact-info.')->group(function() {
+        Route::get('/data', 'getData')->name('get');
+        Route::post('/', 'store')->name('store');
+     });
+     
 });
 
 Route::middleware('auth')->group(function () {

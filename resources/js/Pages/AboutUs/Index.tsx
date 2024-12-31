@@ -6,6 +6,8 @@ import { VisiMisi } from "./Tabs/VisiMisi";
 import { Accreditation } from "./Tabs/Akreditasi";
 import { Leaders } from "./Tabs/Leader";
 import { OrganizationStructure } from "./Tabs/OrganizationStructure";
+import History from "./Tabs/History";
+import LocationContact from "./Tabs/LocationContact";
 
 const AboutUs = () => {
     const { url } = usePage();
@@ -25,6 +27,7 @@ const AboutUs = () => {
     };
 
     const tabs = [
+        { id: "history", title: "Sejarah", component: <History /> },
         { id: "visi-misi", title: "Visi & Misi", component: <VisiMisi /> },
         {
             id: "akreditasi",
@@ -37,6 +40,11 @@ const AboutUs = () => {
             component: <OrganizationStructure />,
         },
         { id: "leader", title: "Pimpinan", component: <Leaders /> },
+        {
+            id: "contact",
+            title: "Lokasi dan kontak",
+            component: <LocationContact />,
+        },
     ];
 
     return (

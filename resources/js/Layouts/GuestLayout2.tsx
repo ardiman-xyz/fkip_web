@@ -16,7 +16,7 @@ export default function Guest2({ children }: Props) {
                 <div className="fixed top-[36px] left-0 right-0 z-40">
                     <Navbar />
                 </div>
-                <main className="flex-grow bg-gray-100 pt-[116px]">
+                <main className="flex-grow bg-gray-100 pt-[104px]">
                     {children}
                 </main>
                 <Footer />
