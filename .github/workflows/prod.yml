@@ -65,8 +65,6 @@ jobs:
               echo "APP_ENV=production" >> .env
             fi
 
-
-
             docker compose pull
 
             docker image prune -f

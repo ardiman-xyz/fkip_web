@@ -34,7 +34,7 @@ const History = () => {
     const [isFetching, setIsFetching] = useState(true);
     const [history, setHistory] = useState<HistoryType | null>(null);
     const [formData, setFormData] = useState({
-        is_active: true,
+        is_active: 1,
         translations: {
             id: {
                 language_id: 1,
