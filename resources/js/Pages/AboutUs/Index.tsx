@@ -12,7 +12,7 @@ import LocationContact from "./Tabs/LocationContact";
 const AboutUs = () => {
     const { url } = usePage();
     const searchParams = new URLSearchParams(window.location.search);
-    const activeTab = searchParams.get("active") || "visi-misi";
+    const activeTab = searchParams.get("active") || "history";
 
     const handleTabChange = (value: string) => {
         router.get(

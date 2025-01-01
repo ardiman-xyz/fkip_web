@@ -87,5 +87,30 @@ class AboutService
        return About::firstOrFail()->organizationStructure;
    }
 
+
+   public function getVisionMissionFirst()
+    {
+    $about = About::with(['translations'])->first();
+
+        if (!$about) return null;
+
+        $translations = [];
+        foreach ($about->translations as $translation) {
+            $translations[$translation->language_id == 1 ? 'id' : 'en'] = [
+                'language_id' => $translation->language_id,
+                'title' => 'Visi & Misi',  // Static title
+                'vision' => $translation->vision,
+                'mission' => $translation->mission,
+            ];
+        }
+
+        return [
+            'id' => $about->id,
+            'translations' => $translations,
+            'created_at' => $about->created_at,
+            'updated_at' => $about->updated_at
+        ];
+    }
+
  
 }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('address');
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
-            $table->string('google_maps_url')->nullable();
+            $table->text('google_maps_url')->nullable();
             $table->json('social_media')->nullable(); 
             $table->json('operating_hours')->nullable(); 
             $table->json('department_contacts')->nullable(); 

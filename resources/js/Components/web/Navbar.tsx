@@ -33,7 +33,7 @@ const DesktopNav = () => (
                                                 <li key={item.title}>
                                                     <NavigationMenuLink asChild>
                                                         <a
-                                                            href="#"
+                                                            href={item.url}
                                                             className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
                                                         >
                                                             <item.icon className="w-4 h-4" />
