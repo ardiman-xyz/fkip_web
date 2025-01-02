@@ -70,7 +70,7 @@ jobs:
             docker image prune -f
 
             docker compose -p fkip down
-            docker compose -p fkip up -d --no-deps
+            docker compose -p fkip up -d --no-recreate --no-deps
 
             echo "Waiting for container to be ready..."
             sleep 20

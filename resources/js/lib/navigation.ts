@@ -66,11 +66,11 @@ export const navigationMenus = {
                 icon: GraduationCap,
                 url: "/program/magister",
             },
-            {
-                title: "Program Doktor (S3)",
-                icon: GraduationCap,
-                url: "/program/doktor",
-            },
+            // {
+            //     title: "Program Doktor (S3)",
+            //     icon: GraduationCap,
+            //     url: "/program/doktor",
+            // },
         ],
         Akademik: [
             {
@@ -81,35 +81,42 @@ export const navigationMenus = {
             {
                 title: "E-Learning",
                 icon: Book,
-                url: "https://elearning.umkendari.ac.id",
+                url: "https://elumak.umkendari.ac.id",
                 external: true,
             },
             {
                 title: "Sistem Informasi Akademik",
                 icon: Book,
-                url: "https://siakad.umkendari.ac.id",
+                url: "https://simak.umkendari.ac.id",
                 external: true,
             },
         ],
     },
     Penelitian: {
         "Riset & Publikasi": [
-            { title: "Grup Riset", icon: Users, url: "/riset/grup" },
-            { title: "Publikasi", icon: Book, url: "/riset/publikasi" },
-            { title: "Jurnal Fakultas", icon: Book, url: "/riset/jurnal" },
-        ],
-        Fasilitas: [
             {
-                title: "Laboratorium",
-                icon: FlaskConical,
-                url: "/fasilitas/laboratorium",
+                title: "Publikasi",
+                icon: Book,
+                url: "https://journal.umkendari.ac.id/",
             },
             {
-                title: "Pusat Kajian",
-                icon: Library,
-                url: "/fasilitas/pusat-kajian",
+                title: "Jurnal Universitas",
+                icon: Book,
+                url: "https://journal.umkendari.ac.id/",
             },
         ],
+        // Fasilitas: [
+        //     {
+        //         title: "Laboratorium",
+        //         icon: FlaskConical,
+        //         url: "/fasilitas/laboratorium",
+        //     },
+        //     {
+        //         title: "Pusat Kajian",
+        //         icon: Library,
+        //         url: "/fasilitas/pusat-kajian",
+        //     },
+        // ],
     },
     Kemahasiswaan: {
         Layanan: [
