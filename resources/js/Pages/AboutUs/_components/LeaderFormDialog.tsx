@@ -17,6 +17,8 @@ import { MediaModal } from "@/Components/MediaModal";
 import { DialogError } from "./DialogError";
 import { Loader } from "lucide-react";
 import { Leader } from "../_types/leader";
+import { getPositionLabel } from "../_helper";
+import { positionOptions } from "../_data";
 
 interface Props {
     isOpen: boolean;
@@ -36,6 +38,7 @@ export const LeaderFormDialog = ({
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
     const [showErrors, setShowErrors] = useState(false);
+    const [useCustomPosition, setUseCustomPosition] = useState(false);
 
     const [formData, setFormData] = useState<LeaderFormData>({
         media_id: null,
@@ -193,6 +196,8 @@ export const LeaderFormDialog = ({
             setIsLoading(false);
         }
     };
+
+    console.info(formData);
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -372,26 +377,147 @@ export const LeaderFormDialog = ({
                                     <label className="text-sm font-medium mb-2 block">
                                         Jabatan
                                     </label>
-                                    <Input
-                                        placeholder="Jabatan"
-                                        value={
-                                            formData.translations.id.position
-                                        }
-                                        onChange={(e) =>
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                translations: {
-                                                    ...prev.translations,
-                                                    id: {
-                                                        ...prev.translations.id,
-                                                        position:
-                                                            e.target.value,
-                                                    },
-                                                },
-                                            }))
-                                        }
-                                    />
+                                    {!useCustomPosition ? (
+                                        <select
+                                            className="w-full rounded-md border border-input bg-background px-3 h-10"
+                                            value={
+                                                formData.translations.id
+                                                    .position
+                                            }
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                if (value === "other") {
+                                                    setUseCustomPosition(true);
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        translations: {
+                                                            ...prev.translations,
+                                                            id: {
+                                                                ...prev
+                                                                    .translations
+                                                                    .id,
+                                                                position: "",
+                                                            },
+                                                            en: {
+                                                                ...prev
+                                                                    .translations
+                                                                    .en,
+                                                                position: "",
+                                                            },
+                                                        },
+                                                    }));
+                                                } else {
+                                                    const idLabel =
+                                                        getPositionLabel(
+                                                            value,
+                                                            "id"
+                                                        );
+                                                    const enLabel =
+                                                        getPositionLabel(
+                                                            value,
+                                                            "en"
+                                                        );
+
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        translations: {
+                                                            ...prev.translations,
+                                                            id: {
+                                                                ...prev
+                                                                    .translations
+                                                                    .id,
+                                                                position:
+                                                                    idLabel,
+                                                            },
+                                                            en: {
+                                                                ...prev
+                                                                    .translations
+                                                                    .en,
+                                                                position:
+                                                                    enLabel,
+                                                            },
+                                                        },
+                                                    }));
+                                                }
+                                            }}
+                                        >
+                                            <option value="">
+                                                Pilih Jabatan
+                                            </option>
+                                            {positionOptions.id.map(
+                                                (option) => (
+                                                    <option
+                                                        key={option.value}
+                                                        value={option.value}
+                                                    >
+                                                        {option.label}
+                                                    </option>
+                                                )
+                                            )}
+                                        </select>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <Input
+                                                placeholder="Masukkan Jabatan"
+                                                value={
+                                                    formData.translations.id
+                                                        .position
+                                                }
+                                                onChange={(e) => {
+                                                    const value =
+                                                        e.target.value;
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        translations: {
+                                                            ...prev.translations,
+                                                            id: {
+                                                                ...prev
+                                                                    .translations
+                                                                    .id,
+                                                                position: value,
+                                                            },
+                                                            en: {
+                                                                ...prev
+                                                                    .translations
+                                                                    .en,
+                                                                position: value,
+                                                            },
+                                                        },
+                                                    }));
+                                                }}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setUseCustomPosition(false);
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        translations: {
+                                                            ...prev.translations,
+                                                            id: {
+                                                                ...prev
+                                                                    .translations
+                                                                    .id,
+                                                                position: "",
+                                                            },
+                                                            en: {
+                                                                ...prev
+                                                                    .translations
+                                                                    .en,
+                                                                position: "",
+                                                            },
+                                                        },
+                                                    }));
+                                                }}
+                                            >
+                                                Kembali ke Pilihan
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
+
                                 <div>
                                     <label className="text-sm font-medium mb-2 block">
                                         Riwayat Pendidikan
@@ -500,19 +626,7 @@ export const LeaderFormDialog = ({
                                         value={
                                             formData.translations.en.position
                                         }
-                                        onChange={(e) =>
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                translations: {
-                                                    ...prev.translations,
-                                                    en: {
-                                                        ...prev.translations.en,
-                                                        position:
-                                                            e.target.value,
-                                                    },
-                                                },
-                                            }))
-                                        }
+                                        disabled
                                     />
                                 </div>
                                 <div>

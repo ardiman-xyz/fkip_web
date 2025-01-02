@@ -7,8 +7,6 @@ import { EmptyState } from "../_components/EmptyState";
 import { LeaderSection } from "../_components/LeaderSection";
 
 const Leaders = ({ leaders }: { leaders: Leader[] }) => {
-    console.info(leaders);
-
     const dekan = leaders.filter(
         (l) =>
             l.translations.id.position.toLowerCase().includes("dekan") &&
@@ -23,6 +21,16 @@ const Leaders = ({ leaders }: { leaders: Leader[] }) => {
                 .toLowerCase()
                 .includes("ketua program studi") ||
             l.translations.id.position.toLowerCase().includes("kaprodi")
+    );
+
+    // Filter untuk jabatan lainnya
+    const others = leaders.filter(
+        (l) =>
+            !l.translations.id.position.toLowerCase().includes("dekan") &&
+            !l.translations.id.position
+                .toLowerCase()
+                .includes("ketua program studi") &&
+            !l.translations.id.position.toLowerCase().includes("kaprodi")
     );
 
     return (
@@ -54,6 +62,13 @@ const Leaders = ({ leaders }: { leaders: Leader[] }) => {
                                             leaders={kaprodi}
                                         />
                                     )}
+
+                                    {others.length > 0 && (
+                                        <LeaderSection
+                                            title="Pejabat Lainnya"
+                                            leaders={others}
+                                        />
+                                    )}
                                 </div>
                             ) : (
                                 <EmptyState
@@ -73,5 +88,4 @@ const Leaders = ({ leaders }: { leaders: Leader[] }) => {
         </Guest2>
     );
 };
-
 export default Leaders;
