@@ -32,6 +32,11 @@ class WelcomeController extends Controller
         ]);
     }
 
+    public function news()
+    {
+        return Inertia::render("Web/News/AllNews");
+    }
+
     public function newsDetail(string $slug): InertiaResponse
     {
         $news = $this->welcomeService->getNewsDetail($slug);
@@ -47,6 +52,11 @@ class WelcomeController extends Controller
                 'type' => 'article'
             ]
         ]);
+    }
+
+    public function events()
+    {
+        return Inertia::render("Web/Event/AllEvent");
     }
 
     public function eventDetail(string $slug): InertiaResponse

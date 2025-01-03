@@ -2,7 +2,15 @@
 
 use App\Http\Controllers\Home\FacultyProfileController;
 use App\Http\Controllers\ProdiController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/', [WelcomeController::class, "index"])->name("welcome");
+Route::get('berita/{slug}', [WelcomeController::class, "newsDetail"])->name("news.detail");
+Route::get('berita', [WelcomeController::class, "news"])->name("news");
+
+Route::get('/agenda/{slug}', [WelcomeController::class, 'eventDetail'])->name('event.detail');
+Route::get('/agenda', [WelcomeController::class, 'events'])->name('event.all');
 
 Route::prefix('fakultas')->name('fakultas.')->group(function () {
     Route::get('/sejarah', [FacultyProfileController::class, 'history'])->name('history');

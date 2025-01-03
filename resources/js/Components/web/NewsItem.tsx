@@ -1,5 +1,7 @@
+// Components/web/NewsItem.tsx
 import { News } from "@/Pages/News/_types";
 import { useState } from "react";
+import { Card } from "@/Components/ui/card";
 
 interface NewsItemProps {
     news: News;
@@ -7,15 +9,12 @@ interface NewsItemProps {
 
 export const NewsItem = ({ news }: NewsItemProps) => {
     const translation = news.translations.id || news.translations.en;
-
     const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
-    if (!translation) {
-        return null;
-    }
+    if (!translation) return null;
 
     return (
-        <div className="bg-white  overflow-hidden h-[300px] flex flex-col">
+        <Card className="group overflow-hidden bg-white h-[350px] flex flex-col  transition-all duration-300 p-4">
             <a
                 href={`/berita/${translation.slug}`}
                 className="w-full h-48 flex-shrink-0 relative overflow-hidden group cursor-pointer"
@@ -40,40 +39,38 @@ export const NewsItem = ({ news }: NewsItemProps) => {
                 />
             </a>
 
-            <div className=" flex flex-col flex-grow">
-                <div className="flex items-center gap-2 my-2">
-                    <div>
-                        {news.category && news.category.translations.id && (
-                            <a
-                                href={`/kategori/${news.category.translations.id.name}`}
-                                className="text-sm text-green-600 hover:underline"
-                            >
-                                {news.category.translations.id.name}
-                            </a>
-                        )}
-                    </div>
-                    {news.category && news.tags.length > 0 && (
-                        <span className="text-gray-400">•</span>
+            <div className="p-4 flex flex-col flex-grow">
+                {/* Category and Tags */}
+                <div className="flex items-center gap-2 mb-2">
+                    {news.category && news.category.translations.id && (
+                        <a
+                            href={`/kategori/${news.category.translations.id.name}`}
+                            className="px-2.5 py-1 text-sm bg-green-100 text-green-600 rounded-full hover:bg-green-200 transition-colors"
+                        >
+                            {news.category.translations.id.name}
+                        </a>
                     )}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1">
                         {news.tags.map((tag) => (
                             <a
                                 key={tag.value}
                                 href={`/tag/${tag.value}`}
-                                className="text-sm text-gray-500 hover:text-green-600 hover:underline"
+                                className="text-sm text-gray-500 hover:text-green-600"
                             >
                                 #{tag.label}
                             </a>
                         ))}
                     </div>
                 </div>
+
+                {/* Title */}
                 <a
                     href={`/berita/${translation.slug}`}
-                    className="text-xl font-semibold mb-2 line-clamp-2 min-h-[3.5rem] hover:underline"
+                    className="text-lg font-semibold line-clamp-2 min-h-[3.5rem] group-hover:text-green-600 transition-colors"
                 >
                     {translation.title}
                 </a>
             </div>
-        </div>
+        </Card>
     );
 };
