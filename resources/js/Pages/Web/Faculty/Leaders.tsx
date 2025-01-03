@@ -1,10 +1,17 @@
-// pages/Leaders.tsx
 import Guest2 from "@/Layouts/GuestLayout2";
 import { Users } from "lucide-react";
 import { Leader } from "@/Pages/AboutUs/_types/leader";
 import { ProfileSidebar } from "../_components/ProfileSidebar";
 import { EmptyState } from "../_components/EmptyState";
 import { LeaderSection } from "../_components/LeaderSection";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/Components/ui/breadcrumb";
 
 const Leaders = ({ leaders }: { leaders: Leader[] }) => {
     const dekan = leaders.filter(
@@ -23,7 +30,6 @@ const Leaders = ({ leaders }: { leaders: Leader[] }) => {
             l.translations.id.position.toLowerCase().includes("kaprodi")
     );
 
-    // Filter untuk jabatan lainnya
     const others = leaders.filter(
         (l) =>
             !l.translations.id.position.toLowerCase().includes("dekan") &&
@@ -32,13 +38,35 @@ const Leaders = ({ leaders }: { leaders: Leader[] }) => {
                 .includes("ketua program studi") &&
             !l.translations.id.position.toLowerCase().includes("kaprodi")
     );
-
     return (
         <Guest2>
             <div className="min-h-screen bg-white py-12">
                 <div className="container max-w-6xl mx-auto px-4">
+                    {/* Breadcrumb */}
+                    <div className="mb-8">
+                        <Breadcrumb>
+                            <BreadcrumbList>
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink href="/">
+                                        Beranda
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage className="text-muted-foreground">
+                                        Profil
+                                    </BreadcrumbPage>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbPage>Pimpinan</BreadcrumbPage>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                    </div>
+
                     <div className="grid grid-cols-12 gap-20">
-                        <div className="col-span-9">
+                        <div className="col-span-12 lg:col-span-8">
                             {leaders.length > 0 ? (
                                 <div className="space-y-16">
                                     {dekan.length > 0 && (
@@ -79,7 +107,7 @@ const Leaders = ({ leaders }: { leaders: Leader[] }) => {
                             )}
                         </div>
 
-                        <div className="col-span-3">
+                        <div className="col-span-12 lg:col-span-4">
                             <ProfileSidebar />
                         </div>
                     </div>
@@ -88,4 +116,5 @@ const Leaders = ({ leaders }: { leaders: Leader[] }) => {
         </Guest2>
     );
 };
+
 export default Leaders;
