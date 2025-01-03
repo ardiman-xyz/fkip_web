@@ -56,4 +56,15 @@ class FacultyProfileController extends Controller
         $contact = $this->contactInfoService->getFirstHome();
         return Inertia::render('Web/Faculty/ContactInfo', compact("contact"));
     }
+
+
+    public function lecturer()
+    {
+        return Inertia::render('Web/Faculty/Lecturer');
+    }
+
+    public function employee()
+    {
+        return Inertia::render('Web/Faculty/Employee');
+    }
 }

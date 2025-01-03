@@ -8,6 +8,7 @@ import { Leaders } from "./Tabs/Leader";
 import { OrganizationStructure } from "./Tabs/OrganizationStructure";
 import History from "./Tabs/History";
 import LocationContact from "./Tabs/LocationContact";
+import { Staff } from "./Tabs/Staff";
 
 const AboutUs = () => {
     const { url } = usePage();
@@ -40,6 +41,7 @@ const AboutUs = () => {
             component: <OrganizationStructure />,
         },
         { id: "leader", title: "Pimpinan", component: <Leaders /> },
+        { id: "staff", title: "Tendik", component: <Staff /> },
         {
             id: "contact",
             title: "Lokasi dan kontak",

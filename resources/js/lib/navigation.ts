@@ -47,11 +47,6 @@ export const navigationMenus = {
                 icon: Users,
                 url: "/fakultas/tendik",
             },
-            {
-                title: "Pengelola Fakultas",
-                icon: Users,
-                url: "/fakultas/pengelola",
-            },
         ],
     },
     "Program Studi": {
