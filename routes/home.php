@@ -20,6 +20,7 @@ Route::prefix('fakultas')->name('fakultas.')->group(function () {
     Route::get('/fasilitas', [FacultyProfileController::class, 'facilities'])->name('facilities');
     Route::get('/lokasi-kontak', [FacultyProfileController::class, 'contact'])->name('contact');
     Route::get('/dosen', [FacultyProfileController::class, 'lecturer'])->name('lecturer');
+    Route::get('/dosen/{id}', [FacultyProfileController::class, 'lecturerDetail'])->name('lecturer.detail');
     Route::get('/tendik', [FacultyProfileController::class, 'employee'])->name('employee');
 });
 

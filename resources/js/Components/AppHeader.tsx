@@ -12,28 +12,6 @@ const AppHeader = ({ header }: { header?: ReactNode }) => {
                 {/* <SearchButton className="w-full" /> */}
             </div>
             <div className="flex items-center gap-2">
-                {/* <div className="mr-4 flex gap-2">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="relative rounded-full"
-                    >
-                        <span className="absolute -right-1 -top-2 flex size-6 items-center justify-center rounded-full border-2 border-white bg-red-600 text-xs font-bold text-white dark:border-gray-800">
-                            5
-                        </span>
-                        <PiChatCenteredDotsFill className="size-8" />
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="relative rounded-full"
-                    >
-                        <span className="absolute -right-1 -top-2 flex size-6 items-center justify-center rounded-full border-2 border-white bg-red-600 text-xs font-bold text-white dark:border-gray-800">
-                            8
-                        </span>
-                        <PiBellFill className="size-8" />
-                    </Button>
-                </div>{" "} */}
                 <UserDropdownMenu />
             </div>
         </div>

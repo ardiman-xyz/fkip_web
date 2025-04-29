@@ -11,6 +11,7 @@ use App\Models\News;
 use App\Models\NewsTranslation;
 use Exception;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
@@ -151,7 +152,7 @@ class MediaService
             return $paths;
 
         } catch (Exception $e) {
-            \Log::error('Image processing error: ' . $e->getMessage());
+            Log::error('Image processing error: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -245,6 +246,7 @@ class MediaService
     {
         try {
             $usageCheck = $this->checkMediaUsage($media);
+
 
             if ($usageCheck['isUsed']) {
                 throw new Exception("Media sedang digunakan di: " . $usageCheck['usedIn']);

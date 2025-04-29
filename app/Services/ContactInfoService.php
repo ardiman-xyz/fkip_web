@@ -37,7 +37,6 @@ class ContactInfoService
 
        if (!$contact) return null;
 
-       // Transform ke format yang sesuai interface
        return [
            'id' => $contact->id,
            'email' => $contact->email,

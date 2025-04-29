@@ -67,4 +67,9 @@ class FacultyProfileController extends Controller
     {
         return Inertia::render('Web/Faculty/Employee');
     }
+
+    public function lecturerDetail(string $id)
+    {
+        return Inertia::render("Web/Faculty/LecturerDetail");
+    }
 }

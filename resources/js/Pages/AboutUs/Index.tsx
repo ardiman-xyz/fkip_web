@@ -6,9 +6,10 @@ import { VisiMisi } from "./Tabs/VisiMisi";
 import { Accreditation } from "./Tabs/Akreditasi";
 import { Leaders } from "./Tabs/Leader";
 import { OrganizationStructure } from "./Tabs/OrganizationStructure";
+import { Staff } from "./Tabs/Staff";
 import History from "./Tabs/History";
 import LocationContact from "./Tabs/LocationContact";
-import { Staff } from "./Tabs/Staff";
+import { Lecturer } from "./Tabs/Lecturer";
 
 const AboutUs = () => {
     const { url } = usePage();
@@ -41,6 +42,7 @@ const AboutUs = () => {
             component: <OrganizationStructure />,
         },
         { id: "leader", title: "Pimpinan", component: <Leaders /> },
+        { id: "lecturer", title: "Dosen", component: <Lecturer /> },
         { id: "staff", title: "Tendik", component: <Staff /> },
         {
             id: "contact",

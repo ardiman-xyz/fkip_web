@@ -7,7 +7,8 @@ import {
     Search,
     X,
     Upload as UploadIcon,
-    UploadCloud, Loader,
+    UploadCloud,
+    Loader,
 } from "lucide-react";
 import {
     Dialog,
@@ -29,7 +30,7 @@ export const UploadModalMedia = ({
 }) => {
     const [dragActive, setDragActive] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
-    const[isLoading, setIsLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -96,7 +97,9 @@ export const UploadModalMedia = ({
         } catch (error: any) {
             if (error.response) {
                 toast.error(
-                    `Server error: ${error.response.status} - ${error.response.data.message || "Something went wrong"}`
+                    `Server error: ${error.response.status} - ${
+                        error.response.data.message || "Something went wrong"
+                    }`
                 );
             } else if (error.request) {
                 toast.error("No response from server. Please try again later.");
@@ -188,7 +191,7 @@ export const UploadModalMedia = ({
                     >
                         {isLoading && (
                             <Loader className="mr-2 size-4 animate-spin" />
-                            )}
+                        )}
                         Upload Files
                     </button>
                 </DialogFooter>

@@ -193,7 +193,7 @@ const LecturerDirectory = () => {
                                                 >
                                                     <CardContent className="p-4">
                                                         <a
-                                                            href={`/dosen/${lecturer.id}`}
+                                                            href={`/fakultas/dosen/${lecturer.id}`}
                                                             className="flex items-center gap-4"
                                                         >
                                                             <div className="w-16 h-16 rounded-lg bg-gray-100 overflow-hidden">
