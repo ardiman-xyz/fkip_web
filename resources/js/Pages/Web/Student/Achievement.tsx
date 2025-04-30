@@ -2,6 +2,7 @@ import Guest2 from "@/Layouts/GuestLayout2";
 import { StudentSidebar } from "../_components/StudentSidebar";
 import { Card, CardContent } from "@/Components/ui/card";
 import { Trophy } from "lucide-react";
+import { UnderDevelopment } from "@/Components/UnderDevelopment";
 
 // pages/Student/Achievement.tsx
 const Achievement = () => {
@@ -69,98 +70,7 @@ const Achievement = () => {
                                     </p>
                                 </div>
 
-                                {/* Achievement Categories */}
-                                {achievements.map((category, idx) => (
-                                    <div key={idx} className="space-y-6">
-                                        <h2 className="text-2xl font-semibold">
-                                            {category.category}
-                                        </h2>
-                                        <div className="grid gap-6">
-                                            {category.items.map(
-                                                (item, index) => (
-                                                    <Card key={index}>
-                                                        <CardContent className="p-6">
-                                                            <div className="flex flex-col md:flex-row gap-6">
-                                                                {/* Badge & Level */}
-                                                                <div className="md:w-64 flex-shrink-0">
-                                                                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
-                                                                        <Trophy className="h-12 w-12 text-yellow-500" />
-                                                                    </div>
-                                                                    <div className="mt-4 text-center">
-                                                                        <span
-                                                                            className={`px-3 py-1 rounded-full text-sm font-medium
-                                                                        ${
-                                                                            item.level ===
-                                                                            "Internasional"
-                                                                                ? "bg-purple-100 text-purple-700"
-                                                                                : item.level ===
-                                                                                  "Nasional"
-                                                                                ? "bg-blue-100 text-blue-700"
-                                                                                : "bg-green-100 text-green-700"
-                                                                        }`}
-                                                                        >
-                                                                            Tingkat{" "}
-                                                                            {
-                                                                                item.level
-                                                                            }
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* Achievement Details */}
-                                                                <div className="flex-grow space-y-4">
-                                                                    <div>
-                                                                        <h3 className="text-lg font-semibold">
-                                                                            {
-                                                                                item.title
-                                                                            }
-                                                                        </h3>
-                                                                        <p className="text-gray-600">
-                                                                            {
-                                                                                item.event
-                                                                            }
-                                                                        </p>
-                                                                    </div>
-
-                                                                    <div>
-                                                                        <h4 className="text-sm font-medium text-gray-500 mb-2">
-                                                                            Mahasiswa/i
-                                                                        </h4>
-                                                                        <div className="flex flex-wrap gap-2">
-                                                                            {item.students.map(
-                                                                                (
-                                                                                    student,
-                                                                                    i
-                                                                                ) => (
-                                                                                    <span
-                                                                                        key={
-                                                                                            i
-                                                                                        }
-                                                                                        className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600"
-                                                                                    >
-                                                                                        {
-                                                                                            student
-                                                                                        }
-                                                                                    </span>
-                                                                                )
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-
-                                                                    <div className="text-sm text-gray-500">
-                                                                        {
-                                                                            item.date
-                                                                        }
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </CardContent>
-                                                    </Card>
-                                                )
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
+                                <UnderDevelopment />
                             </div>
                         </div>
 

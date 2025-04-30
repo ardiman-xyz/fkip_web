@@ -235,8 +235,7 @@ const Detail = ({ event }: Props) => {
                                         Event Mendatang
                                     </h3>
                                     <div className="space-y-4">
-                                        {/* Event Item */}
-                                        {[1, 2, 3].map((_, idx) => (
+                                        {/* {[1, 2, 3].map((_, idx) => (
                                             <div
                                                 key={idx}
                                                 className="flex gap-3"
@@ -259,7 +258,7 @@ const Detail = ({ event }: Props) => {
                                                     </p>
                                                 </div>
                                             </div>
-                                        ))}
+                                        ))} */}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -270,7 +269,7 @@ const Detail = ({ event }: Props) => {
                                     <h3 className="text-lg font-semibold mb-4">
                                         Kategori Event
                                     </h3>
-                                    <div className="space-y-2">
+                                    {/* <div className="space-y-2">
                                         {[
                                             { name: "Seminar", count: 12 },
                                             { name: "Workshop", count: 8 },
@@ -290,30 +289,7 @@ const Detail = ({ event }: Props) => {
                                                 </span>
                                             </div>
                                         ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            <Card>
-                                <CardContent className="p-6">
-                                    <h3 className="text-lg font-semibold mb-4">
-                                        Bagikan Event
-                                    </h3>
-                                    <p className="text-sm text-gray-600 mb-4">
-                                        Bantu sebarkan informasi event ini ke
-                                        rekan-rekan Anda
-                                    </p>
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            className="flex-1"
-                                        >
-                                            Copy Link
-                                        </Button>
-                                        <Button className="flex-1">
-                                            Share
-                                        </Button>
-                                    </div>
+                                    </div> */}
                                 </CardContent>
                             </Card>
                         </div>

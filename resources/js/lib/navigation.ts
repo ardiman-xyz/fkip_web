@@ -125,25 +125,20 @@ export const navigationMenus = {
         ],
         Fasilitas: [
             {
-                title: "Perpustakaan",
+                title: "Perpustakaan Kampus",
                 icon: Library,
-                url: "/fasilitas/perpustakaan",
-            },
-            {
-                title: "Laboratorium",
-                icon: FlaskConical,
-                url: "/fasilitas/laboratorium",
+                url: "https://perpustakaan.umkendari.ac.id/",
             },
         ],
     },
     "Penjaminan Mutu": {
         Mutu: [
             {
-                title: "Unit Penjaminan Mutu",
+                title: "Unit Penjaminan Mutu Universitas",
                 icon: ClipboardCheck,
-                url: "/mutu/upm",
+                url: "https://sipemutu.umkendari.ac.id/",
             },
-            { title: "Akreditasi", icon: Award, url: "/mutu/akreditasi" },
+            // { title: "Akreditasi", icon: Award, url: "/mutu/akreditasi" },
         ],
     },
 };

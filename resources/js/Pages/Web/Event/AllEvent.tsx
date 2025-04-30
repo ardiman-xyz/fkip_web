@@ -100,7 +100,6 @@ const EventIndex = () => {
                                     <Card key={event.id}>
                                         <CardContent className="p-2">
                                             <div className="grid md:grid-cols-12 gap-6">
-                                                {/* Event Image */}
                                                 <div className="md:col-span-4">
                                                     <div className="h-48 bg-gray-100 relative rounded-l-lg overflow-hidden">
                                                         <img
@@ -111,7 +110,6 @@ const EventIndex = () => {
                                                     </div>
                                                 </div>
 
-                                                {/* Event Details */}
                                                 <div className="md:col-span-8 p-6">
                                                     <div className="flex items-center gap-2 mb-2">
                                                         <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm">

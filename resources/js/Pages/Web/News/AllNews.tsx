@@ -12,6 +12,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
+import { UnderDevelopment } from "@/Components/UnderDevelopment";
 
 const NewsIndex = () => {
     // Data tag/kategori berita
@@ -73,8 +74,11 @@ const NewsIndex = () => {
                         </p>
                     </div>
 
-                    {/* Tag Categories */}
-                    <div className="mb-12">
+                    <div>
+                        <UnderDevelopment />
+                    </div>
+
+                    {/* <div className="mb-12">
                         <h2 className="text-xl font-semibold mb-4">
                             Kategori Berita
                         </h2>
@@ -94,7 +98,6 @@ const NewsIndex = () => {
                         </div>
                     </div>
 
-                    {/* Featured News */}
                     <div className="mb-12">
                         <h2 className="text-xl font-semibold mb-6">
                             Berita Unggulan
@@ -156,7 +159,6 @@ const NewsIndex = () => {
                         </div>
                     </div>
 
-                    {/* Latest News */}
                     <div>
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-xl font-semibold">
@@ -201,7 +203,7 @@ const NewsIndex = () => {
                                 </Card>
                             ))}
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </Guest2>

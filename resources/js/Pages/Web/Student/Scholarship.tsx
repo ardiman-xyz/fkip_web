@@ -2,6 +2,7 @@ import { Button } from "@/Components/ui/button";
 import { Card, CardContent } from "@/Components/ui/card";
 import Guest2 from "@/Layouts/GuestLayout2";
 import { StudentSidebar } from "../_components/StudentSidebar";
+import { UnderDevelopment } from "@/Components/UnderDevelopment";
 
 const Scholarship = () => {
     const scholarships = [
@@ -62,123 +63,7 @@ const Scholarship = () => {
                                     </p>
                                 </div>
 
-                                {/* Scholarship List */}
-                                <div className="space-y-6">
-                                    {scholarships.map((scholarship, index) => (
-                                        <Card key={index}>
-                                            <CardContent className="p-6">
-                                                <div className="space-y-4">
-                                                    {/* Header */}
-                                                    <div className="flex justify-between items-start">
-                                                        <div>
-                                                            <h2 className="text-xl font-semibold">
-                                                                {
-                                                                    scholarship.name
-                                                                }
-                                                            </h2>
-                                                            <p className="text-gray-500">
-                                                                {
-                                                                    scholarship.provider
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                        <span
-                                                            className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                                                scholarship.status ===
-                                                                "open"
-                                                                    ? "bg-green-100 text-green-700"
-                                                                    : "bg-red-100 text-red-700"
-                                                            }`}
-                                                        >
-                                                            {scholarship.status ===
-                                                            "open"
-                                                                ? "Dibuka"
-                                                                : "Ditutup"}
-                                                        </span>
-                                                    </div>
-
-                                                    <p className="text-gray-600">
-                                                        {
-                                                            scholarship.description
-                                                        }
-                                                    </p>
-
-                                                    <div className="grid md:grid-cols-2 gap-6">
-                                                        {/* Benefits */}
-                                                        <div>
-                                                            <h3 className="font-medium mb-2">
-                                                                Manfaat Beasiswa
-                                                            </h3>
-                                                            <ul className="space-y-2">
-                                                                {scholarship.benefits.map(
-                                                                    (
-                                                                        benefit,
-                                                                        idx
-                                                                    ) => (
-                                                                        <li
-                                                                            key={
-                                                                                idx
-                                                                            }
-                                                                            className="flex items-center gap-2 text-gray-600"
-                                                                        >
-                                                                            <div className="w-1.5 h-1.5 bg-green-600 rounded-full" />
-                                                                            <span className="text-sm">
-                                                                                {
-                                                                                    benefit
-                                                                                }
-                                                                            </span>
-                                                                        </li>
-                                                                    )
-                                                                )}
-                                                            </ul>
-                                                        </div>
-
-                                                        {/* Requirements */}
-                                                        <div>
-                                                            <h3 className="font-medium mb-2">
-                                                                Persyaratan
-                                                            </h3>
-                                                            <ul className="space-y-2">
-                                                                {scholarship.requirements.map(
-                                                                    (
-                                                                        req,
-                                                                        idx
-                                                                    ) => (
-                                                                        <li
-                                                                            key={
-                                                                                idx
-                                                                            }
-                                                                            className="flex items-center gap-2 text-gray-600"
-                                                                        >
-                                                                            <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
-                                                                            <span className="text-sm">
-                                                                                {
-                                                                                    req
-                                                                                }
-                                                                            </span>
-                                                                        </li>
-                                                                    )
-                                                                )}
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="flex items-center justify-between pt-4 border-t">
-                                                        <div className="text-sm text-gray-500">
-                                                            Deadline:{" "}
-                                                            {
-                                                                scholarship.deadline
-                                                            }
-                                                        </div>
-                                                        <Button disabled>
-                                                            Daftar Sekarang
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
+                                <UnderDevelopment />
                             </div>
                         </div>
 
