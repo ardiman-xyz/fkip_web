@@ -5,6 +5,7 @@ use App\Http\Controllers\AccreditationController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LeaderController;
 use App\Http\Controllers\LecturerController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
@@ -47,5 +48,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/{lecturer}', 'update')->name('update');
         Route::delete('/{lecturer}', 'destroy')->name('destroy');
         Route::post('/{lecturer}/order', 'updateOrder')->name('update-order');
+    });
+
+
+    Route::controller(StaffController::class)->prefix('staff')->name('staff.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::get('/data', 'getData')->name('get');
+        Route::post('/', 'store')->name('store');
+        Route::put('/{staff}', 'update')->name('update');
+        Route::delete('/{staff}', 'destroy')->name('destroy');
     });
 });

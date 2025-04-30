@@ -81,20 +81,5 @@ class AccreditationController extends Controller
     }
 
 
-    public function updateOrder(Accreditation $accreditation, UpdateOrderRequest $request)
-    {
-        try {
-            $this->accreditationService->updateOrder($accreditation, $request->direction);
-            
-            return response()->json([
-                'status' => true,
-                'message' => 'Berhasil mengubah urutan'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Gagal mengubah urutan'
-            ], 500);
-        }
-    }
+   
 }
