@@ -8,6 +8,8 @@ use App\Services\AboutService;
 use App\Services\ContactInfoService;
 use App\Services\HistoryService;
 use App\Services\LeaderService;
+use App\Services\LecturerFrontService;
+use App\Services\StaffFrontService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -18,7 +20,9 @@ class FacultyProfileController extends Controller
         private HistoryService $historyService, 
         private AboutService $aboutService,
         private LeaderService $leaderService,
-        private ContactInfoService $contactInfoService
+        private ContactInfoService $contactInfoService,
+        private LecturerFrontService $lecturerFrontService,
+        private StaffFrontService $staffFrontService
     )
    {}
 
@@ -60,16 +64,33 @@ class FacultyProfileController extends Controller
 
     public function lecturer()
     {
-        return Inertia::render('Web/Faculty/Lecturer');
+        $lecturers = $this->lecturerFrontService->getAllForDirectory();
+        
+        return Inertia::render('Web/Faculty/Lecturer', [
+            'lecturers' => $lecturers
+        ]);
     }
 
     public function employee()
     {
-        return Inertia::render('Web/Faculty/Employee');
+        $staff = $this->staffFrontService->getAllForDirectory();
+        
+        return Inertia::render('Web/Faculty/Employee', [
+            'staff' => $staff
+        ]);
     }
 
     public function lecturerDetail(string $id)
     {
-        return Inertia::render("Web/Faculty/LecturerDetail");
+        try {
+            $lecturer = $this->lecturerFrontService->getDetailById($id);
+            
+            return Inertia::render("Web/Faculty/LecturerDetail", [
+                'lecturer' => $lecturer
+            ]);
+        } catch (\Exception $e) {
+            // Handle the case when lecturer is not found
+            return redirect()->route('fakultas.lecturer')->with('error', 'Dosen tidak ditemukan');
+        }
     }
 }

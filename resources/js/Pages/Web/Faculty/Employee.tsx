@@ -11,63 +11,27 @@ import {
 } from "@/Components/ui/breadcrumb";
 import { ProfileSidebar } from "../_components/ProfileSidebar";
 
-interface Employee {
+interface Staff {
     id: number;
     nip?: string;
+    unit?: string;
     translations: {
         id: {
             full_name: string;
-            position: string;
+            position?: string;
         };
     };
-    department?: {
-        translations: {
-            id: {
-                name: string;
-            };
-        };
+    media?: {
+        id: number;
+        path: string;
     };
 }
 
-const dummyEmployees: Employee[] = [
-    {
-        id: 1,
-        nip: "198501012015011001",
-        translations: {
-            id: {
-                full_name: "Ahmad Subagyo",
-                position: "Kepala Bagian Tata Usaha",
-            },
-        },
-        department: {
-            translations: {
-                id: {
-                    name: "Bagian Tata Usaha",
-                },
-            },
-        },
-    },
-    {
-        id: 2,
-        nip: "199001022016012001",
-        translations: {
-            id: {
-                full_name: "Siti Aminah",
-                position: "Staf Akademik",
-            },
-        },
-        department: {
-            translations: {
-                id: {
-                    name: "Bagian Akademik",
-                },
-            },
-        },
-    },
-    // ... tambahkan data dummy lainnya
-];
+interface EmployeeDirectoryProps {
+    staff: Staff[];
+}
 
-const EmployeeDirectory = () => {
+const EmployeeDirectory = ({ staff = [] }: EmployeeDirectoryProps) => {
     return (
         <Guest2>
             <div className="min-h-screen bg-white py-12">
@@ -104,62 +68,86 @@ const EmployeeDirectory = () => {
                                         Tenaga Kependidikan
                                     </h1>
 
-                                    {/* Employee List */}
-                                    <div className="space-y-4">
-                                        {dummyEmployees.map((employee) => (
-                                            <Card key={employee.id}>
-                                                <CardContent className="p-4">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-14 h-14 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
-                                                            <UserSquare2 className="w-full h-full p-3 text-gray-400" />
-                                                        </div>
-                                                        <div>
-                                                            <h3 className="font-medium text-gray-900">
-                                                                {
-                                                                    employee
-                                                                        .translations
-                                                                        .id
-                                                                        .full_name
-                                                                }
-                                                            </h3>
-                                                            {employee.nip && (
-                                                                <p className="text-sm text-gray-500">
-                                                                    NIP.{" "}
+                                    {/* Staff List */}
+                                    {staff.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {staff.map((staffMember) => (
+                                                <Card key={staffMember.id}>
+                                                    <CardContent className="p-4">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-14 h-14 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
+                                                                {staffMember.media ? (
+                                                                    <img
+                                                                        src={
+                                                                            staffMember
+                                                                                .media
+                                                                                .path
+                                                                        }
+                                                                        alt={
+                                                                            staffMember
+                                                                                .translations
+                                                                                .id
+                                                                                .full_name
+                                                                        }
+                                                                        className="w-full h-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <UserSquare2 className="w-full h-full p-3 text-gray-400" />
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <h3 className="font-medium text-gray-900">
                                                                     {
-                                                                        employee.nip
+                                                                        staffMember
+                                                                            .translations
+                                                                            .id
+                                                                            .full_name
                                                                     }
-                                                                </p>
-                                                            )}
-                                                            {employee.department && (
+                                                                </h3>
+                                                                {staffMember.nip && (
+                                                                    <p className="text-sm text-gray-500">
+                                                                        NIP.{" "}
+                                                                        {
+                                                                            staffMember.nip
+                                                                        }
+                                                                    </p>
+                                                                )}
                                                                 <p className="text-sm text-gray-600">
                                                                     {
-                                                                        employee
+                                                                        staffMember
                                                                             .translations
                                                                             .id
                                                                             .position
-                                                                    }{" "}
-                                                                    -{" "}
-                                                                    {
-                                                                        employee
-                                                                            .department
+                                                                    }
+                                                                    {staffMember.unit &&
+                                                                        staffMember
                                                                             .translations
                                                                             .id
-                                                                            .name
+                                                                            .position &&
+                                                                        " - "}
+                                                                    {
+                                                                        staffMember.unit
                                                                     }
                                                                 </p>
-                                                            )}
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        ))}
-                                    </div>
+                                                    </CardContent>
+                                                </Card>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-12 text-gray-500">
+                                            Belum ada data tenaga kependidikan
+                                        </div>
+                                    )}
                                 </CardContent>
                             </Card>
                         </div>
 
                         <div className="col-span-12 lg:col-span-4">
-                            <ProfileSidebar />
+                            <div className="sticky top-20">
+                                <ProfileSidebar />
+                            </div>
                         </div>
                     </div>
                 </div>
