@@ -72,12 +72,6 @@ const menuItems: MenuItem[] = [
     },
 
     {
-        label: "Dosen",
-        icon: <PiUserSquareDuotone className="size-5" />,
-        href: "/admin/lecturer",
-    },
-
-    {
         label: "separator",
         icon: null,
     },

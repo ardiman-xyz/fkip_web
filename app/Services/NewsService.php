@@ -206,21 +206,21 @@ class NewsService
 
     public function delete(News $news)
     {
-    try {
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        $news->translations()->delete();
+            $news->translations()->delete();
 
-        $news->tags()->detach();
+            $news->tags()->detach();
 
-        $news->delete();
+            $news->delete();
 
-        DB::commit();
-        return true;
+            DB::commit();
+            return true;
 
-    } catch (\Exception $e) {
-        DB::rollBack();
-        throw $e;
-    }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 }

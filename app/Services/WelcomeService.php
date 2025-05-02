@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Category;
 use App\Models\DefaultSlider;
 use App\Models\Event;
 use App\Models\News;
 use App\Models\Language;
 use App\Models\NewsTranslation;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class WelcomeService
 {
@@ -335,6 +337,114 @@ class WelcomeService
                     'is_active' => (bool) $slide->is_active
                 ];
             });
+    }
+
+
+     /**
+     * Mendapatkan semua berita dengan paginasi
+     */
+    public function getAllNews(int $perPage = 10, array $filters = []): LengthAwarePaginator
+    {
+        $query = News::with(['translations', 'media', 'category.translations', 'tags.translations'])
+            ->where('status', 'published')
+            ->where('publish_date', '<=', now())
+            ->orderByDesc('publish_date');
+
+        // Filter berdasarkan kategori
+        if (!empty($filters['category'])) {
+            $query->whereHas('category', function ($q) use ($filters) {
+                $q->where('id', $filters['category']);
+            });
+        }
+
+        // Filter berdasarkan tag
+        if (!empty($filters['tag'])) {
+            $query->whereHas('tags', function ($q) use ($filters) {
+                $q->where('id', $filters['tag']);
+            });
+        }
+
+        // Filter berdasarkan pencarian
+        if (!empty($filters['search'])) {
+            $query->whereHas('translations', function ($q) use ($filters) {
+                $q->where('title', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('content', 'like', '%' . $filters['search'] . '%');
+            });
+        }
+
+        return $query->paginate($perPage);
+    }
+
+    /**
+     * Mendapatkan semua kategori berita dengan jumlah berita
+     */
+    public function getAllCategories()
+    {
+        return Category::withCount(['news' => function ($query) {
+            $query->where('status', 'published')
+                 ->where('publish_date', '<=', now());
+        }])
+        ->with('translations')
+        ->get()
+        ->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->translations->firstWhere('language_id', 1)->name ?? '',
+                'slug' => $category->translations->firstWhere('language_id', 1)->slug ?? '',
+                'count' => $category->news_count
+            ];
+        });
+    }
+
+    /**
+     * Mendapatkan berita populer
+     */
+    public function getPopularNews($limit = 5)
+    {
+        // Implementasi ini sederhana, Anda bisa mengembangkannya dengan
+        // logika yang lebih kompleks (misalnya berdasarkan view count atau interaksi)
+        return News::with(['translations', 'media', 'category.translations'])
+            ->where('status', 'published')
+            ->where('publish_date', '<=', now())
+            ->orderByDesc('publish_date')
+            ->limit($limit)
+            ->get()
+            ->map(function ($news) {
+                return $this->formatNewsData($news);
+            });
+    }
+
+    /**
+     * Format data berita untuk response
+     */
+    private function formatNewsData($news)
+    {
+        $translations = $news->translations->mapWithKeys(function ($translation) {
+            return [$translation->language->locale => [
+                'title' => $translation->title,
+                'slug' => $translation->slug,
+                'content' => $translation->content,
+            ]];
+        })->toArray();
+
+        return [
+            'id' => $news->id,
+            'publish_date' => $news->publish_date->format('Y-m-d'),
+            'is_featured' => $news->is_featured,
+            'media' => $news->media ? [
+                'id' => $news->media->id,
+                'path' => $news->media->path,
+                'paths' => [
+                    'thumbnail' => $news->media->path, // Idealnya gunakan path thumbnail jika tersedia
+                ]
+            ] : null,
+            'category' => $news->category ? [
+                'id' => $news->category->id,
+                'name' => $news->category->translations->firstWhere('language_id', 1)->name ?? '',
+                'slug' => $news->category->translations->firstWhere('language_id', 1)->slug ?? '',
+            ] : null,
+            'translations' => $translations,
+        ];
     }
 
 }

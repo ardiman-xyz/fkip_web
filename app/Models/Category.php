@@ -29,4 +29,9 @@ class Category extends Model
             ->first();
     }
 
+    public function news()
+    {
+        return $this->hasMany(News::class);
+    }
+
 }

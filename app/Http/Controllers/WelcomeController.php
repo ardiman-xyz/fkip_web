@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\WelcomeService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
@@ -32,9 +33,29 @@ class WelcomeController extends Controller
         ]);
     }
 
-    public function news()
+    public function news(Request $request)
     {
-        return Inertia::render("Web/News/AllNews");
+        $perPage = $request->input('per_page', 12);
+        $filters = [
+            'category' => $request->input('category'),
+            'tag' => $request->input('tag'),
+            'search' => $request->input('search'),
+        ];
+        
+        $newsService = new WelcomeService();
+        
+        $news = $newsService->getAllNews($perPage, $filters);
+        $categories = $newsService->getAllCategories();
+        $popularNews = $newsService->getPopularNews(5);
+
+        $data = [
+            'news' => $news,
+            'categories' => $categories,
+            'popularNews' => $popularNews,
+            'filters' => $filters
+        ];
+
+        return Inertia::render("Web/News/AllNews", $data);
     }
 
     public function newsDetail(string $slug): InertiaResponse

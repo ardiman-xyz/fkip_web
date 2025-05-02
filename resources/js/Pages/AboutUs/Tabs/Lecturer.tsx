@@ -16,6 +16,7 @@ import { Lecturer as LecturerType } from "../_types/lecturer";
 import { LecturerTableItem } from "../_components/LecturerTableItem";
 import { LecturerFormDialog } from "../_components/LecturerFormDialog";
 import { ConfirmDialog } from "../_components/ConfirmDialog";
+import { LecturerSyncButton } from "../_components/LecturerSyncButton";
 
 export const Lecturer = () => {
     const [showForm, setShowForm] = useState<boolean>(false);
@@ -69,7 +70,7 @@ export const Lecturer = () => {
         } finally {
             setShowDeleteConfirm(false);
             setDeleteId(null);
-            setIsLoading(false);
+            setIsLoadingDelete(false);
         }
     };
 
@@ -94,7 +95,12 @@ export const Lecturer = () => {
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Dosen FKIP</CardTitle>
-                <Button onClick={() => setShowForm(true)}>Tambah Dosen</Button>
+                <div className="flex items-center gap-2">
+                    <LecturerSyncButton onSyncComplete={fetchLecturers} />
+                    <Button onClick={() => setShowForm(true)}>
+                        Tambah Dosen
+                    </Button>
+                </div>
             </CardHeader>
             <CardContent>
                 <Table>

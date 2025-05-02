@@ -7,8 +7,8 @@ on:
 permissions:
   contents: read
   packages: write
-  actions: write # Tambahkan ini
-  id-token: write # Dan ini
+  actions: write
+  id-token: write
 
 jobs:
   build-and-deploy:
@@ -53,7 +53,8 @@ jobs:
           script: |
             cd /var/www/html/docker/web-fkip/prod
 
-             if grep -q "APP_VERSION=" .env; then
+            # Update environment variables
+            if grep -q "APP_VERSION=" .env; then
               sed -i "s/APP_VERSION=.*/APP_VERSION=${{ env.VERSION }}/" .env
             else
               echo "APP_VERSION=${{ env.VERSION }}" >> .env
@@ -65,19 +66,45 @@ jobs:
               echo "APP_ENV=production" >> .env
             fi
 
+            # Pull latest images
             docker compose pull
 
+            # Clean up old images
             docker image prune -f
 
+            # Stop and remove existing containers properly
             docker compose -p fkip down
-            docker compose -p fkip up -d --no-recreate --no-deps
 
-            echo "Waiting for container to be ready..."
-            sleep 20
-
-            if docker compose -p fkip ps | grep -q "app.*running"; then
-                docker compose -p fkip exec -T app php artisan migrate --force
-            else
-                echo "Container app is not running"
-                exit 1
+            # Make sure the container is really gone before recreating
+            if docker ps -a | grep -q "fkip_web_prod"; then
+              docker rm -f fkip_web_prod
             fi
+
+            # Start containers with new images
+            docker compose -p fkip up -d
+
+            # Wait for the container to be fully started
+            echo "Waiting for container to be ready..."
+
+            # More robust approach for checking if container is ready
+            for i in {1..30}; do
+              if docker compose -p fkip ps | grep -q "app.*running"; then
+                echo "Container is running!"
+                break
+              fi
+              
+              if [ $i -eq 30 ]; then
+                echo "Container failed to start within timeout"
+                exit 1
+              fi
+              
+              echo "Waiting for container... attempt $i/30"
+              sleep 5
+            done
+
+            # Run migrations after ensuring container is up and healthy
+            docker compose -p fkip exec -T app php artisan migrate --force
+
+            # Verify all is good
+            docker compose -p fkip ps
+            echo "Deployment completed successfully"

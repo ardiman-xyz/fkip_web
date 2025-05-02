@@ -1,8 +1,10 @@
-// pages/News/Index.tsx
+// Web/News/AllNews.tsx
 import Guest2 from "@/Layouts/GuestLayout2";
 import { Card, CardContent } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import { Calendar, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useForm } from "@inertiajs/react";
 
 import {
     Breadcrumb,
@@ -12,37 +14,104 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
-import { UnderDevelopment } from "@/Components/UnderDevelopment";
+import { formatDate } from "@/lib/utils";
+import { Pagination } from "../_components/pagination";
 
-const NewsIndex = () => {
-    // Data tag/kategori berita
-    const newsTags = [
-        { id: "prestasi", name: "Prestasi", count: 24 },
-        { id: "pendidikan", name: "Pendidikan", count: 36 },
-        { id: "penelitian", name: "Penelitian", count: 18 },
-        { id: "pengabdian", name: "Pengabdian", count: 15 },
-        { id: "kemahasiswaan", name: "Kemahasiswaan", count: 42 },
-    ];
+interface Category {
+    id: number;
+    name: string;
+    slug: string;
+    count: number;
+}
 
-    // Data berita terbaru
-    const latestNews = [
-        {
-            title: "Workshop Pengembangan Aplikasi Mobile untuk Pemula",
-            date: "31 Desember 2024",
-            tag: "Pendidikan",
-            excerpt:
-                "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium...",
-            image: "/path/to/image.jpg",
-        },
-        {
-            title: "Mahasiswa FKIP Raih Juara Nasional",
-            date: "30 Desember 2024",
-            tag: "Prestasi",
-            excerpt:
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
-            image: "/path/to/image2.jpg",
-        },
-    ];
+interface NewsItem {
+    id: number;
+    publish_date: string;
+    is_featured: boolean;
+    media: {
+        id: number;
+        path: string;
+        paths: {
+            thumbnail: string;
+        };
+    } | null;
+    category: {
+        id: number;
+        name: string;
+        slug: string;
+    } | null;
+    translations: {
+        id: {
+            title: string;
+            slug: string;
+            content: string;
+        };
+        en?: {
+            title: string;
+            slug: string;
+            content: string;
+        };
+    };
+}
+
+interface NewsIndexProps {
+    news: {
+        data: NewsItem[];
+        links: any;
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+    };
+    categories: Category[];
+    popularNews: NewsItem[];
+    filters: {
+        category?: number;
+        tag?: number;
+        search?: string;
+    };
+}
+
+const NewsIndex = ({
+    news,
+    categories,
+    popularNews,
+    filters,
+}: NewsIndexProps) => {
+    const { data, setData, get } = useForm({
+        search: filters.search || "",
+        category: filters.category || "",
+        page: 1,
+    });
+
+    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        get("/berita", {
+            preserveState: true,
+        });
+    };
+
+    const handleCategoryFilter = (categoryId: number | string) => {
+        setData("category", categoryId);
+        get("/berita", {
+            preserveState: true,
+        });
+    };
+
+    const handlePageChange = (page: number) => {
+        setData("page", page);
+        get("/berita", {
+            preserveState: true,
+        });
+    };
+
+    // Ekstrak excerpt dari konten HTML
+    const getExcerpt = (htmlContent: string, length = 120) => {
+        const plainText = htmlContent.replace(/<[^>]+>/g, "");
+        return plainText.length > length
+            ? plainText.substring(0, length) + "..."
+            : plainText;
+    };
 
     return (
         <Guest2>
@@ -58,9 +127,7 @@ const NewsIndex = () => {
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
-                                    <BreadcrumbLink href="/berita">
-                                        Berita
-                                    </BreadcrumbLink>
+                                    <BreadcrumbPage>Berita</BreadcrumbPage>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
@@ -74,136 +141,220 @@ const NewsIndex = () => {
                         </p>
                     </div>
 
-                    <div>
-                        <UnderDevelopment />
-                    </div>
-
-                    {/* <div className="mb-12">
+                    <div className="mb-12">
                         <h2 className="text-xl font-semibold mb-4">
                             Kategori Berita
                         </h2>
                         <div className="flex flex-wrap gap-3">
-                            {newsTags.map((tag) => (
+                            <Button
+                                variant={!data.category ? "default" : "outline"}
+                                className="hover:bg-green-50"
+                                onClick={() => handleCategoryFilter("")}
+                            >
+                                Semua
+                            </Button>
+                            {categories.map((category) => (
                                 <Button
-                                    key={tag.id}
-                                    variant="outline"
+                                    key={category.id}
+                                    variant={
+                                        data.category == category.id
+                                            ? "default"
+                                            : "outline"
+                                    }
                                     className="hover:bg-green-50"
+                                    onClick={() =>
+                                        handleCategoryFilter(category.id)
+                                    }
                                 >
-                                    {tag.name}
+                                    {category.name}
                                     <span className="ml-2 text-sm text-gray-500">
-                                        ({tag.count})
+                                        ({category.count})
                                     </span>
                                 </Button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="mb-12">
-                        <h2 className="text-xl font-semibold mb-6">
-                            Berita Unggulan
-                        </h2>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100">
-                                <img
-                                    src="/path/to/featured-image.jpg"
-                                    alt="Featured news"
-                                    className="object-cover w-full h-full"
-                                />
-                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white">
-                                    <span className="px-3 py-1 rounded-full text-sm bg-green-500 mb-2 inline-block">
-                                        Prestasi
-                                    </span>
-                                    <h3 className="text-xl font-semibold mb-2">
-                                        Tim Robotik FKIP Juara Internasional
-                                    </h3>
-                                    <p className="text-sm opacity-90">
-                                        28 Desember 2024
-                                    </p>
-                                </div>
+                    <div className="grid grid-cols-12 gap-8 mb-12">
+                        <div className="col-span-12 lg:col-span-8">
+                            <div className="mb-6">
+                                <form
+                                    onSubmit={handleSearch}
+                                    className="flex gap-2"
+                                >
+                                    <input
+                                        type="text"
+                                        placeholder="Cari berita..."
+                                        className="flex-1 px-4 py-2 border rounded-md"
+                                        value={data.search}
+                                        onChange={(e) =>
+                                            setData("search", e.target.value)
+                                        }
+                                    />
+                                    <Button type="submit">Cari</Button>
+                                </form>
                             </div>
-                            <div className="space-y-4">
-                                <h3 className="font-medium text-gray-500">
+
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {news.data.length > 0 ? (
+                                    news.data.map((item) => (
+                                        <Card key={item.id}>
+                                            <CardContent className="p-0">
+                                                <div className="aspect-video relative">
+                                                    {item.media ? (
+                                                        <img
+                                                            src={
+                                                                item.media
+                                                                    ?.paths
+                                                                    .thumbnail
+                                                            }
+                                                            alt={
+                                                                item
+                                                                    .translations
+                                                                    ?.id
+                                                                    ?.title ||
+                                                                "News image"
+                                                            }
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+                                                            No Image
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="p-6">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        {item.category && (
+                                                            <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm">
+                                                                {
+                                                                    item
+                                                                        .category
+                                                                        .name
+                                                                }
+                                                            </span>
+                                                        )}
+                                                        <span className="text-sm text-gray-500">
+                                                            {formatDate(
+                                                                item.publish_date
+                                                            )}
+                                                        </span>
+                                                    </div>
+                                                    <h3 className="font-semibold mb-2 line-clamp-2">
+                                                        {
+                                                            item.translations
+                                                                ?.id?.title
+                                                        }
+                                                    </h3>
+                                                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                                                        {getExcerpt(
+                                                            item.translations.id
+                                                                .content
+                                                        )}
+                                                    </p>
+                                                    <Button
+                                                        variant="outline"
+                                                        className="w-full"
+                                                        asChild
+                                                    >
+                                                        <a
+                                                            href={`/berita/${item.translations.id.slug}`}
+                                                        >
+                                                            Baca Selengkapnya
+                                                            <ChevronRight className="w-4 h-4 ml-1" />
+                                                        </a>
+                                                    </Button>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    ))
+                                ) : (
+                                    <div className="col-span-2 py-12 text-center text-gray-500">
+                                        Tidak ada berita yang ditemukan
+                                    </div>
+                                )}
+                            </div>
+
+                            {news.last_page > 1 && (
+                                <div className="mt-8 flex justify-center">
+                                    <Pagination
+                                        totalPages={news.last_page}
+                                        currentPage={news.current_page}
+                                        onPageChange={handlePageChange}
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="col-span-12 lg:col-span-4">
+                            <div className="sticky top-20">
+                                <h3 className="font-semibold text-lg mb-4">
                                     Berita Populer
                                 </h3>
-                                {Array(3)
-                                    .fill(null)
-                                    .map((_, idx) => (
-                                        <Card key={idx}>
+                                <div className="space-y-4">
+                                    {popularNews.map((item) => (
+                                        <Card key={item.id}>
                                             <CardContent className="p-4">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0">
-                                                        <img
-                                                            src="/path/to/thumbnail.jpg"
-                                                            alt="News thumbnail"
-                                                            className="w-full h-full object-cover rounded-lg"
-                                                        />
+                                                        {item.media ? (
+                                                            <img
+                                                                src={
+                                                                    item.media
+                                                                        .paths
+                                                                        .thumbnail
+                                                                }
+                                                                alt={
+                                                                    item
+                                                                        .translations
+                                                                        .id
+                                                                        .title
+                                                                }
+                                                                className="w-full h-full object-cover rounded-lg"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 rounded-lg">
+                                                                No Image
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div>
-                                                        <span className="text-sm text-green-600 mb-1 block">
-                                                            Penelitian
-                                                        </span>
+                                                        {item.category && (
+                                                            <span className="text-sm text-green-600 mb-1 block">
+                                                                {
+                                                                    item
+                                                                        .category
+                                                                        .name
+                                                                }
+                                                            </span>
+                                                        )}
                                                         <h4 className="font-medium mb-1 line-clamp-2">
-                                                            Dosen FKIP Publikasi
-                                                            Jurnal Internasional
+                                                            <a
+                                                                href={`/berita/${item.translations.id.slug}`}
+                                                            >
+                                                                {
+                                                                    item
+                                                                        .translations
+                                                                        .id
+                                                                        .title
+                                                                }
+                                                            </a>
                                                         </h4>
                                                         <div className="flex items-center text-sm text-gray-500">
                                                             <Calendar className="w-4 h-4 mr-1" />
-                                                            27 Desember 2024
+                                                            {formatDate(
+                                                                item.publish_date
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </CardContent>
                                         </Card>
                                     ))}
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-semibold">
-                                Berita Terbaru
-                            </h2>
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {latestNews.map((news, idx) => (
-                                <Card key={idx}>
-                                    <CardContent className="p-0">
-                                        <div className="aspect-video relative">
-                                            <img
-                                                src={news.image}
-                                                alt={news.title}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                        <div className="p-6">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm">
-                                                    {news.tag}
-                                                </span>
-                                                <span className="text-sm text-gray-500">
-                                                    {news.date}
-                                                </span>
-                                            </div>
-                                            <h3 className="font-semibold mb-2 line-clamp-2">
-                                                {news.title}
-                                            </h3>
-                                            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                                                {news.excerpt}
-                                            </p>
-                                            <Button
-                                                variant="outline"
-                                                className="w-full"
-                                            >
-                                                Baca Selengkapnya
-                                                <ChevronRight className="w-4 h-4 ml-1" />
-                                            </Button>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </div> */}
                 </div>
             </div>
         </Guest2>

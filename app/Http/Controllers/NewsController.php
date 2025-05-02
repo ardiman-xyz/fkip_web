@@ -11,6 +11,7 @@ use App\Services\NewsService;
 use App\Services\TagService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
 class NewsController extends Controller
@@ -27,8 +28,29 @@ class NewsController extends Controller
     public function index()
     {
         $news = $this->newsService->getAllWithTranslations();
+        
+        // Ambil data dari API simpeg
+        // try {
+        //     $response = Http::get('https://simpeg.umkendari.ac.id/api/pegawai/fakultas/15');
+            
+        //     if ($response->successful()) {
+        //         $pegawaiData = $response->json();
+                
+        //         // Tampilkan hasil dengan var_dump dan hentikan eksekusi
+        //         var_dump($pegawaiData);
+        //         die(); // atau bisa menggunakan dd($pegawaiData);
+        //     } else {
+        //         // Jika terjadi error pada API
+        //         var_dump('Gagal mengambil data: ' . $response->status());
+        //         die();
+        //     }
+        // } catch (\Exception $e) {
+        //     // Tangani error jika ada masalah dengan koneksi
+        //     var_dump('Error: ' . $e->getMessage());
+        //     die();
+        // }
 
-
+        // Kode ini tidak akan dijalankan karena sudah di-die() sebelumnya
         return Inertia::render("News/Index", [
             'news' => $news
         ]);

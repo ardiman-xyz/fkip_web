@@ -48,8 +48,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/{lecturer}', 'update')->name('update');
         Route::delete('/{lecturer}', 'destroy')->name('destroy');
         Route::post('/{lecturer}/order', 'updateOrder')->name('update-order');
+        Route::get('/sync/preview', 'previewFromExternalApi')->name("sync.preview");
     });
-
 
     Route::controller(StaffController::class)->prefix('staff')->name('staff.')->group(function() {
         Route::get('/', 'index')->name('index');
