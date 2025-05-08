@@ -20,7 +20,9 @@ interface Lecturer {
     nip?: string;
     translations: {
         id: {
-            full_name: string;
+            full_name: string; // Hanya nama (tanpa gelar)
+            first_title?: string; // Gelar depan
+            last_title?: string; // Gelar belakang
             position?: string;
         };
     };
@@ -42,14 +44,26 @@ const LecturerDirectory = ({ lecturers = [] }: Props) => {
         []
     );
 
-    // Group lecturers by first letter of name
+    // Group lecturers by first letter of name (not title)
     const [groupedLecturers, setGroupedLecturers] = useState<
         Record<string, Lecturer[]>
     >({});
 
+    // Helper function to format full name with titles
+    const formatFullName = (lecturer: Lecturer) => {
+        const firstName = lecturer.translations?.id?.first_title || "";
+        const name = lecturer.translations?.id?.full_name || "";
+        const lastName = lecturer.translations?.id?.last_title || "";
+
+        return `${firstName ? firstName + " " : ""}${name}${
+            lastName ? " " + lastName : ""
+        }`.trim();
+    };
+
     useEffect(() => {
-        // Create groups by first letter
+        // Create groups by first letter of the name (without titles)
         const grouped = lecturers.reduce((acc, lecturer) => {
+            // Use full_name which contains only the name without titles
             const firstLetter = lecturer.translations.id.full_name
                 .charAt(0)
                 .toUpperCase();
@@ -193,12 +207,9 @@ const LecturerDirectory = ({ lecturers = [] }: Props) => {
                                                                                     .media
                                                                                     .path
                                                                             }
-                                                                            alt={
+                                                                            alt={formatFullName(
                                                                                 lecturer
-                                                                                    .translations
-                                                                                    .id
-                                                                                    .full_name
-                                                                            }
+                                                                            )}
                                                                             className="w-full h-full object-cover"
                                                                         />
                                                                     ) : (
@@ -207,12 +218,9 @@ const LecturerDirectory = ({ lecturers = [] }: Props) => {
                                                                 </div>
                                                                 <div>
                                                                     <h3 className="font-semibold">
-                                                                        {
+                                                                        {formatFullName(
                                                                             lecturer
-                                                                                .translations
-                                                                                .id
-                                                                                .full_name
-                                                                        }
+                                                                        )}
                                                                     </h3>
                                                                     {lecturer.nidn && (
                                                                         <p className="text-sm text-gray-500">

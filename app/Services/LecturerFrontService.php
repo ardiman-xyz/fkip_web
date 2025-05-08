@@ -46,10 +46,12 @@ class LecturerFrontService
         $translations = $lecturer->translations->mapWithKeys(function($translation) {
             return [$translation->locale => [
                 'full_name' => $translation->full_name,
+                'first_title' => $translation->first_title ?? null, // Tambahkan first_title
+                'last_title' => $translation->last_title ?? null,   // Tambahkan last_title
                 'position' => $translation->position ?? '',
             ]];
         })->toArray();
-
+    
         return [
             'id' => $lecturer->id,
             'nidn' => $lecturer->nidn,

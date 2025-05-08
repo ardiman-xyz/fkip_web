@@ -317,6 +317,8 @@ class LecturerService {
                 return [$translation->locale => [
                     'locale' => $translation->locale,
                     'full_name' => $translation->full_name,
+                    'first_title' => $translation->first_title ?? null, // Tambahkan first_title
+                    'last_title' => $translation->last_title ?? null,   // Tambahkan last_title
                     'academic_title' => $translation->academic_title,
                     'place_of_birth' => $translation->place_of_birth,
                     'date_of_birth' => $translation->date_of_birth,
@@ -418,6 +420,7 @@ class LecturerService {
         }
     }
 
+  
     /**
      * Sinkronisasi data dosen dari API eksternal
      */
@@ -435,8 +438,8 @@ class LecturerService {
                 ], 400);
             }
 
-            // Gunakan Http client untuk memanggil API eksternal
-            $response = Http::get('https://simpeg.umkendari.ac.id/api/pegawai/fakultas/15');
+            // Gunakan Http client untuk memanggil API eksternal dengan timeout yang ditingkatkan
+            $response = Http::timeout(30)->get('https://simpeg.umkendari.ac.id/api/pegawai/fakultas/15');
             
             if ($response->successful()) {
                 $pegawaiData = $response->json();
@@ -453,6 +456,11 @@ class LecturerService {
                         if (!in_array($pegawai['detail_pegawai']['Employee_Id'], $employeeIds)) {
                             continue;
                         }
+
+                        // Ambil nilai dari API
+                        $name = $pegawai['detail_pegawai']['Name'] ?? '';
+                        $firstName = $pegawai['detail_pegawai']['First_Title'] ?? null;
+                        $lastName = $pegawai['detail_pegawai']['Last_Title'] ?? null;
                         
                         // Cari program studi dan buat jika belum ada
                         $studyProgramId = null;
@@ -511,15 +519,15 @@ class LecturerService {
                         
                         // Format gelar akademik jika ada
                         $academicTitle = '';
-                        if (!empty($pegawai['detail_pegawai']['First_Title'])) {
-                            $academicTitle .= $pegawai['detail_pegawai']['First_Title'] . ' ';
+                        if (!empty($firstName)) {
+                            $academicTitle .= $firstName . ' ';
                         }
-                        if (!empty($pegawai['detail_pegawai']['Last_Title'])) {
-                            $academicTitle .= $pegawai['detail_pegawai']['Last_Title'];
+                        if (!empty($lastName)) {
+                            $academicTitle .= $lastName;
                         }
                         $lecturerData['academic_title'] = trim($academicTitle);
                         
-                        // Tambahkan updated_at hanya jika kolom tersebut ada
+                        // Tambahkan updated_at jika kolom tersebut ada
                         if ($this->hasColumn('lecturers', 'updated_at')) {
                             $lecturerData['updated_at'] = now();
                         }
@@ -560,10 +568,15 @@ class LecturerService {
                                 DB::table('lecturer_contacts')->insert($contactData);
                             }
                             
+                            // Perbarui data translations - simpan hanya name di full_name
                             $translationData = [
-                                'full_name' => $pegawai['detail_pegawai']['Name'],
+                                'full_name' => $name, // Hanya simpan Name saja
+                                'first_title' => $firstName,
+                                'last_title' => $lastName,
                                 'place_of_birth' => $pegawai['detail_pegawai']['Birth_Place'] ?? null,
-                                'date_of_birth' => $pegawai['detail_pegawai']['Birth_Date'] ? date('Y-m-d', strtotime($pegawai['detail_pegawai']['Birth_Date'])) : null
+                                'date_of_birth' => $pegawai['detail_pegawai']['Birth_Date'] 
+                                    ? date('Y-m-d', strtotime($pegawai['detail_pegawai']['Birth_Date'])) 
+                                    : null
                             ];
                             
                             $existingTranslation = DB::table('lecturer_translations')
@@ -590,10 +603,17 @@ class LecturerService {
                             
                             $totalSync++;
                             
+                            // Generate nama lengkap untuk hasil logging
+                            $fullName = trim(
+                                ($firstName ? $firstName . ' ' : '') . 
+                                $name . 
+                                ($lastName ? ' ' . $lastName : '')
+                            );
+                            
                             // Tambahkan ke hasil untuk logging
                             $results[] = [
                                 'employee_id' => $pegawai['detail_pegawai']['Employee_Id'],
-                                'name' => $pegawai['detail_pegawai']['Name'],
+                                'name' => $fullName, // Tampilkan nama lengkap dengan gelar di hasil
                                 'status' => $existingLecturer ? 'updated' : 'created'
                             ];
                         }

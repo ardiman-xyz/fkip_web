@@ -1,3 +1,5 @@
+// components/ui/pagination-with-controls.tsx
+import React from "react";
 import {
     Pagination,
     PaginationContent,
@@ -14,8 +16,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/Components/ui/select";
-import { Button } from "@/Components/ui/button";
-import { ChevronsLeft, ChevronsRight } from "lucide-react";
+import {
+    ChevronLeft,
+    ChevronRight,
+    ChevronsLeft,
+    ChevronsRight,
+} from "lucide-react";
 
 interface PaginationWithControlsProps {
     currentPage: number;
@@ -41,39 +47,57 @@ export function PaginationWithControls({
     const totalPages = Math.ceil(totalItems / pageSize);
 
     // Generate page numbers to display
-    const getPageNumbers = () => {
-        const maxPagesToShow = 5;
-        let startPage = Math.max(
-            1,
-            currentPage - Math.floor(maxPagesToShow / 2)
-        );
-        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    const getVisiblePages = () => {
+        const delta = 2; // Number of pages to show on each side of current page
+        const pages = [];
 
-        // Adjust if we're near the end
-        if (endPage - startPage + 1 < maxPagesToShow) {
-            startPage = Math.max(1, endPage - maxPagesToShow + 1);
+        // Always include page 1
+        pages.push(1);
+
+        // Calculate range around current page
+        const rangeStart = Math.max(2, currentPage - delta);
+        const rangeEnd = Math.min(totalPages - 1, currentPage + delta);
+
+        // Add ellipsis if there's a gap after page 1
+        if (rangeStart > 2) {
+            pages.push("ellipsis-start");
         }
 
-        return { startPage, endPage };
+        // Add pages in the middle range
+        for (let i = rangeStart; i <= rangeEnd; i++) {
+            pages.push(i);
+        }
+
+        // Add ellipsis if there's a gap before the last page
+        if (rangeEnd < totalPages - 1) {
+            pages.push("ellipsis-end");
+        }
+
+        // Always include the last page if we have more than one page
+        if (totalPages > 1) {
+            pages.push(totalPages);
+        }
+
+        return pages;
     };
 
-    const { startPage, endPage } = getPageNumbers();
+    const visiblePages = getVisiblePages();
 
     return (
         <div
-            className={`flex flex-col md:flex-row items-center justify-between gap-4 py-4 ${className}`}
+            className={`flex flex-col md:flex-row items-center justify-between py-4 ${className}`}
         >
-            <div className="flex items-center text-sm text-muted-foreground">
-                <span>
-                    Menampilkan{" "}
-                    {totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1} -{" "}
-                    {Math.min(currentPage * pageSize, totalItems)} dari{" "}
-                    {totalItems} data
-                </span>
+            <div className="text-sm text-muted-foreground mb-4 md:mb-0">
+                Menampilkan{" "}
+                {totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1} -{" "}
+                {Math.min(currentPage * pageSize, totalItems)} dari {totalItems}{" "}
+                data
+            </div>
 
+            <div className="flex items-center space-x-2">
                 {showPageSizeOptions && onPageSizeChange && (
-                    <div className="ml-4 flex items-center space-x-2">
-                        <span>Tampilkan</span>
+                    <div className="flex items-center space-x-2 mr-4">
+                        <span className="text-sm">Tampilkan</span>
                         <Select
                             value={pageSize.toString()}
                             onValueChange={(value) =>
@@ -96,147 +120,119 @@ export function PaginationWithControls({
                                 ))}
                             </SelectContent>
                         </Select>
-                        <span>data</span>
+                        <span className="text-sm">data</span>
                     </div>
                 )}
-            </div>
 
-            <Pagination>
-                <PaginationContent>
-                    {/* Tombol First Page */}
-                    <PaginationItem className="hidden md:inline-flex">
-                        {currentPage === 1 ? (
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                disabled
-                                className="h-8 w-8 p-0"
-                            >
-                                <ChevronsLeft className="h-4 w-4" />
-                                <span className="sr-only">Halaman pertama</span>
-                            </Button>
-                        ) : (
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => onPageChange(1)}
-                                className="h-8 w-8 p-0"
-                            >
-                                <ChevronsLeft className="h-4 w-4" />
-                                <span className="sr-only">Halaman pertama</span>
-                            </Button>
-                        )}
-                    </PaginationItem>
-
-                    {/* Tombol Previous */}
-                    <PaginationItem>
-                        <PaginationPrevious
-                            onClick={() => onPageChange(currentPage - 1)}
-                            className={
-                                currentPage === 1
-                                    ? "pointer-events-none opacity-50"
-                                    : ""
-                            }
-                        />
-                    </PaginationItem>
-
-                    {/* Halaman pertama */}
-                    {startPage > 1 && (
+                <Pagination>
+                    <PaginationContent>
                         <PaginationItem>
                             <PaginationLink
-                                onClick={() => onPageChange(1)}
-                                isActive={currentPage === 1}
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onPageChange(1);
+                                }}
+                                className={`border rounded px-2 py-1 ${
+                                    currentPage === 1
+                                        ? "pointer-events-none opacity-50"
+                                        : "hover:bg-muted"
+                                }`}
                             >
-                                1
+                                <ChevronsLeft className="h-4 w-4" />
                             </PaginationLink>
                         </PaginationItem>
-                    )}
 
-                    {/* Ellipsis sebelum */}
-                    {startPage > 2 && (
                         <PaginationItem>
-                            <PaginationEllipsis />
+                            <PaginationLink
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (currentPage > 1)
+                                        onPageChange(currentPage - 1);
+                                }}
+                                className={`border rounded px-2 py-1 ${
+                                    currentPage === 1
+                                        ? "pointer-events-none opacity-50"
+                                        : "hover:bg-muted"
+                                }`}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                                <span className="sr-only">Previous</span>
+                            </PaginationLink>
                         </PaginationItem>
-                    )}
 
-                    {/* Halaman tengah */}
-                    {Array.from({ length: endPage - startPage + 1 }).map(
-                        (_, index) => {
-                            const page = startPage + index;
+                        {visiblePages.map((page, index) => {
+                            if (
+                                page === "ellipsis-start" ||
+                                page === "ellipsis-end"
+                            ) {
+                                return (
+                                    <PaginationItem key={`ellipsis-${index}`}>
+                                        <PaginationEllipsis />
+                                    </PaginationItem>
+                                );
+                            }
+
                             return (
                                 <PaginationItem key={page}>
                                     <PaginationLink
-                                        onClick={() => onPageChange(page)}
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            onPageChange(Number(page));
+                                        }}
                                         isActive={currentPage === page}
+                                        className={`border rounded px-3 py-1 ${
+                                            currentPage === page
+                                                ? "bg-primary text-primary-foreground"
+                                                : "hover:bg-muted"
+                                        }`}
                                     >
                                         {page}
                                     </PaginationLink>
                                 </PaginationItem>
                             );
-                        }
-                    )}
+                        })}
 
-                    {/* Ellipsis setelah */}
-                    {endPage < totalPages - 1 && (
-                        <PaginationItem>
-                            <PaginationEllipsis />
-                        </PaginationItem>
-                    )}
-
-                    {/* Halaman terakhir */}
-                    {endPage < totalPages && (
                         <PaginationItem>
                             <PaginationLink
-                                onClick={() => onPageChange(totalPages)}
-                                isActive={currentPage === totalPages}
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (currentPage < totalPages)
+                                        onPageChange(currentPage + 1);
+                                }}
+                                className={`border rounded px-2 py-1 ${
+                                    currentPage === totalPages
+                                        ? "pointer-events-none opacity-50"
+                                        : "hover:bg-muted"
+                                }`}
                             >
-                                {totalPages}
+                                <ChevronRight className="h-4 w-4" />
+                                <span className="sr-only">Next</span>
                             </PaginationLink>
                         </PaginationItem>
-                    )}
 
-                    {/* Tombol Next */}
-                    <PaginationItem>
-                        <PaginationNext
-                            onClick={() => onPageChange(currentPage + 1)}
-                            className={
-                                currentPage === totalPages
-                                    ? "pointer-events-none opacity-50"
-                                    : ""
-                            }
-                        />
-                    </PaginationItem>
-
-                    {/* Tombol Last Page */}
-                    <PaginationItem className="hidden md:inline-flex">
-                        {currentPage === totalPages ? (
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                disabled
-                                className="h-8 w-8 p-0"
+                        <PaginationItem>
+                            <PaginationLink
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    onPageChange(totalPages);
+                                }}
+                                className={`border rounded px-2 py-1 ${
+                                    currentPage === totalPages
+                                        ? "pointer-events-none opacity-50"
+                                        : "hover:bg-muted"
+                                }`}
                             >
                                 <ChevronsRight className="h-4 w-4" />
-                                <span className="sr-only">
-                                    Halaman terakhir
-                                </span>
-                            </Button>
-                        ) : (
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => onPageChange(totalPages)}
-                                className="h-8 w-8 p-0"
-                            >
-                                <ChevronsRight className="h-4 w-4" />
-                                <span className="sr-only">
-                                    Halaman terakhir
-                                </span>
-                            </Button>
-                        )}
-                    </PaginationItem>
-                </PaginationContent>
-            </Pagination>
+                            </PaginationLink>
+                        </PaginationItem>
+                    </PaginationContent>
+                </Pagination>
+            </div>
         </div>
     );
 }
