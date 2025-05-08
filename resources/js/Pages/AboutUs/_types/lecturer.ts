@@ -21,6 +21,7 @@ export interface Lecturer {
     };
     contact?: Contact | null;
     media?: Media | null;
+    last_sync_at: string;
 }
 
 export type Contact = {

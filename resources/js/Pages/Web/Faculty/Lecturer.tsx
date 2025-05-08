@@ -216,7 +216,7 @@ const LecturerDirectory = ({ lecturers = [] }: Props) => {
                                                                     </h3>
                                                                     {lecturer.nidn && (
                                                                         <p className="text-sm text-gray-500">
-                                                                            NIDN.{" "}
+                                                                            NIDN/NIP.{" "}
                                                                             {
                                                                                 lecturer.nidn
                                                                             }

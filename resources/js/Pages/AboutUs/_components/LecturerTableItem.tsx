@@ -53,8 +53,7 @@ export const LecturerTableItem = ({
                 </div>
             </TableCell>
             <TableCell>
-                <div>NIP: {data.nip || "-"}</div>
-                <div>NIDN: {data.nidn || "-"}</div>
+                <div>{data.nidn || "-"}</div>
             </TableCell>
             <TableCell>
                 <div>{data?.contact?.email}</div>
@@ -69,6 +68,17 @@ export const LecturerTableItem = ({
                 >
                     {data.is_active ? "Aktif" : "Non-aktif"}
                 </Badge>
+            </TableCell>
+            <TableCell className="text-muted-foreground text-xs">
+                {data.last_sync_at
+                    ? new Date(data.last_sync_at).toLocaleString("id-ID", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                      })
+                    : "Belum disinkronkan"}
             </TableCell>
             <TableCell className="text-right">
                 <div className="flex justify-end gap-2">

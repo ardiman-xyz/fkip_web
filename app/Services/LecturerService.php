@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\Lecturer;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 
 class LecturerService {
@@ -52,6 +54,7 @@ class LecturerService {
                 'study_program_id' => $data['study_program_id'] ?? null,
                 'academic_position_id' => $data['academic_position_id'] ?? null,
                 'media_id' => $data['media_id'] ?? null,
+              
             ]);
 
             // Simpan terjemahan Indonesia (wajib)
@@ -305,6 +308,7 @@ class LecturerService {
             'media_id' => $lecturer->media_id,
             'created_at' => $lecturer->created_at,
             'updated_at' => $lecturer->updated_at,
+            'last_sync_at' => $lecturer->last_sync_at ?? null,
             'media' => $lecturer->media ? [
                 'id' => $lecturer->media->id,
                 'path' => $lecturer->media->path ?? $lecturer->media->url ?? null
@@ -335,4 +339,312 @@ class LecturerService {
             'social_media' => []
         ];
     }
+
+
+
+    public function previewFromExternalApi()
+    {
+        try {
+            $response = Http::get('https://simpeg.umkendari.ac.id/api/pegawai/fakultas/15');
+            
+            if ($response->successful()) {
+                $pegawaiData = $response->json();
+                $previewData = [];
+                
+                // Siapkan data untuk preview
+                if (isset($pegawaiData['data']) && is_array($pegawaiData['data'])) {
+                    foreach ($pegawaiData['data'] as $pegawai) {
+                        // Cek apakah dosen sudah ada berdasarkan Employee_Id
+                        $existingLecturer = DB::table('lecturers')
+                            ->where('nip', $pegawai['detail_pegawai']['Employee_Id'])
+                            ->first();
+                        
+                        // Jika tidak ditemukan berdasarkan Employee_Id, coba cari berdasarkan email
+                        if (!$existingLecturer && !empty($pegawai['detail_pegawai']['Email_Corporate'])) {
+                            $existingContact = DB::table('lecturer_contacts')
+                                ->where('email', $pegawai['detail_pegawai']['Email_Corporate'])
+                                ->first();
+                                
+                            if ($existingContact) {
+                                $existingLecturer = DB::table('lecturers')
+                                    ->where('id', $existingContact->lecturer_id)
+                                    ->first();
+                            }
+                        }
+                        
+                        // Jika masih belum ditemukan, coba cari berdasarkan nama
+                        if (!$existingLecturer) {
+                            $existingTranslation = DB::table('lecturer_translations')
+                                ->where('full_name', 'like', '%' . $pegawai['detail_pegawai']['Name'] . '%')
+                                ->first();
+                                
+                            if ($existingTranslation) {
+                                $existingLecturer = DB::table('lecturers')
+                                    ->where('id', $existingTranslation->lecturer_id)
+                                    ->first();
+                            }
+                        }
+                        
+                        // Siapkan data untuk preview
+                        $previewData[] = [
+                            'employee_id' => $pegawai['detail_pegawai']['Employee_Id'],
+                            'nama' => $pegawai['detail_pegawai']['Name'],
+                            'email' => $pegawai['detail_pegawai']['Email_Corporate'] ?? null,
+                            'jenis_kelamin' => $pegawai['detail_pegawai']['Gender_Type'] ?? null,
+                            'program_studi' => isset($pegawai['penempatan'][0]) ? ($pegawai['penempatan'][0]['Department_Name'] ?? null) : null,
+                            'department_id' => isset($pegawai['penempatan'][0]) ? ($pegawai['penempatan'][0]['Department_Id'] ?? null) : null,
+                            'status' => $existingLecturer ? 'update' : 'new'
+                        ];
+                    }
+                }
+                
+                return response()->json([
+                    'status' => true,
+                    'data' => $previewData,
+                    'total' => count($previewData)
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Gagal mengambil data: ' . $response->status()
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
+            ], 500);
+        }
+    }
+
+    /**
+     * Sinkronisasi data dosen dari API eksternal
+     */
+    public function syncFromExternalApi(Request $request)
+    {
+        try {
+            // Ambil daftar employee_id yang dipilih dari request
+            $employeeIds = $request->input('nidn_list', []);
+            
+            // Validasi input
+            if (empty($employeeIds)) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tidak ada data dosen yang dipilih untuk disinkronkan'
+                ], 400);
+            }
+
+            // Gunakan Http client untuk memanggil API eksternal
+            $response = Http::get('https://simpeg.umkendari.ac.id/api/pegawai/fakultas/15');
+            
+            if ($response->successful()) {
+                $pegawaiData = $response->json();
+                $totalSync = 0;
+                $results = [];
+                
+                // Sinkronisasi data dosen
+                if (isset($pegawaiData['data']) && is_array($pegawaiData['data'])) {
+                    // Mulai transaction untuk memastikan semua operasi database berhasil
+                    DB::beginTransaction();
+                    
+                    foreach ($pegawaiData['data'] as $pegawai) {
+                        // Hanya proses pegawai yang dipilih di frontend
+                        if (!in_array($pegawai['detail_pegawai']['Employee_Id'], $employeeIds)) {
+                            continue;
+                        }
+                        
+                        // Cari program studi dan buat jika belum ada
+                        $studyProgramId = null;
+                        if (!empty($pegawai['penempatan']) && isset($pegawai['penempatan'][0]['Department_Id'])) {
+                            $departmentId = $pegawai['penempatan'][0]['Department_Id'];
+                            $departmentName = $pegawai['penempatan'][0]['Department_Name'] ?? null;
+                            $facultyId = $pegawai['penempatan'][0]['Faculty_Id'] ?? null;
+                            $facultyName = $pegawai['penempatan'][0]['Faculty_Name'] ?? null;
+                            
+                            if ($departmentId && $departmentName) {
+                                // Cek program studi yang sudah ada
+                                $existingProgram = DB::table('study_programs')
+                                    ->where('department_id', $departmentId)
+                                    ->first();
+                                    
+                                if ($existingProgram) {
+                                    $studyProgramId = $existingProgram->id;
+                                    
+                                    // Update program studi jika ada perubahan
+                                    DB::table('study_programs')
+                                        ->where('id', $studyProgramId)
+                                        ->update([
+                                            'name' => $departmentName,
+                                            'faculty_id' => $facultyId,
+                                            'faculty_name' => $facultyName,
+                                            'updated_at' => now()
+                                        ]);
+                                } else {
+                                    // Buat program studi baru
+                                    $studyProgramId = DB::table('study_programs')->insertGetId([
+                                        'department_id' => $departmentId,
+                                        'name' => $departmentName,
+                                        'faculty_id' => $facultyId,
+                                        'faculty_name' => $facultyName,
+                                        'status' => 'active',
+                                        'created_at' => now(),
+                                        'updated_at' => now()
+                                    ]);
+                                }
+                            }
+                        }
+                        
+                        // Cek apakah dosen sudah ada berdasarkan Employee_Id (yang digunakan sebagai NIP)
+                        $existingLecturer = DB::table('lecturers')
+                            ->where('nip', $pegawai['detail_pegawai']['Employee_Id'])
+                            ->first();
+                        
+                        // Siapkan data lecturer
+                        $lecturerData = [
+                            'nip' => $pegawai['detail_pegawai']['Employee_Id'],
+                            'nidn' => $pegawai['detail_pegawai']['Nidn'] ?? null,
+                            'status' => 'active',
+                            'study_program_id' => $studyProgramId,
+                            'last_sync_at' => now()
+                        ];
+                        
+                        // Format gelar akademik jika ada
+                        $academicTitle = '';
+                        if (!empty($pegawai['detail_pegawai']['First_Title'])) {
+                            $academicTitle .= $pegawai['detail_pegawai']['First_Title'] . ' ';
+                        }
+                        if (!empty($pegawai['detail_pegawai']['Last_Title'])) {
+                            $academicTitle .= $pegawai['detail_pegawai']['Last_Title'];
+                        }
+                        $lecturerData['academic_title'] = trim($academicTitle);
+                        
+                        // Tambahkan updated_at hanya jika kolom tersebut ada
+                        if ($this->hasColumn('lecturers', 'updated_at')) {
+                            $lecturerData['updated_at'] = now();
+                        }
+                        
+                        // Simpan atau update data dosen
+                        $lecturerId = null;
+                        if ($existingLecturer) {
+                            // Update dosen yang sudah ada
+                            DB::table('lecturers')
+                                ->where('id', $existingLecturer->id)
+                                ->update($lecturerData);
+                            $lecturerId = $existingLecturer->id;
+                        } else {
+                            // Buat dosen baru
+                            $lecturerData['created_at'] = now();
+                            $lecturerId = DB::table('lecturers')->insertGetId($lecturerData);
+                        }
+                        
+                        if ($lecturerId) {
+                            // Update atau buat data kontak
+                            $contactData = [
+                                'email' => $pegawai['detail_pegawai']['Email_Corporate'] ?? null,
+                                'phone' => $pegawai['detail_pegawai']['Phone_Mobile'] ?? null,
+                                'updated_at' => now()
+                            ];
+                            
+                            $existingContact = DB::table('lecturer_contacts')
+                                ->where('lecturer_id', $lecturerId)
+                                ->first();
+                            
+                            if ($existingContact) {
+                                DB::table('lecturer_contacts')
+                                    ->where('id', $existingContact->id)
+                                    ->update($contactData);
+                            } else {
+                                $contactData['lecturer_id'] = $lecturerId;
+                                $contactData['created_at'] = now();
+                                DB::table('lecturer_contacts')->insert($contactData);
+                            }
+                            
+                            $translationData = [
+                                'full_name' => $pegawai['detail_pegawai']['Name'],
+                                'place_of_birth' => $pegawai['detail_pegawai']['Birth_Place'] ?? null,
+                                'date_of_birth' => $pegawai['detail_pegawai']['Birth_Date'] ? date('Y-m-d', strtotime($pegawai['detail_pegawai']['Birth_Date'])) : null
+                            ];
+                            
+                            $existingTranslation = DB::table('lecturer_translations')
+                                ->where('lecturer_id', $lecturerId)
+                                ->where('locale', 'id') // Menggunakan locale 'id' untuk Indonesia
+                                ->first();
+                            
+                            if ($existingTranslation) {
+                                DB::table('lecturer_translations')
+                                    ->where('id', $existingTranslation->id)
+                                    ->update($translationData);
+                            } else {
+                                $translationData['lecturer_id'] = $lecturerId;
+                                $translationData['locale'] = 'id';
+                                
+                                // Cek apakah tabel memiliki kolom created_at
+                                $hasCreatedAt = DB::getSchemaBuilder()->hasColumn('lecturer_translations', 'created_at');
+                                if ($hasCreatedAt) {
+                                    $translationData['created_at'] = now();
+                                }
+                                
+                                DB::table('lecturer_translations')->insert($translationData);
+                            }
+                            
+                            $totalSync++;
+                            
+                            // Tambahkan ke hasil untuk logging
+                            $results[] = [
+                                'employee_id' => $pegawai['detail_pegawai']['Employee_Id'],
+                                'name' => $pegawai['detail_pegawai']['Name'],
+                                'status' => $existingLecturer ? 'updated' : 'created'
+                            ];
+                        }
+                    }
+                    
+                    // Commit transaction jika semua operasi berhasil
+                    DB::commit();
+                    
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Berhasil sinkronisasi ' . $totalSync . ' data dosen',
+                        'total_sync' => $totalSync,
+                        'results' => $results
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Format data dari API tidak sesuai'
+                    ], 500);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Gagal mengambil data: ' . $response->status()
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            // Rollback transaction jika terjadi error
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+            
+            return response()->json([
+                'status' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
+            ], 500);
+        }
+    }
+
+    /**
+    * @param string $table Nama tabel
+    * @param string $column Nama kolom
+    * @return bool
+    */
+    private function hasColumn($table, $column)
+    {
+        return DB::getSchemaBuilder()->hasColumn($table, $column);
+    }
+
+    
+
+
 }

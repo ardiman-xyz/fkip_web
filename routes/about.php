@@ -42,6 +42,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
      });
 
      Route::controller(LecturerController::class)->prefix('lecturers')->name('lecturers.')->group(function() {
+        Route::post('/sync', 'syncFromExternalApi')->name("sync");
         Route::get('/', 'index')->name('index');
         Route::get('/data', 'getData')->name('get');
         Route::post('/', 'store')->name('store');
