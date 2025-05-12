@@ -12,6 +12,7 @@ import {
     PiSlideshowDuotone,
     PiBuildingsDuotone,
     PiUserSquareDuotone,
+    PiGraduationCapDuotone,
 } from "react-icons/pi";
 
 type MenuItem = {
@@ -69,6 +70,12 @@ const menuItems: MenuItem[] = [
         label: "About Us",
         icon: <PiBuildingsDuotone className="size-5" />,
         href: "/admin/about-us",
+    },
+
+    {
+        label: "Program Studi",
+        icon: <PiGraduationCapDuotone className="size-5" />,
+        href: "/admin/study-programs",
     },
 
     {

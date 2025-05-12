@@ -1,7 +1,6 @@
 import {
     PiArchiveDuotone,
     PiArrowLeftDuotone,
-    PiCheckDuotone,
     PiCheckFatDuotone,
     PiImageDuotone,
     PiNewspaperDuotone,
@@ -14,7 +13,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardHeader,
     CardTitle,
 } from "@/Components/ui/card";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
@@ -76,7 +74,7 @@ const Create = ({ categories, tags }: Props) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isFeaturedModalOpen, setIsFeaturedModalOpen] = useState(false);
     const [sliderImage, setSliderImage] = useState<Media | null>(null);
-    const [featuredExpiredDate, setFeaturedExpiredDate] = useState('');
+    const [featuredExpiredDate, setFeaturedExpiredDate] = useState("");
 
     const form = useForm<NewsFormValues>({
         resolver: zodResolver(newsFormSchema),
@@ -99,7 +97,6 @@ const Create = ({ categories, tags }: Props) => {
             slider_image: null,
         },
     });
-
 
     const onSubmit = async (values: NewsFormValues) => {
         if (isSubmitting) return;
@@ -498,41 +495,60 @@ const Create = ({ categories, tags }: Props) => {
                                             control={form.control}
                                             name="is_featured"
                                             render={({ field }) => (
-                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                <FormControl>
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={field.value}
-                                                        onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                setIsFeaturedModalOpen(true);
-                                                            } else {
-                                                                field.onChange(false);
-                                                                setSliderImage(null);
-                                                                setFeaturedExpiredDate('');
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={
+                                                                field.value
                                                             }
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <div className="space-y-1 leading-none">
-                                                    <FormLabel>Featured Article</FormLabel>
-                                                    <FormDescription>
-                                                        This article will appear in the slider section
-                                                    </FormDescription>
-                                                </div>
-                                            </FormItem>
+                                                            onChange={(e) => {
+                                                                if (
+                                                                    e.target
+                                                                        .checked
+                                                                ) {
+                                                                    setIsFeaturedModalOpen(
+                                                                        true
+                                                                    );
+                                                                } else {
+                                                                    field.onChange(
+                                                                        false
+                                                                    );
+                                                                    setSliderImage(
+                                                                        null
+                                                                    );
+                                                                    setFeaturedExpiredDate(
+                                                                        ""
+                                                                    );
+                                                                }
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Featured Article
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            This article will
+                                                            appear in the slider
+                                                            section
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        {sliderImage && (
+                                            <div className="flex justify-between items-center text-sm text-gray-500">
+                                                <span>
+                                                    Featured until:{" "}
+                                                    {new Date(
+                                                        featuredExpiredDate
+                                                    ).toLocaleDateString()}
+                                                </span>
+                                                <span>Size: 1920x694</span>
+                                            </div>
                                         )}
-                                            />
-                                        {
-                                            sliderImage && (
-                                                <div className="flex justify-between items-center text-sm text-gray-500">
-                                                    <span>Featured until: {new Date(featuredExpiredDate).toLocaleDateString()}</span>
-                                                    <span>Size: 1920x694</span>
-                                                </div>
-                                            )
-                                        }
                                     </div>
-
                                 </div>
                             </div>
                         </CardContent>
@@ -556,9 +572,9 @@ const Create = ({ categories, tags }: Props) => {
                 onConfirm={({ image, expiredDate }) => {
                     setSliderImage(image);
                     setFeaturedExpiredDate(expiredDate);
-                    form.setValue('is_featured', true);
-                    form.setValue('slider_image', image);
-                    form.setValue('featured_expired_date', expiredDate);
+                    form.setValue("is_featured", true);
+                    form.setValue("slider_image", image);
+                    form.setValue("featured_expired_date", expiredDate);
                 }}
                 defaultImage={sliderImage}
                 defaultExpiredDate={featuredExpiredDate}

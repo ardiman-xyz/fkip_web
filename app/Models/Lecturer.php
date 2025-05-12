@@ -63,4 +63,12 @@ class Lecturer extends Model
         return $this->belongsTo(AcademicPosition::class, 'academic_position_id');
     }
 
+
+    public function studyPrograms(): BelongsToMany
+    {
+        return $this->belongsToMany(StudyProgram::class, 'study_program_lecturers')
+                    ->withPivot('role', 'is_active')
+                    ->withTimestamps();
+    }
+
 }

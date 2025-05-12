@@ -3,10 +3,13 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactInfoController;
 use App\Http\Controllers\DefaultSliderController;
+use App\Http\Controllers\EducationLevelController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StudyProgram;
+use App\Http\Controllers\StudyProgramDescriptionController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UploadMinio;
 use App\Http\Controllers\WelcomeController;
@@ -88,6 +91,26 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('/{slide}', 'destroy')->name('destroy');
         Route::post('/{slide}/move-up', 'moveUp')->name('move-up');
         Route::post('/{slide}/move-down', 'moveDown')->name('move-down');
+    });
+
+    Route::controller(StudyProgram::class)->prefix('study-programs')->name('study-program.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{studyProgram}', 'show')->name('show');
+        Route::post('/', 'store')->name('store');
+        Route::put('/{studyProgram}', 'update')->name('update');
+        Route::delete('/{studyProgram}', 'destroy')->name('destroy');
+    });
+
+    Route::controller(EducationLevelController::class)->prefix('education-levels')->name('education-level.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::put('/{educationLevel}', 'update')->name('update');
+        Route::delete('/{educationLevel}', 'destroy')->name('destroy');
+    });
+
+    Route::controller(StudyProgramDescriptionController::class)->prefix('study-programs')->name('study-program.description.')->group(function() {
+        Route::post('/{studyProgramId}/description', 'store')->name('store');
+        Route::put('/{studyProgramId}/description/{descriptionId}', 'update')->name('update');
     });
 
     Route::controller(ContactInfoController::class)->prefix('contact-info')->name('contact-info.')->group(function() {
