@@ -1,8 +1,11 @@
+// resources/js/Pages/Admin/StudyProgram/_tabs/LecturersTab.tsx
 import { Card, CardContent } from "@/Components/ui/card";
-import { Button } from "@/Components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
+import { PiUserDuotone } from "react-icons/pi";
 import { Badge } from "@/Components/ui/badge";
-import { PiPlusDuotone, PiUserDuotone } from "react-icons/pi";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "sonner";
 
 interface Lecturer {
     id: number;
@@ -12,50 +15,64 @@ interface Lecturer {
     position: string | null;
     education: string | null;
     photo: string | null;
-    pivot: {
+    pivot?: {
         role: string | null;
         is_active: boolean;
     };
 }
 
 interface LecturersTabProps {
-    lecturers: Lecturer[];
+    studyProgramId: number;
 }
 
-const LecturersTab = ({ lecturers }: LecturersTabProps) => {
-    if (lecturers.length === 0) {
-        return (
-            <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                <p className="text-gray-500 text-center">
-                    Belum ada dosen yang terdaftar untuk program studi ini.
-                </p>
-                <Button className="gap-2">
-                    <PiPlusDuotone className="h-4 w-4" />
-                    Tambah Dosen
-                </Button>
-            </div>
-        );
-    }
+const LecturersTab = ({ studyProgramId }: LecturersTabProps) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [lecturers, setLecturers] = useState<Lecturer[]>([]);
 
-    // Filter and sort by role
+    // Pisahkan dosen berdasarkan role
     const kaprodi = lecturers.find(
         (l) =>
-            l.pivot.role?.toLowerCase().includes("kepala") ||
-            l.pivot.role?.toLowerCase().includes("kaprodi")
+            l.pivot?.role?.toLowerCase().includes("kepala") ||
+            l.pivot?.role?.toLowerCase().includes("kaprodi")
     );
 
     const sekretaris = lecturers.find((l) =>
-        l.pivot.role?.toLowerCase().includes("sekretaris")
+        l.pivot?.role?.toLowerCase().includes("sekretaris")
     );
 
     const regularLecturers = lecturers.filter(
         (l) =>
             !(
-                l.pivot.role?.toLowerCase().includes("kepala") ||
-                l.pivot.role?.toLowerCase().includes("kaprodi") ||
-                l.pivot.role?.toLowerCase().includes("sekretaris")
+                l.pivot?.role?.toLowerCase().includes("kepala") ||
+                l.pivot?.role?.toLowerCase().includes("kaprodi") ||
+                l.pivot?.role?.toLowerCase().includes("sekretaris")
             )
     );
+
+    useEffect(() => {
+        fetchLecturers();
+    }, [studyProgramId]);
+
+    const fetchLecturers = async () => {
+        try {
+            setIsLoading(true);
+            // Gunakan endpoint direct query yang mengambil dosen dari kolom study_program_id
+            const response = await axios.get(
+                route("admin.lecturer.get-data", studyProgramId)
+            );
+
+            if (response.data.status) {
+                setLecturers(response.data.data || []);
+            } else {
+                toast.error("Gagal memuat data dosen");
+            }
+        } catch (error) {
+            console.error("Error fetching lecturers:", error);
+            toast.error("Gagal memuat data dosen");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -158,13 +175,14 @@ const LecturersTab = ({ lecturers }: LecturersTabProps) => {
                         <h3 className="text-lg font-semibold">
                             Dosen Program Studi
                         </h3>
-                        <Button size="sm" className="gap-2">
-                            <PiPlusDuotone className="h-4 w-4" />
-                            Tambah Dosen
-                        </Button>
+                        {/* Tombol Kelola Dosen disembunyikan sesuai permintaan */}
                     </div>
 
-                    {regularLecturers.length > 0 ? (
+                    {isLoading ? (
+                        <div className="flex justify-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                        </div>
+                    ) : regularLecturers.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {regularLecturers.map((lecturer) => (
                                 <div
@@ -188,14 +206,15 @@ const LecturersTab = ({ lecturers }: LecturersTabProps) => {
                                             <h4 className="text-sm font-medium line-clamp-1">
                                                 {lecturer.name}
                                             </h4>
-                                            {!lecturer.pivot.is_active && (
-                                                <Badge
-                                                    variant="outline"
-                                                    className="text-red-500 border-red-200 bg-red-50"
-                                                >
-                                                    Nonaktif
-                                                </Badge>
-                                            )}
+                                            {lecturer.pivot &&
+                                                !lecturer.pivot.is_active && (
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="text-red-500 border-red-200 bg-red-50"
+                                                    >
+                                                        Nonaktif
+                                                    </Badge>
+                                                )}
                                         </div>
                                         {lecturer.nidn && (
                                             <p className="text-xs text-gray-500">

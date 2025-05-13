@@ -19,7 +19,7 @@ import BasicInfoTab from "./_tabs/BasicInfoTab";
 import DescriptionTab from "./_tabs/DescriptionTab";
 import LecturersTab from "./_tabs/LecturersTab";
 import ContactsTab from "./_tabs/ContactsTab";
-import { StudyProgramDescription } from "./_types/program-studi";
+import { Lecturer, StudyProgramDescription } from "./_types/program-studi";
 
 interface StudyProgram {
     id: number;
@@ -56,20 +56,6 @@ interface StudyProgramContact {
     instagram: string | null;
     youtube: string | null;
     address: string | null;
-}
-
-interface Lecturer {
-    id: number;
-    name: string;
-    nip: string | null;
-    nidn: string | null;
-    position: string | null;
-    education: string | null;
-    photo: string | null;
-    pivot: {
-        role: string | null;
-        is_active: boolean;
-    };
 }
 
 interface Props {
@@ -171,7 +157,7 @@ export default function Show({ studyProgram }: Props) {
 
                             <TabsContent value="lecturers">
                                 <LecturersTab
-                                    lecturers={studyProgram.lecturers || []}
+                                    studyProgramId={studyProgram.id}
                                 />
                             </TabsContent>
 

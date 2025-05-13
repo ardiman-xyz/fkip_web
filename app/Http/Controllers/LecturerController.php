@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LecturerRequest;
 use App\Models\Lecturer;
+use App\Models\StudyProgram;
 use App\Services\LecturerService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -50,6 +52,44 @@ class LecturerController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Gagal memuat data dosen'
+            ], 500);
+        }
+    }
+
+    public function getStudyProgramLecturers(int $studyProgramId)
+    {
+        try {
+            // Gunakan query langsung ke database untuk lecturers dengan study_program_id tertentu
+            $lecturers = Lecturer::where('study_program_id', $studyProgramId)
+                ->with(['academicPosition', 'media', 'translations'])
+                ->get()
+                ->map(function ($lecturer) {
+                    return [
+                        'id' => $lecturer->id,
+                        'name' => $lecturer->translations->where('locale', 'id')->first()->full_name ?? $lecturer->academic_title ?? 'Unnamed',
+                        'nip' => $lecturer->nip,
+                        'nidn' => $lecturer->nidn,
+                        'position' => $lecturer->academicPosition?->name,
+                        'education' => $lecturer->translations->where('locale', 'id')->first()->education_history ?? null,
+                        'photo' => $lecturer->media ? ($lecturer->media->path ?? $lecturer->media->url ?? null) : null,
+                        // Tampilkan status dan role dari kolom langsung di tabel lecturer
+                        // karena bukan dari pivot table
+                        'pivot' => [
+                            'role' => null, // Tidak ada di kolom lecturer
+                            'is_active' => $lecturer->status === 'active'
+                        ]
+                    ];
+                });
+            
+            return response()->json([
+                'status' => true,
+                'data' => $lecturers
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal memuat data dosen program studi',
+                'error' => $e->getMessage()
             ], 500);
         }
     }

@@ -39,3 +39,17 @@ export interface StudyProgramDescription {
     accreditation: string | null;
     accreditation_date: string | null;
 }
+
+export interface Lecturer {
+    id: number;
+    name: string;
+    nip: string | null;
+    nidn: string | null;
+    position: string | null;
+    education: string | null;
+    photo: string | null;
+    pivot: {
+        role: string | null;
+        is_active: boolean;
+    };
+}

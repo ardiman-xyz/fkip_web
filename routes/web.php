@@ -5,6 +5,7 @@ use App\Http\Controllers\ContactInfoController;
 use App\Http\Controllers\DefaultSliderController;
 use App\Http\Controllers\EducationLevelController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
@@ -117,6 +118,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/data', 'getData')->name('get');
         Route::post('/', 'store')->name('store');
      });
+
+     Route::get('/study-program/{studyProgramId}/lecturers', [LecturerController::class, "getStudyProgramLecturers"])
+                ->name('lecturer.get-data');
      
 });
 

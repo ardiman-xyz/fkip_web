@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Lecturer;
+use App\Models\StudyProgram;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -339,6 +340,50 @@ class LecturerService {
             'expertise' => [],
             'research_interests' => [],
             'social_media' => []
+        ];
+    }
+
+
+    /**
+     * Get all lecturers for a study program formatted for frontend
+     * 
+     * @param StudyProgram $studyProgram
+     * @return array
+     */
+    public function getLecturers(StudyProgram $studyProgram): array
+    {
+        $lecturers = $studyProgram->lecturers()
+            ->with(['academicPosition', 'media', 'translations'])
+            ->get()
+            ->map(function ($lecturer) {
+                return $this->formatLecturerForResponse($lecturer);
+            });
+        
+        return $lecturers->toArray();
+    }
+
+    
+
+     /**
+     * Format lecturer data to match frontend interface
+     * 
+     * @param Lecturer $lecturer
+     * @return array
+     */
+    private function formatLecturerForResponse($lecturer): array
+    {
+        return [
+            'id' => $lecturer->id,
+            'name' => $lecturer->translations->where('locale', 'id')->first()->full_name ?? '',
+            'nip' => $lecturer->nip,
+            'nidn' => $lecturer->nidn,
+            'position' => $lecturer->academicPosition?->name,
+            'education' => $lecturer->translations->where('locale', 'id')->first()->education_history ?? '',
+            'photo' => $lecturer->media ? ($lecturer->media->path ?? $lecturer->media->url ?? null) : null,
+            'pivot' => [
+                'role' => $lecturer->pivot->role,
+                'is_active' => (bool)$lecturer->pivot->is_active
+            ]
         ];
     }
 
