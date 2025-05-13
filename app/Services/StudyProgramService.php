@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\StudyProgram;
 use App\Models\EducationLevel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class StudyProgramService
@@ -93,19 +94,23 @@ class StudyProgramService
     public function create(array $data): StudyProgram
     {
         return DB::transaction(function () use ($data) {
-            // Generate program code if not provided
-            if (empty($data['program_code'])) {
-                $educationLevel = EducationLevel::find($data['department_id']);
-                $count = StudyProgram::where('department_id', $data['department_id'])->count();
-                $data['program_code'] = strtoupper($educationLevel->code) . str_pad($count + 1, 3, '0', STR_PAD_LEFT);
-            }
-
-            // Set default values
-            $data['status'] = $data['status'] ?? 'active';
-            $data['faculty_id'] = $data['faculty_id'] ?? 15; // Default FKIP
-            $data['faculty_name'] = $data['faculty_name'] ?? 'KEGURUAN DAN ILMU PENDIDIKAN';
+            // Prepare data with only the required fields
+            $programData = [
+                'name' => $data['name'],
+                'education_level_id' => $data['education_level_id'],
+            ];
             
-            return StudyProgram::create($data);
+            // Generate program code automatically
+            $educationLevel = EducationLevel::find($data['education_level_id']);
+            $count = StudyProgram::where('education_level_id', $data['education_level_id'])->count();
+            $programData['program_code'] = strtoupper($educationLevel->code) . str_pad($count + 1, 3, '0', STR_PAD_LEFT);
+            
+            // Set default values
+            $programData['status'] = 'active';
+            $programData['faculty_id'] = 15; // Default FKIP
+            $programData['faculty_name'] = 'KEGURUAN DAN ILMU PENDIDIKAN';
+            
+            return StudyProgram::create($programData);
         });
     }
 
@@ -120,14 +125,14 @@ class StudyProgramService
         return $studyProgram->fresh();
     }
 
-    public function delete(int $id): void
-    {
-        $studyProgram = StudyProgram::findOrFail($id);
+    // public function delete(int $id): void
+    // {
+    //     $studyProgram = StudyProgram::findOrFail($id);
         
-        DB::transaction(function () use ($studyProgram) {
-            $studyProgram->delete();
-        });
-    }
+    //     DB::transaction(function () use ($studyProgram) {
+    //         $studyProgram->delete();
+    //     });
+    // }
 
 
      /**
@@ -153,6 +158,51 @@ class StudyProgramService
             ->findOrFail($id);
     }
 
-
+    public function delete(StudyProgram $studyProgram): bool
+    {
+        return DB::transaction(function () use ($studyProgram) {
+            try {
+                // Log the deletion
+                Log::info('Menghapus program studi:', [
+                    'id' => $studyProgram->id,
+                    'name' => $studyProgram->name,
+                    'code' => $studyProgram->program_code
+                ]);
+                
+                // Delete related records first
+                // 1. Delete study program description if exists
+                if ($studyProgram->description) {
+                    $studyProgram->description->delete();
+                }
+                
+                // 2. Delete study program contact if exists
+                if ($studyProgram->contact) {
+                    $studyProgram->contact->delete();
+                }
+                
+                // 3. Detach all lecturers if any
+                $studyProgram->lecturers()->detach();
+                
+                // 4. Delete the study program itself
+                $deleted = $studyProgram->delete();
+                
+                if ($deleted) {
+                    Log::info('Program studi berhasil dihapus', ['id' => $studyProgram->id]);
+                } else {
+                    Log::error('Gagal menghapus program studi', ['id' => $studyProgram->id]);
+                }
+                
+                return $deleted;
+            } catch (\Exception $e) {
+                Log::error('Error saat menghapus program studi:', [
+                    'id' => $studyProgram->id,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                
+                throw $e;
+            }
+        });
+    }
     
 }

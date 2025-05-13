@@ -11,28 +11,32 @@ class StoreStudyProgramRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
     public function rules(): array
     {
-        $rules = [
-            'department_id' => ['required', 'exists:education_levels,id'],
+        return [
             'name' => ['required', 'string', 'max:255'],
-            'program_code' => ['nullable', 'string', 'max:20'],
-            'faculty_id' => ['nullable', 'integer'],
-            'faculty_name' => ['nullable', 'string'],
-            'status' => ['nullable', 'in:active,inactive']
+            'education_level_id' => ['required', 'exists:education_levels,id'],
         ];
-
-
-        return $rules;
     }
 
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
     public function messages(): array
     {
         return [
-            'department_id.required' => 'Jenjang pendidikan harus dipilih',
-            'department_id.exists' => 'Jenjang pendidikan tidak valid',
             'name.required' => 'Nama program studi harus diisi',
-            'program_code.unique' => 'Kode program studi sudah digunakan',
+            'name.string' => 'Nama program studi harus berupa teks',
+            'name.max' => 'Nama program studi maksimal 255 karakter',
+            'education_level_id.required' => 'Jenjang pendidikan harus dipilih',
+            'education_level_id.exists' => 'Jenjang pendidikan tidak valid',
         ];
     }
 }

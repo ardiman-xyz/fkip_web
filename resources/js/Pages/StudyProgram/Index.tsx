@@ -27,6 +27,9 @@ import {
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
 import AddProgramStudiModal from "./_components/AddProgramStudyModal";
+import axios from "axios";
+import { toast } from "sonner";
+import { EducationLevel } from "./_types/program-studi";
 
 interface StudyProgram {
     id: number;
@@ -35,15 +38,6 @@ interface StudyProgram {
     status: string;
     created_at: string;
     updated_at: string;
-}
-
-interface EducationLevel {
-    id: number;
-    name: string;
-    code: string;
-    slug: string;
-    study_programs: StudyProgram[];
-    study_programs_count: number;
 }
 
 interface Props {
@@ -113,7 +107,10 @@ const Index = ({ educationLevels }: Props) => {
                                         value={level.code.toLowerCase()}
                                     >
                                         <ProgramList
-                                            programs={level.study_programs}
+                                            programs={
+                                                (level.study_programs as any[]) ||
+                                                []
+                                            }
                                         />
                                     </TabsContent>
                                 ))}
@@ -132,24 +129,45 @@ const Index = ({ educationLevels }: Props) => {
     );
 };
 
-// Component untuk menampilkan list program studi
 const ProgramList = ({ programs }: { programs: StudyProgram[] }) => {
+    const [isDeleting, setIsDeleting] = useState<number | null>(null);
+
     const handleView = (id: number) => {
         router.visit(`/admin/study-programs/${id}`);
     };
 
     const handleEdit = (id: number) => {
         console.log(`Edit program studi with ID: ${id}`);
-        // Implementasi untuk edit program studi
     };
 
-    const handleDelete = (id: number) => {
+    const handleDelete = async (id: number) => {
         if (confirm("Apakah Anda yakin ingin menghapus program studi ini?")) {
-            console.log(`Delete program studi with ID: ${id}`);
-            // Implementasi untuk hapus program studi
+            try {
+                setIsDeleting(id);
+
+                // Kirim request delete ke server
+                const response = await axios.delete(
+                    `/admin/study-programs/${id}`
+                );
+
+                if (response.data.status) {
+                    toast.success("Program studi berhasil dihapus");
+
+                    // Refresh halaman setelah hapus berhasil
+                    router.reload();
+                } else {
+                    toast.error(
+                        response.data.message || "Gagal menghapus program studi"
+                    );
+                }
+            } catch (error) {
+                console.error("Error deleting program studi:", error);
+                toast.error("Terjadi kesalahan saat menghapus program studi");
+            } finally {
+                setIsDeleting(null); // Reset state
+            }
         }
     };
-
     if (programs.length === 0) {
         return (
             <div className="text-center py-8 text-gray-500">

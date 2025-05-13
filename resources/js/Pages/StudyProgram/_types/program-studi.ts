@@ -20,11 +20,9 @@ export interface EducationLevel {
     id: number;
     name: string;
     code: string;
-    slug?: string;
-    description?: string;
-    order?: number;
-    is_active?: boolean;
-    study_programs?: StudyProgram[]; // Menambahkan relasi study_programs
+    slug?: string; // Properti opsional
+    study_programs?: StudyProgram[]; // Properti opsional
+    study_programs_count?: number; // Properti opsional
 }
 
 export interface StudyProgramDescription {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreStudyProgramRequest;
+use App\Models\StudyProgram as ModelsStudyProgram;
 use App\Services\EducationLevelService;
 use App\Services\StudyProgramService;
 use Illuminate\Http\JsonResponse;
@@ -29,6 +30,7 @@ class StudyProgram extends Controller
 
     public function store(StoreStudyProgramRequest $request): JsonResponse
     {
+
         try {
             $studyProgram = $this->studyProgramService->create($request->validated());
             
@@ -54,5 +56,31 @@ class StudyProgram extends Controller
         return Inertia::render('StudyProgram/Show', [
             'studyProgram' => $studyProgram
         ]);
+    }
+
+    public function destroy(ModelsStudyProgram $studyProgram): JsonResponse
+    {
+        try {
+            // Gunakan service untuk menghapus program studi
+            $result = $this->studyProgramService->delete($studyProgram);
+            
+            if ($result) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Program studi berhasil dihapus'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Gagal menghapus program studi'
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat menghapus program studi',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

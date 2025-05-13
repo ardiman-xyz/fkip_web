@@ -87,20 +87,15 @@ export default function AddProgramStudiModal({
         setIsLoading(true);
 
         try {
-            router.post("/admin/study-programs", formData, {
-                onSuccess: () => {
-                    toast.success("Program studi berhasil ditambahkan");
-                    resetForm();
-                    onClose();
-                },
-                onError: (errors) => {
-                    console.error(errors);
-                    toast.error("Gagal menambahkan program studi");
-                },
-                onFinish: () => {
-                    setIsLoading(false);
-                },
+            const response = await axios.post("/admin/study-programs", {
+                name: formData.name,
+                education_level_id: formData.education_level_id,
             });
+
+            toast.success("Program studi berhasil ditambahkan");
+            resetForm();
+            window.location.reload();
+            onClose();
         } catch (error) {
             console.error("Error:", error);
             toast.error("Terjadi kesalahan");
