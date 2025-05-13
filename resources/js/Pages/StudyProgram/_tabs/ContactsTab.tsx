@@ -1,19 +1,22 @@
+// resources/js/Pages/Admin/StudyProgram/_tabs/ContactsTab.tsx
 import { Card, CardContent } from "@/Components/ui/card";
 import { Button } from "@/Components/ui/button";
 import {
-    PiPlusDuotone,
-    PiGlobe,
-    PiEnvelope,
-    PiPhone,
-    PiWhatsappLogo,
-    PiInstagramLogo,
-    PiYoutubeLogo,
-    PiMapPin,
+    PiEnvelopeDuotone,
+    PiPhoneDuotone,
+    PiWhatsappLogoDuotone,
+    PiInstagramLogoDuotone,
+    PiYoutubeLogoDuotone,
+    PiGlobeDuotone,
+    PiMapPinDuotone,
+    PiPencilSimpleDuotone,
 } from "react-icons/pi";
+import { useState } from "react";
+import EditContactModal from "../_components/EditContactModal";
 
 interface StudyProgramContact {
-    id: number;
-    study_program_id: number;
+    id?: number;
+    study_program_id?: number;
     website: string | null;
     email: string | null;
     phone: string | null;
@@ -24,223 +27,267 @@ interface StudyProgramContact {
 }
 
 interface ContactsTabProps {
-    contact?: StudyProgramContact | null;
+    contact: StudyProgramContact | null | undefined;
+    studyProgramId: number;
 }
 
-const ContactsTab = ({ contact }: ContactsTabProps) => {
-    if (!contact) {
-        return (
-            <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                <p className="text-gray-500 text-center">
-                    Belum ada informasi kontak untuk program studi ini.
-                </p>
-                <Button className="gap-2">
-                    <PiPlusDuotone className="h-4 w-4" />
-                    Tambah Kontak
-                </Button>
-            </div>
-        );
-    }
+const ContactsTab = ({ contact, studyProgramId }: ContactsTabProps) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentContact, setCurrentContact] =
+        useState<StudyProgramContact | null>(contact || null);
 
-    const hasWebsiteOrSocial =
-        contact.website || contact.instagram || contact.youtube;
-    const hasContactInfo = contact.email || contact.phone || contact.whatsapp;
+    const handleSuccess = (updatedContact: StudyProgramContact) => {
+        setCurrentContact(updatedContact);
+    };
+
+    // Helper function untuk format nomor telepon
+    const formatPhoneNumber = (phoneNumber: string | null) => {
+        if (!phoneNumber) return null;
+
+        // Hapus karakter non-digit
+        const digits = phoneNumber.replace(/\D/g, "");
+
+        // Pastikan dimulai dengan +62
+        if (digits.startsWith("62")) {
+            return `+${digits}`;
+        } else if (digits.startsWith("0")) {
+            return `+62${digits.substring(1)}`;
+        } else {
+            return `+62${digits}`;
+        }
+    };
+
+    // Helper function untuk membuat link WhatsApp
+    const getWhatsAppLink = (number: string | null) => {
+        if (!number) return "#";
+        const formattedNumber = formatPhoneNumber(number);
+        if (!formattedNumber) return "#";
+        return `https://wa.me/${formattedNumber.replace("+", "")}`;
+    };
+
+    // Helper function untuk membuat link Instagram
+    const getInstagramLink = (username: string | null) => {
+        if (!username) return "#";
+        // Hapus @ jika ada
+        const cleanUsername = username.startsWith("@")
+            ? username.substring(1)
+            : username;
+        return `https://instagram.com/${cleanUsername}`;
+    };
+
+    // Helper function untuk membuat link YouTube
+    const getYouTubeLink = (channel: string | null) => {
+        if (!channel) return "#";
+        if (channel.includes("youtube.com") || channel.includes("youtu.be")) {
+            return channel;
+        }
+        return `https://youtube.com/${channel}`;
+    };
 
     return (
         <div className="space-y-6">
-            {hasWebsiteOrSocial && (
-                <Card>
-                    <CardContent className="p-6">
-                        <h3 className="text-lg font-semibold mb-4">
-                            Website & Media Sosial
-                        </h3>
-
-                        <div className="space-y-4">
-                            {contact.website && (
-                                <div className="flex items-center gap-2">
-                                    <div className="bg-blue-100 p-2 rounded-full">
-                                        <PiGlobe className="h-5 w-5 text-blue-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm text-gray-500 font-medium">
-                                            Website
-                                        </h4>
-                                        <a
-                                            href={
-                                                contact.website.startsWith(
-                                                    "http"
-                                                )
-                                                    ? contact.website
-                                                    : `https://${contact.website}`
-                                            }
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-blue-600 hover:underline"
-                                        >
-                                            {contact.website}
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-
-                            {contact.instagram && (
-                                <div className="flex items-center gap-2">
-                                    <div className="bg-pink-100 p-2 rounded-full">
-                                        <PiInstagramLogo className="h-5 w-5 text-pink-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm text-gray-500 font-medium">
-                                            Instagram
-                                        </h4>
-                                        <a
-                                            href={`https://instagram.com/${contact.instagram.replace(
-                                                "@",
-                                                ""
-                                            )}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-pink-600 hover:underline"
-                                        >
-                                            {contact.instagram}
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-
-                            {contact.youtube && (
-                                <div className="flex items-center gap-2">
-                                    <div className="bg-red-100 p-2 rounded-full">
-                                        <PiYoutubeLogo className="h-5 w-5 text-red-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm text-gray-500 font-medium">
-                                            YouTube
-                                        </h4>
-                                        <a
-                                            href={
-                                                contact.youtube.startsWith(
-                                                    "http"
-                                                )
-                                                    ? contact.youtube
-                                                    : `https://youtube.com/${contact.youtube}`
-                                            }
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-red-600 hover:underline"
-                                        >
-                                            {contact.youtube}
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {hasContactInfo && (
-                <Card>
-                    <CardContent className="p-6">
-                        <h3 className="text-lg font-semibold mb-4">
+            <Card>
+                <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold">
                             Informasi Kontak
                         </h3>
+                        <Button
+                            size="sm"
+                            className="gap-2"
+                            onClick={() => setIsModalOpen(true)}
+                        >
+                            <PiPencilSimpleDuotone className="h-4 w-4" />
+                            Edit Kontak
+                        </Button>
+                    </div>
 
-                        <div className="space-y-4">
-                            {contact.email && (
-                                <div className="flex items-center gap-2">
-                                    <div className="bg-indigo-100 p-2 rounded-full">
-                                        {" "}
-                                        <PiEnvelope className="h-5 w-5 text-indigo-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm text-gray-500 font-medium">
-                                            Email
-                                        </h4>
-                                        <a
-                                            href={`mailto:${contact.email}`}
-                                            className="text-indigo-600 hover:underline"
-                                        >
-                                            {contact.email}
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-
-                            {contact.phone && (
-                                <div className="flex items-center gap-2">
-                                    <div className="bg-orange-100 p-2 rounded-full">
-                                        <PiPhone className="h-5 w-5 text-orange-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm text-gray-500 font-medium">
-                                            Telepon
-                                        </h4>
-                                        <a
-                                            href={`tel:${contact.phone}`}
-                                            className="text-orange-600 hover:underline"
-                                        >
-                                            {contact.phone}
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-
-                            {contact.whatsapp && (
-                                <div className="flex items-center gap-2">
-                                    <div className="bg-green-100 p-2 rounded-full">
-                                        <PiWhatsappLogo className="h-5 w-5 text-green-600" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm text-gray-500 font-medium">
-                                            WhatsApp
-                                        </h4>
-                                        <a
-                                            href={`https://wa.me/${contact.whatsapp.replace(
-                                                /\D/g,
-                                                ""
-                                            )}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-green-600 hover:underline"
-                                        >
-                                            {contact.whatsapp}
-                                        </a>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {contact.address && (
-                <Card>
-                    <CardContent className="p-6">
-                        <h3 className="text-lg font-semibold mb-4">Alamat</h3>
-
-                        <div className="flex items-start gap-2">
-                            <div className="bg-gray-100 p-2 rounded-full mt-0.5">
-                                <PiMapPin className="h-5 w-5 text-gray-600" />
+                    {/* Informasi kontak */}
+                    <div className="grid gap-4">
+                        {/* Email */}
+                        <div className="flex items-start gap-3">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                                <PiEnvelopeDuotone className="h-5 w-5 text-primary" />
                             </div>
                             <div>
-                                <h4 className="text-sm text-gray-500 font-medium">
-                                    Alamat Kantor
-                                </h4>
-                                <p className="text-base whitespace-pre-line">
-                                    {contact.address}
-                                </p>
+                                <p className="text-sm font-medium">Email</p>
+                                {currentContact?.email ? (
+                                    <a
+                                        href={`mailto:${currentContact.email}`}
+                                        className="text-sm text-blue-600 hover:underline"
+                                    >
+                                        {currentContact.email}
+                                    </a>
+                                ) : (
+                                    <p className="text-sm text-gray-500 italic">
+                                        Belum ada email
+                                    </p>
+                                )}
                             </div>
                         </div>
-                    </CardContent>
-                </Card>
-            )}
 
-            <div className="flex justify-end">
-                <Button variant="outline" className="gap-2">
-                    <PiPlusDuotone className="h-4 w-4" />
-                    Edit Informasi Kontak
-                </Button>
-            </div>
+                        {/* Telepon */}
+                        <div className="flex items-start gap-3">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                                <PiPhoneDuotone className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium">Telepon</p>
+                                {currentContact?.phone ? (
+                                    <a
+                                        href={`tel:${currentContact.phone}`}
+                                        className="text-sm text-blue-600 hover:underline"
+                                    >
+                                        {currentContact.phone}
+                                    </a>
+                                ) : (
+                                    <p className="text-sm text-gray-500 italic">
+                                        Belum ada nomor telepon
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* WhatsApp */}
+                        <div className="flex items-start gap-3">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                                <PiWhatsappLogoDuotone className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium">WhatsApp</p>
+                                {currentContact?.whatsapp ? (
+                                    <a
+                                        href={getWhatsAppLink(
+                                            currentContact.whatsapp
+                                        )}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-sm text-blue-600 hover:underline"
+                                    >
+                                        {currentContact.whatsapp}
+                                    </a>
+                                ) : (
+                                    <p className="text-sm text-gray-500 italic">
+                                        Belum ada nomor WhatsApp
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Website */}
+                        <div className="flex items-start gap-3">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                                <PiGlobeDuotone className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium">Website</p>
+                                {currentContact?.website ? (
+                                    <a
+                                        href={
+                                            currentContact.website.startsWith(
+                                                "http"
+                                            )
+                                                ? currentContact.website
+                                                : `https://${currentContact.website}`
+                                        }
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-sm text-blue-600 hover:underline"
+                                    >
+                                        {currentContact.website}
+                                    </a>
+                                ) : (
+                                    <p className="text-sm text-gray-500 italic">
+                                        Belum ada website
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Instagram */}
+                        <div className="flex items-start gap-3">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                                <PiInstagramLogoDuotone className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium">Instagram</p>
+                                {currentContact?.instagram ? (
+                                    <a
+                                        href={getInstagramLink(
+                                            currentContact.instagram
+                                        )}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-sm text-blue-600 hover:underline"
+                                    >
+                                        {currentContact.instagram}
+                                    </a>
+                                ) : (
+                                    <p className="text-sm text-gray-500 italic">
+                                        Belum ada akun Instagram
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* YouTube */}
+                        <div className="flex items-start gap-3">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                                <PiYoutubeLogoDuotone className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium">YouTube</p>
+                                {currentContact?.youtube ? (
+                                    <a
+                                        href={getYouTubeLink(
+                                            currentContact.youtube
+                                        )}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-sm text-blue-600 hover:underline"
+                                    >
+                                        {currentContact.youtube}
+                                    </a>
+                                ) : (
+                                    <p className="text-sm text-gray-500 italic">
+                                        Belum ada channel YouTube
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Alamat */}
+                        <div className="flex items-start gap-3">
+                            <div className="bg-primary/10 p-2 rounded-lg">
+                                <PiMapPinDuotone className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium">Alamat</p>
+                                {currentContact?.address ? (
+                                    <p className="text-sm">
+                                        {currentContact.address}
+                                    </p>
+                                ) : (
+                                    <p className="text-sm text-gray-500 italic">
+                                        Belum ada alamat
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Modal edit kontak */}
+            {isModalOpen && (
+                <EditContactModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    onSuccess={handleSuccess}
+                    studyProgramId={studyProgramId}
+                    contact={currentContact}
+                />
+            )}
         </div>
     );
 };

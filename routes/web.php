@@ -10,6 +10,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudyProgram;
+use App\Http\Controllers\StudyProgramContactController;
 use App\Http\Controllers\StudyProgramDescriptionController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UploadMinio;
@@ -121,6 +122,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
      Route::get('/study-program/{studyProgramId}/lecturers', [LecturerController::class, "getStudyProgramLecturers"])
                 ->name('lecturer.get-data');
+
+    Route::post('/study-program/{studyProgramId}/contact', [StudyProgramContactController::class, "store"])
+                ->name('study-program.contact.store');
      
 });
 

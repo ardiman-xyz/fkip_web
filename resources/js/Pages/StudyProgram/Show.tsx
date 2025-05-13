@@ -162,7 +162,10 @@ export default function Show({ studyProgram }: Props) {
                             </TabsContent>
 
                             <TabsContent value="contacts">
-                                <ContactsTab contact={studyProgram.contact} />
+                                <ContactsTab
+                                    contact={studyProgram.contact}
+                                    studyProgramId={studyProgram.id}
+                                />
                             </TabsContent>
                         </Tabs>
                     </CardContent>
