@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\EducationLevel;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -36,7 +37,26 @@ class HandleInertiaRequests extends Middleware
             ],
             'app_version' => env('APP_VERSION', 'v1.0.0'),
             'meta' => $this->getDefaultMeta($request),
+            'education_levels' => $this->getEducationLevels(),
         ];
+    }
+
+      /**
+     * Get education levels for use across the application
+     * Cache this data to improve performance
+     */
+    private function getEducationLevels(): array
+    {
+        return cache()->remember('education_levels', 60 * 60, function () {
+            return EducationLevel::orderBy('order')->get()->map(function ($level) {
+                return [
+                    'id' => $level->id,
+                    'name' => $level->name,
+                    'code' => $level->code,
+                    'slug' => $level->slug,
+                ];
+            })->toArray();
+        });
     }
 
 

@@ -1,3 +1,5 @@
+import { EducationLevel } from "@/Pages/StudyProgram/_types/program-studi";
+import { usePage } from "@inertiajs/react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -56,3 +58,37 @@ export const isEditorEmpty = (content: string): boolean => {
         content.trim().length === 0
     );
 };
+
+// resources/js/utils/useSharedData.ts
+
+type PageProps = {
+    education_levels: EducationLevel[];
+    auth: {
+        user: any;
+    };
+    meta: any;
+    app_version: string;
+    [key: string]: any;
+};
+
+export function useSharedData() {
+    const { props } = usePage<PageProps>();
+
+    // Pastikan education_levels adalah array
+    const educationLevels: EducationLevel[] = Array.isArray(
+        props.education_levels
+    )
+        ? props.education_levels
+        : [];
+
+    const auth = props.auth || {};
+    const meta = props.meta || {};
+    const appVersion = props.app_version || "v1.0.0";
+
+    return {
+        educationLevels,
+        auth,
+        meta,
+        appVersion,
+    };
+}
