@@ -27,6 +27,7 @@ Route::prefix('fakultas')->name('fakultas.')->group(function () {
 Route::prefix('program')->name('program.')->group(function () {
     Route::get('sarjana', [ProdiController::class, 'undergraduate'])->name('undergraduate');
     Route::get('magister', [ProdiController::class, 'magister'])->name('magister');
+    Route::get('detail/{slug}', [ProdiController::class, 'detail'])->name('detail');
 });
 
 Route::get('akademik/kalender', [ProdiController::class, 'kalenderAkdemik']);

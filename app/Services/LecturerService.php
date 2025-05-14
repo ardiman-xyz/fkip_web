@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class LecturerService {
     
@@ -538,6 +539,7 @@ class LecturerService {
                                     $studyProgramId = DB::table('study_programs')->insertGetId([
                                         'department_id' => $departmentId,
                                         'name' => $departmentName,
+                                        'slug' => Str::slug($departmentName, "-"),
                                         'faculty_id' => $facultyId,
                                         'faculty_name' => $facultyName,
                                         'status' => 'active',

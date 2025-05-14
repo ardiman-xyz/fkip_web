@@ -13,16 +13,10 @@ use App\Http\Controllers\StudyProgram;
 use App\Http\Controllers\StudyProgramContactController;
 use App\Http\Controllers\StudyProgramDescriptionController;
 use App\Http\Controllers\TagController;
-use App\Http\Controllers\UploadMinio;
-use App\Http\Controllers\WelcomeController;
 use App\Models\User;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
-
 
 
 

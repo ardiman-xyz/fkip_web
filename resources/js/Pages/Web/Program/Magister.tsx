@@ -1,419 +1,306 @@
 import Guest2 from "@/Layouts/GuestLayout2";
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { ProdiSidebar } from "../_components/ProdiSidebar";
 import {
-    ChevronRight,
-    ChevronLeft,
-    Users,
-    BookOpen,
     Award,
-    ExternalLink,
-    Mail,
-    Phone,
-    Globe,
+    BookOpen,
+    GraduationCap,
+    Users,
+    Building,
+    ArrowRight,
+    Clock4,
 } from "lucide-react";
+import { Badge } from "@/Components/ui/badge";
+import { Button } from "@/Components/ui/button";
+import { Card, CardContent } from "@/Components/ui/card";
+import { useState } from "react";
 
-interface ProgramStudi {
-    id: string;
-    name: string;
-    level: "S1" | "S2" | "S3";
-    akreditasi: string;
-    deskripsi: string;
-    ketuaProdi: {
-        nama: string;
-        foto: string;
-        email: string;
-        telp: string;
-    };
-    stats: {
-        dosen: number;
-        mahasiswa: number;
-        publikasi: number;
-        prestasi: number;
-    };
-    website: string;
+interface ProgramProps {
+    programs: Array<{
+        id: number;
+        name: string;
+        slug: string;
+        description?: string;
+        accreditation: string;
+        level: string;
+        dosen_count: number;
+    }>;
 }
 
-const dummyPrograms: ProgramStudi[] = [
-    {
-        id: "pbsi",
-        name: "Pendidikan Bahasa dan Sastra Indonesia",
-        level: "S1",
-        akreditasi: "B",
-        deskripsi:
-            "Program studi yang fokus pada pengembangan kompetensi dalam bidang pengajaran bahasa dan sastra Indonesia. Lulusan dipersiapkan untuk menjadi tenaga pendidik profesional di bidang bahasa Indonesia.",
-        ketuaProdi: {
-            nama: "Dr. Hasna Nurjaya, M.Pd.",
-            foto: "/placeholder-female.png",
-            email: "hasna.nurjaya@umkendari.ac.id",
-            telp: "0813-4444-5555",
-        },
-        stats: {
-            dosen: 15,
-            mahasiswa: 350,
-            publikasi: 45,
-            prestasi: 18,
-        },
-        website: "https://pbsi.fkip.umkendari.ac.id",
-    },
-    {
-        id: "pmat",
-        name: "Pendidikan Matematika",
-        level: "S1",
-        akreditasi: "B",
-        deskripsi:
-            "Program studi yang mempersiapkan pendidik profesional yang memiliki kompetensi dalam pengajaran matematika modern dengan pendekatan inovatif dan berbasis teknologi.",
-        ketuaProdi: {
-            nama: "Dr. Abdul Hamid, M.Si.",
-            foto: "/placeholder-male.png",
-            email: "abdul.hamid@umkendari.ac.id",
-            telp: "0823-4618-7255",
-        },
-        stats: {
-            dosen: 12,
-            mahasiswa: 280,
-            publikasi: 38,
-            prestasi: 15,
-        },
-        website: "https://pmat.fkip.umkendari.ac.id",
-    },
-    // ... data lainnya
-];
-
-const ProgramStudiPage = () => {
-    const [selectedProdi, setSelectedProdi] = useState<ProgramStudi | null>(
-        null
-    );
-    const [selectedLevel, setSelectedLevel] = useState<
-        "S1" | "S2" | "S3" | null
-    >(null);
-
-    const filteredPrograms = selectedLevel
-        ? dummyPrograms.filter((p) => p.level === selectedLevel)
-        : dummyPrograms;
-
-    const handleSelectProdi = (prodi: ProgramStudi) => {
-        setSelectedProdi(prodi);
-    };
-
-    const handleBack = () => {
-        setSelectedProdi(null);
-    };
-
-    const StatItem = ({
-        icon,
-        value,
-        label,
-        color,
-    }: {
-        icon: React.ReactNode;
-        value: number;
-        label: string;
-        color: string;
-    }) => (
-        <div className="text-center">
-            <div
-                className={`${color} w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-2`}
-            >
-                {icon}
-            </div>
-            <div className="text-sm">
-                <p className="font-semibold">{value}</p>
-                <p className="text-gray-600">{label}</p>
-            </div>
-        </div>
-    );
+const Magister = ({ programs = [] }: ProgramProps) => {
+    console.info(programs);
 
     return (
         <Guest2>
             <div className="min-h-screen bg-white py-12">
                 <div className="container max-w-6xl mx-auto px-4">
-                    {/* Header */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                            Program Studi FKIP
-                        </h1>
-                        <p className="text-gray-600">
-                            FKIP Universitas Muhammadiyah Kendari menawarkan
-                            berbagai program studi yang terakreditasi dan
-                            berkualitas untuk menghasilkan tenaga pendidik
-                            profesional.
-                        </p>
+                    {/* Header Banner */}
+                    <div className="bg-green-700 rounded-xl overflow-hidden mb-12 relative">
+                        <div className="absolute inset-0 opacity-10 bg-[url('/images/patterns/pattern-dots.svg')] bg-repeat"></div>
+                        <div className="relative z-10 p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
+                            <div className="md:w-3/4">
+                                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                                    Program Magister (S2)
+                                </h1>
+                                <p className="text-green-100 mb-6">
+                                    Program Magister FKIP Universitas
+                                    Muhammadiyah Kendari menawarkan berbagai
+                                    program studi yang terakreditasi dan
+                                    berkualitas untuk menghasilkan tenaga
+                                    pendidik profesional.
+                                </p>
+                                <div className="flex flex-wrap gap-4">
+                                    <div className="flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm">
+                                        <Clock4 className="w-4 h-4" />
+                                        <span>Durasi 2 Tahun</span>
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm">
+                                        <GraduationCap className="w-4 h-4" />
+                                        <span>Gelar M.Pd</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="md:w-1/4 flex items-center justify-center">
+                                <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
+                                    <GraduationCap className="w-16 h-16 text-white" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Level Filter */}
-                    <div className="flex gap-2 mb-8">
-                        <button
-                            className={`px-4 py-2 rounded-md transition-colors ${
-                                selectedLevel === null
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100 hover:bg-gray-200"
-                            }`}
-                            onClick={() => setSelectedLevel(null)}
-                        >
-                            Semua
-                        </button>
-                        <button
-                            className={`px-4 py-2 rounded-md transition-colors ${
-                                selectedLevel === "S1"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100 hover:bg-gray-200"
-                            }`}
-                            onClick={() => setSelectedLevel("S1")}
-                        >
-                            Program Sarjana (S1)
-                        </button>
-                        <button
-                            className={`px-4 py-2 rounded-md transition-colors ${
-                                selectedLevel === "S2"
-                                    ? "bg-blue-600 text-white"
-                                    : "bg-gray-100 hover:bg-gray-200"
-                            }`}
-                            onClick={() => setSelectedLevel("S2")}
-                        >
-                            Program Magister (S2)
-                        </button>
-                    </div>
-
-                    <div className="relative overflow-hidden min-h-[60vh]">
-                        <AnimatePresence mode="wait">
-                            {!selectedProdi ? (
-                                <motion.div
-                                    key="program-list"
-                                    initial={{ opacity: 1, x: 0 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: "-100%" }}
-                                    transition={{ duration: 0.3 }}
-                                    className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-                                >
-                                    {filteredPrograms.map((program) => (
-                                        <motion.div
-                                            key={program.id}
-                                            whileHover={{ scale: 1.03 }}
-                                            className="bg-white border rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-all"
-                                            onClick={() =>
-                                                handleSelectProdi(program)
-                                            }
-                                        >
-                                            <div className="p-5">
-                                                <div className="flex flex-col h-full">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <span className="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                                                            {program.level}
-                                                        </span>
-                                                        <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                                                            Akreditasi{" "}
-                                                            {program.akreditasi}
-                                                        </span>
-                                                    </div>
-                                                    <h3 className="text-lg font-medium mb-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                        <div className="md:col-span-8">
+                            <div className="grid gap-6">
+                                {programs.map((program) => (
+                                    <Card
+                                        key={program.id}
+                                        className="overflow-hidden border border-gray-200 hover:shadow-lg transition-all"
+                                    >
+                                        <CardContent className="p-6">
+                                            <div className="flex flex-col">
+                                                {/* Header dengan nama prodi dan badge akreditasi */}
+                                                <div className="flex justify-between items-start mb-5">
+                                                    <h3 className="text-xl font-bold text-gray-900 pr-20 md:pr-0">
                                                         {program.name}
                                                     </h3>
-                                                    <div className="mt-4 flex items-center text-sm text-blue-600">
-                                                        <span>
-                                                            Lihat Detail
-                                                        </span>
-                                                        <ChevronRight
-                                                            size={16}
-                                                            className="ml-1"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))}
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="program-detail"
-                                    initial={{ opacity: 0, x: "100%" }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: "100%" }}
-                                    transition={{ duration: 0.3 }}
-                                    className="w-full bg-white rounded-lg shadow-md"
-                                >
-                                    <div className="p-6">
-                                        <button
-                                            onClick={handleBack}
-                                            className="flex items-center text-blue-600 mb-6 hover:underline"
-                                        >
-                                            <ChevronLeft
-                                                size={16}
-                                                className="mr-1"
-                                            />
-                                            Kembali ke daftar program studi
-                                        </button>
-
-                                        <div className="flex flex-col lg:flex-row gap-8">
-                                            {/* Program Info */}
-                                            <div className="lg:w-2/3">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <span className="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
-                                                        {selectedProdi.level}
-                                                    </span>
-                                                    <span className="text-xs font-medium px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                                                    <Badge className="whitespace-nowrap px-3 py-1 text-sm bg-blue-100 text-blue-800">
                                                         Akreditasi{" "}
-                                                        {
-                                                            selectedProdi.akreditasi
-                                                        }
+                                                        {program.accreditation ||
+                                                            "B"}
+                                                    </Badge>
+                                                </div>
+
+                                                {/* Deskripsi program studi */}
+                                                <div className="mb-6">
+                                                    <p className="text-gray-600 text-sm">
+                                                        {program.description ||
+                                                            "<p>Deskripsi program studi akan ditampilkan di sini.</p><p></p>"}
+                                                    </p>
+                                                </div>
+
+                                                {/* Icon dan Statistics dengan layout mirip screenshot */}
+                                                <div className="flex flex-col sm:flex-row gap-6">
+                                                    {/* Icon section */}
+                                                    <div className="flex-shrink-0 bg-green-50 p-4 rounded-lg w-16 h-16 flex items-center justify-center self-center sm:self-start">
+                                                        <BookOpen className="w-8 h-8 text-green-600" />
+                                                    </div>
+
+                                                    {/* Statistics grid dengan 2x2 layout */}
+                                                    <div className="grid grid-cols-2 gap-4 flex-grow">
+                                                        <div className="flex items-center gap-2 text-gray-700">
+                                                            <Users className="w-4 h-4 text-green-600" />
+                                                            <span className="text-sm">
+                                                                10 Dosen
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-gray-700">
+                                                            <GraduationCap className="w-4 h-4 text-green-600" />
+                                                            <span className="text-sm">
+                                                                100+ Alumni
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-gray-700">
+                                                            <BookOpen className="w-4 h-4 text-green-600" />
+                                                            <span className="text-sm">
+                                                                30 MK
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-gray-700">
+                                                            <Award className="w-4 h-4 text-green-600" />
+                                                            <span className="text-sm">
+                                                                Aktif
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* CTA Button */}
+                                                <div className="mt-6">
+                                                    <Button
+                                                        className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
+                                                        asChild
+                                                    >
+                                                        <a
+                                                            href={`/program/detail/${program.slug}`}
+                                                        >
+                                                            <span>
+                                                                Lihat Detail
+                                                                Program
+                                                            </span>
+                                                            <ArrowRight className="w-4 h-4 ml-2" />
+                                                        </a>
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+
+                                {programs.length === 0 && (
+                                    <div className="text-center py-12 text-gray-500 border rounded-lg p-8">
+                                        <GraduationCap className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                                        <h3 className="text-lg font-medium">
+                                            Belum ada program studi
+                                        </h3>
+                                        <p className="text-sm">
+                                            Program studi magister belum
+                                            tersedia saat ini
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* CTA Section */}
+                            <div className="mt-10 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 border border-green-100">
+                                <div className="flex flex-col md:flex-row items-center gap-6">
+                                    <div className="md:w-2/3">
+                                        <h3 className="text-xl font-bold mb-2 text-gray-900">
+                                            Tertarik dengan Program Magister?
+                                        </h3>
+                                        <p className="text-gray-600">
+                                            Program Magister FKIP UMK membuka
+                                            pendaftaran untuk tahun akademik
+                                            2025/2026. Dapatkan kesempatan untuk
+                                            melanjutkan studi dengan dosen-dosen
+                                            berkualitas.
+                                        </p>
+                                    </div>
+                                    <div className="md:w-1/3 flex justify-center">
+                                        <Button
+                                            size="lg"
+                                            className="bg-green-600 hover:bg-green-700"
+                                        >
+                                            Daftar Sekarang
+                                            <ArrowRight className="w-4 h-4 ml-1" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-4">
+                            <div className="sticky top-20">
+                                <ProdiSidebar />
+
+                                {/* Benefit Program Magister */}
+                                <Card className="mt-6 border-2 border-green-100 bg-green-50">
+                                    <CardContent className="p-6">
+                                        <h3 className="font-bold text-lg mb-4 text-green-800">
+                                            Keunggulan Program Magister
+                                        </h3>
+                                        <ul className="space-y-3">
+                                            <li className="flex items-start gap-2">
+                                                <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center mt-0.5 flex-shrink-0">
+                                                    <span className="text-xs font-bold">
+                                                        1
                                                     </span>
                                                 </div>
-
-                                                <h2 className="text-2xl font-bold mb-4">
-                                                    {selectedProdi.name}
-                                                </h2>
-                                                <p className="text-gray-700 mb-6">
-                                                    {selectedProdi.deskripsi}
+                                                <p className="text-sm text-gray-700">
+                                                    Dosen dengan kualifikasi
+                                                    Doktor dan Profesor
                                                 </p>
-
-                                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                                                    <StatItem
-                                                        icon={
-                                                            <Users className="h-6 w-6 text-blue-600" />
-                                                        }
-                                                        value={
-                                                            selectedProdi.stats
-                                                                .dosen
-                                                        }
-                                                        label="Dosen"
-                                                        color="bg-blue-50"
-                                                    />
-                                                    <StatItem
-                                                        icon={
-                                                            <Users className="h-6 w-6 text-green-600" />
-                                                        }
-                                                        value={
-                                                            selectedProdi.stats
-                                                                .mahasiswa
-                                                        }
-                                                        label="Mahasiswa"
-                                                        color="bg-green-50"
-                                                    />
-                                                    <StatItem
-                                                        icon={
-                                                            <BookOpen className="h-6 w-6 text-purple-600" />
-                                                        }
-                                                        value={
-                                                            selectedProdi.stats
-                                                                .publikasi
-                                                        }
-                                                        label="Publikasi"
-                                                        color="bg-purple-50"
-                                                    />
-                                                    <StatItem
-                                                        icon={
-                                                            <Award className="h-6 w-6 text-orange-600" />
-                                                        }
-                                                        value={
-                                                            selectedProdi.stats
-                                                                .prestasi
-                                                        }
-                                                        label="Prestasi"
-                                                        color="bg-orange-50"
-                                                    />
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center mt-0.5 flex-shrink-0">
+                                                    <span className="text-xs font-bold">
+                                                        2
+                                                    </span>
                                                 </div>
+                                                <p className="text-sm text-gray-700">
+                                                    Kelas perkuliahan yang
+                                                    fleksibel (weekend dan
+                                                    weekday)
+                                                </p>
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center mt-0.5 flex-shrink-0">
+                                                    <span className="text-xs font-bold">
+                                                        3
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-gray-700">
+                                                    Akses ke perpustakaan
+                                                    digital dan jurnal ilmiah
+                                                    internasional
+                                                </p>
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center mt-0.5 flex-shrink-0">
+                                                    <span className="text-xs font-bold">
+                                                        4
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-gray-700">
+                                                    Peluang publikasi di jurnal
+                                                    nasional dan internasional
+                                                </p>
+                                            </li>
+                                        </ul>
+                                    </CardContent>
+                                </Card>
 
-                                                <a
-                                                    href={selectedProdi.website}
-                                                    target="_blank"
-                                                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                                                >
-                                                    Kunjungi Website Program
-                                                    Studi
-                                                    <ExternalLink
-                                                        size={16}
-                                                        className="ml-2"
-                                                    />
-                                                </a>
+                                {/* Info Card */}
+                                <Card className="mt-6">
+                                    <CardContent className="p-6">
+                                        <h3 className="font-semibold mb-4">
+                                            Informasi Pendaftaran
+                                        </h3>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center pb-2 border-b border-dashed">
+                                                <span className="text-gray-700">
+                                                    Gelombang I
+                                                </span>
+                                                <span className="text-sm font-medium px-2 py-1 bg-yellow-100 text-yellow-800 rounded">
+                                                    Januari - Maret
+                                                </span>
                                             </div>
-
-                                            {/* Ketua Prodi */}
-                                            <div className="lg:w-1/3 bg-gray-50 p-6 rounded-lg">
-                                                <h3 className="text-lg font-semibold mb-4">
-                                                    Ketua Program Studi
-                                                </h3>
-                                                <div className="flex flex-col items-center text-center">
-                                                    <div className="w-24 h-24 rounded-full bg-gray-200 mb-3 overflow-hidden">
-                                                        <img
-                                                            src={
-                                                                selectedProdi
-                                                                    .ketuaProdi
-                                                                    .foto
-                                                            }
-                                                            alt={
-                                                                selectedProdi
-                                                                    .ketuaProdi
-                                                                    .nama
-                                                            }
-                                                            className="w-full h-full object-cover"
-                                                            onError={(e) => {
-                                                                const target =
-                                                                    e.target as HTMLImageElement;
-                                                                target.src =
-                                                                    "https://via.placeholder.com/150";
-                                                            }}
-                                                        />
-                                                    </div>
-                                                    <h4 className="font-medium">
-                                                        {
-                                                            selectedProdi
-                                                                .ketuaProdi.nama
-                                                        }
-                                                    </h4>
-                                                    <p className="text-sm text-gray-500 mb-4">
-                                                        Ketua Program Studi
-                                                    </p>
-
-                                                    <div className="w-full space-y-2 text-left">
-                                                        <div className="flex items-center gap-2 text-sm">
-                                                            <Mail
-                                                                size={16}
-                                                                className="text-gray-500"
-                                                            />
-                                                            <span>
-                                                                {
-                                                                    selectedProdi
-                                                                        .ketuaProdi
-                                                                        .email
-                                                                }
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2 text-sm">
-                                                            <Phone
-                                                                size={16}
-                                                                className="text-gray-500"
-                                                            />
-                                                            <span>
-                                                                {
-                                                                    selectedProdi
-                                                                        .ketuaProdi
-                                                                        .telp
-                                                                }
-                                                            </span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2 text-sm">
-                                                            <Globe
-                                                                size={16}
-                                                                className="text-gray-500"
-                                                            />
-                                                            <a
-                                                                href={
-                                                                    selectedProdi.website
-                                                                }
-                                                                target="_blank"
-                                                                className="text-blue-600 hover:underline"
-                                                            >
-                                                                Website
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <div className="flex justify-between items-center pb-2 border-b border-dashed">
+                                                <span className="text-gray-700">
+                                                    Gelombang II
+                                                </span>
+                                                <span className="text-sm font-medium px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                                                    April - Juni
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-700">
+                                                    Gelombang III
+                                                </span>
+                                                <span className="text-sm font-medium px-2 py-1 bg-green-100 text-green-800 rounded">
+                                                    Juli - Agustus
+                                                </span>
                                             </div>
                                         </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+
+                                        <Button
+                                            variant="outline"
+                                            className="w-full mt-4 border-green-600 text-green-700 hover:bg-green-50"
+                                        >
+                                            Download Brosur
+                                        </Button>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -421,4 +308,4 @@ const ProgramStudiPage = () => {
     );
 };
 
-export default ProgramStudiPage;
+export default Magister;

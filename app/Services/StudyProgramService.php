@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\StudyProgram;
 use App\Models\EducationLevel;
+use App\Models\Lecturer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -202,6 +203,113 @@ class StudyProgramService
                 
                 throw $e;
             }
+        });
+    }
+
+
+    /**
+     * Mendapatkan program studi berdasarkan level pendidikan
+     * @param string $level kode level (S1, S2, S3)
+     * @return array
+     */
+    public function getStudyProgramsByLevel($level)
+    {
+        // Cari id level pendidikan berdasarkan kode
+        $educationLevelId = EducationLevel::where('code', $level)->first()->id ?? null;
+        
+        if (!$educationLevelId) {
+            return [];
+        }
+        
+        // Ambil semua program studi untuk level tersebut
+        return StudyProgram::with(['educationLevel', 'description', 'contact', 'lecturers'])
+            ->where('education_level_id', $educationLevelId)
+            ->where('status', "active")
+            ->get()
+            ->map(function ($program) {
+                return [
+                    'id' => $program->id,
+                    'name' => $program->name,
+                    'slug' => $program->slug,
+                    'level' => $program->educationLevel->code,
+                    'description' => $program->description ? $program->description->description : null,
+                    'accreditation' => $program->description ? $program->description->accreditation : null,
+                    'contact' => $program->contact,
+                    'lecturers_count' => $program->lecturers->count(),
+                ];
+            });
+    }
+
+     /**
+     * Mendapatkan program studi berdasarkan slug
+     */
+    public function getStudyProgramBySlug($slug)
+    {
+        $program = StudyProgram::with(['description', 'contact', 'educationLevel'])
+            ->where('slug', $slug)
+            ->where('status', 'active')
+            ->first();
+            
+        if (!$program) {
+            return null;
+        }
+        
+        // Format data untuk dikirim ke frontend
+        return [
+            'id' => $program->id,
+            'name' => $program->name,
+            'slug' => $program->slug,
+            'code' => $program->code ?? '-',
+            'level' => $program->educationLevel ? [
+                'id' => $program->educationLevel->id,
+                'name' => $program->educationLevel->name,
+                'code' => $program->educationLevel->code,
+            ] : null,
+            'faculty' => 'KEGURUAN DAN ILMU PENDIDIKAN',
+            'department' => $program->department ?? '-',
+            'status' => $program->status ? 'active' : 'Tidak Aktif',
+            'description' => $program->description ? [
+                'description' => $program->description->description,
+                'vision' => $program->description->vision ?? null,
+                'mission' => $program->description->mission ?? null,
+                'accreditation' => $program->description->accreditation ?? 'B',
+                'accreditation_date' => $program->description->accreditation_date,
+            ] : null,
+            'contact' => $program->contact ? [
+                'email' => $program->contact->email,
+                'phone' => $program->contact->phone,
+                'whatsapp' => $program->contact->whatsapp,
+                'website' => $program->contact->website,
+                'instagram' => $program->contact->instagram,
+                'youtube' => $program->contact->youtube,
+                'address' => $program->contact->address,
+            ] : null,
+            'system_info' => [
+                'id' => $program->id,
+                'updated_at' => $program->updated_at->format('d M Y \p\u\k\u\l H:i'),
+            ],
+        ];
+    }
+    
+    /**
+     * Mendapatkan daftar dosen berdasarkan program studi
+     */
+    public function getDosenByStudyProgram($studyProgramId)
+    {
+        $lecturers = Lecturer::where('study_program_id', $studyProgramId)
+            ->where('status', 'active')
+            ->with(['translations'])
+            ->get();
+            
+        return $lecturers->map(function ($lecturer) {
+            $translation = $lecturer->translations->where('locale', 'id')->first();
+            
+            return [
+                'id' => $lecturer->id,
+                'name' => $translation ? $translation->full_name : $lecturer->academic_title,
+                'nidn' => $lecturer->nidn,
+                'position' => $lecturer->position ?? null,
+            ];
         });
     }
     

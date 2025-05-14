@@ -1,219 +1,165 @@
 import Guest2 from "@/Layouts/GuestLayout2";
-import React, { useState } from "react";
-import { EmptyState } from "../_components/EmptyState";
 import { ProdiSidebar } from "../_components/ProdiSidebar";
-import { Card, CardContent } from "@/Components/ui/card";
 import {
-    ArrowRight,
     Award,
     BookOpen,
     GraduationCap,
     Users,
-    X,
+    Building,
+    ArrowRight,
+    Calendar,
 } from "lucide-react";
-import { Button } from "@headlessui/react";
+import { Badge } from "@/Components/ui/badge";
+import { Button } from "@/Components/ui/button";
+import { Card, CardContent, CardFooter } from "@/Components/ui/card";
+import { motion } from "framer-motion";
 
-const Undergraduate = () => {
-    const [showAdmission, setShowAdmission] = useState(false);
+interface ProgramProps {
+    programs: Array<{
+        id: number;
+        name: string;
+        slug: string;
+        accreditation: string;
+        description?: string;
+    }>;
+}
 
-    const programs = [
-        {
-            name: "Pendidikan Bahasa dan Sastra Indonesia",
-            description:
-                "Program studi yang fokus pada pengembangan kompetensi dalam bidang pengajaran bahasa dan sastra Indonesia.",
-            akreditasi: "B",
-            stats: {
-                dosen: 15,
-                mahasiswa: 350,
-                publikasi: 45,
-                prestasi: 18,
-            },
-        },
-        {
-            name: "Pendidikan Matematika",
-            description:
-                "Mempersiapkan pendidik profesional yang memiliki kompetensi dalam pengajaran matematika modern.",
-            akreditasi: "B",
-            stats: {
-                dosen: 12,
-                mahasiswa: 280,
-                publikasi: 38,
-                prestasi: 15,
-            },
-        },
-    ];
-
+const Undergraduate = ({ programs = [] }: ProgramProps) => {
     return (
         <Guest2>
-            {showAdmission && (
-                <div className="fixed inset-x-0 top-0 z-50 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
-                    <div className="container max-w-6xl mx-auto px-4 py-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="hidden md:block">
-                                    <GraduationCap className="h-8 w-8" />
-                                </div>
-                                <div>
-                                    <h3 className="font-medium">
-                                        Penerimaan Mahasiswa Baru 2025/2026
-                                        Telah Dibuka!
-                                    </h3>
-                                    <p className="text-sm text-blue-100">
-                                        Daftar sekarang dan raih masa depanmu
-                                        bersama kami
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Button
-                                    className="whitespace-nowrap"
-                                    onClick={() =>
-                                        window.open(
-                                            "https://pmb.umkendari.ac.id",
-                                            "_blank"
-                                        )
-                                    }
-                                >
-                                    Daftar Sekarang
-                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                </Button>
-                                <button onClick={() => setShowAdmission(false)}>
-                                    <X className="h-5 w-5 text-blue-100 hover:text-white" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            <div
-                className={`min-h-screen bg-white py-12 ${
-                    showAdmission ? "pt-24" : ""
-                }`}
-            >
+            <div className="min-h-screen bg-white py-12">
                 <div className="container max-w-6xl mx-auto px-4">
-                    <div className="grid grid-cols-12 gap-20">
-                        <div className="col-span-8">
-                            <div className="mb-12">
-                                <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                    <div className="relative rounded-2xl overflow-hidden mb-12 bg-gradient-to-r from-green-700 to-green-900 border border-green-600">
+                        <div className="absolute inset-0 opacity-20 bg-[url('/images/patterns/pattern-dots.svg')] bg-repeat"></div>
+                        <div className="relative z-10 p-10 flex flex-col md:flex-row items-center">
+                            <div className="md:w-2/3 mb-8 md:mb-0">
+                                <h1 className="text-3xl md:text-4xl font-bold mb-4 text-white">
                                     Program Sarjana (S1)
                                 </h1>
-                                <p className="text-gray-600">
+                                <p className="text-green-100 text-lg">
                                     Program Sarjana FKIP Universitas
                                     Muhammadiyah Kendari menawarkan berbagai
                                     program studi yang terakreditasi dan
                                     berkualitas untuk menghasilkan tenaga
                                     pendidik profesional.
                                 </p>
+                                <div className="flex gap-4 mt-6">
+                                    <Badge className="px-3 py-2 bg-green-200 text-green-900 hover:bg-green-300 transition-all">
+                                        <Calendar className="w-4 h-4 mr-1" />{" "}
+                                        Durasi 4 Tahun
+                                    </Badge>
+                                    <Badge className="px-3 py-2 bg-green-200 text-green-900 hover:bg-green-300 transition-all">
+                                        <GraduationCap className="w-4 h-4 mr-1" />{" "}
+                                        Gelar S.Pd
+                                    </Badge>
+                                </div>
                             </div>
+                            <div className="md:w-1/3 hidden md:flex justify-center">
+                                <div className="w-48 h-48 rounded-full bg-white/10 flex items-center justify-center animate-pulse-slow">
+                                    <GraduationCap className="w-24 h-24 text-white" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                        <div className="md:col-span-8">
                             <div className="grid gap-6">
-                                {programs.map((program, index) => (
+                                {programs.map((program) => (
                                     <Card
-                                        key={index}
-                                        className="hover:shadow-lg transition-shadow"
+                                        key={program.id}
+                                        className="overflow-hidden border border-gray-200"
                                     >
                                         <CardContent className="p-6">
-                                            <div className="space-y-6">
-                                                <div>
-                                                    <div className="flex items-start justify-between">
-                                                        <h2 className="text-xl font-semibold">
-                                                            {program.name}
-                                                        </h2>
-                                                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                                                            Akreditasi{" "}
-                                                            {program.akreditasi}
-                                                        </span>
-                                                    </div>
-                                                    <p className="mt-2 text-gray-600">
-                                                        {program.description}
-                                                    </p>
+                                            <div className="flex flex-col">
+                                                {/* Header dengan nama prodi dan badge akreditasi */}
+                                                <div className="flex justify-between items-start mb-5">
+                                                    <h3 className="text-xl font-bold text-gray-900 pr-20 md:pr-0">
+                                                        {program.name}
+                                                    </h3>
+                                                    <Badge className="whitespace-nowrap px-3 py-1 text-sm bg-blue-100 text-blue-800">
+                                                        Akreditasi{" "}
+                                                        {program.accreditation ||
+                                                            "B"}
+                                                    </Badge>
                                                 </div>
 
-                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                    <div className="text-center">
-                                                        <div className="bg-blue-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-2">
-                                                            <Users className="h-6 w-6 text-blue-600" />
-                                                        </div>
-                                                        <div className="text-sm">
-                                                            <p className="font-semibold">
-                                                                {
-                                                                    program
-                                                                        .stats
-                                                                        .dosen
-                                                                }
-                                                            </p>
-                                                            <p className="text-gray-600">
+                                                {/* Icon dan Statistics dengan layout mirip screenshot */}
+                                                <div className="flex flex-col sm:flex-row gap-6">
+                                                    {/* Icon section */}
+                                                    <div className="flex-shrink-0 bg-green-50 p-4 rounded-lg w-16 h-16 flex items-center justify-center self-center sm:self-start">
+                                                        <BookOpen className="w-8 h-8 text-green-600" />
+                                                    </div>
+
+                                                    {/* Statistics grid dengan 2x2 layout */}
+                                                    <div className="grid grid-cols-2 gap-4 flex-grow">
+                                                        <div className="flex items-center gap-2 text-gray-700">
+                                                            <Users className="w-4 h-4 text-green-600" />
+                                                            <span className="text-sm">
                                                                 Dosen
-                                                            </p>
+                                                            </span>
                                                         </div>
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <div className="bg-green-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-2">
-                                                            <GraduationCap className="h-6 w-6 text-green-600" />
+                                                        <div className="flex items-center gap-2 text-gray-700">
+                                                            <GraduationCap className="w-4 h-4 text-green-600" />
+                                                            <span className="text-sm">
+                                                                Alumni
+                                                            </span>
                                                         </div>
-                                                        <div className="text-sm">
-                                                            <p className="font-semibold">
-                                                                {
-                                                                    program
-                                                                        .stats
-                                                                        .mahasiswa
-                                                                }
-                                                            </p>
-                                                            <p className="text-gray-600">
-                                                                Mahasiswa
-                                                            </p>
+                                                        <div className="flex items-center gap-2 text-gray-700">
+                                                            <BookOpen className="w-4 h-4 text-green-600" />
+                                                            <span className="text-sm">
+                                                                Matakuliah
+                                                            </span>
                                                         </div>
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <div className="bg-purple-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-2">
-                                                            <BookOpen className="h-6 w-6 text-purple-600" />
-                                                        </div>
-                                                        <div className="text-sm">
-                                                            <p className="font-semibold">
-                                                                {
-                                                                    program
-                                                                        .stats
-                                                                        .publikasi
-                                                                }
-                                                            </p>
-                                                            <p className="text-gray-600">
-                                                                Publikasi
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-center">
-                                                        <div className="bg-orange-50 w-12 h-12 mx-auto rounded-full flex items-center justify-center mb-2">
-                                                            <Award className="h-6 w-6 text-orange-600" />
-                                                        </div>
-                                                        <div className="text-sm">
-                                                            <p className="font-semibold">
-                                                                {
-                                                                    program
-                                                                        .stats
-                                                                        .prestasi
-                                                                }
-                                                            </p>
-                                                            <p className="text-gray-600">
-                                                                Prestasi
-                                                            </p>
+                                                        <div className="flex items-center gap-2 text-gray-700">
+                                                            <Award className="w-4 h-4 text-green-600" />
+                                                            <span className="text-sm">
+                                                                Aktif
+                                                            </span>
                                                         </div>
                                                     </div>
                                                 </div>
-
-                                                <Button className="w-full">
-                                                    Lihat Detail
-                                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                                </Button>
+                                                {/* CTA Button */}
+                                                <div className="mt-6">
+                                                    <Button
+                                                        className="w-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
+                                                        asChild
+                                                    >
+                                                        <a
+                                                            href={`/program/detail/${program.slug}`}
+                                                        >
+                                                            <span>
+                                                                Lihat Detail
+                                                                Program
+                                                            </span>
+                                                            <ArrowRight className="w-4 h-4 ml-2" />
+                                                        </a>
+                                                    </Button>
+                                                </div>
                                             </div>
                                         </CardContent>
                                     </Card>
                                 ))}
+
+                                {programs.length === 0 && (
+                                    <div className="text-center py-12 text-gray-500 border rounded-lg p-8">
+                                        <GraduationCap className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                                        <h3 className="text-lg font-medium">
+                                            Belum ada data program studi
+                                        </h3>
+                                        <p className="text-sm">
+                                            Silakan cek kembali nanti untuk
+                                            informasi program studi
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
-                        <div className="col-span-4">
-                            <ProdiSidebar />
+                        <div className="md:col-span-4">
+                            <div className="sticky top-20">
+                                <ProdiSidebar />
+                            </div>
                         </div>
                     </div>
                 </div>
