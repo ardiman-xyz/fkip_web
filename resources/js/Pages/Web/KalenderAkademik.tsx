@@ -29,7 +29,6 @@ const Calendar = () => {
             endDate: "31 Agustus 2025",
             icon: <CalendarDays className="h-5 w-5" />,
         },
-        // ... tambahkan aktivitas lainnya
     ];
 
     return (

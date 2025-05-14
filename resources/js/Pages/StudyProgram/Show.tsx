@@ -102,14 +102,14 @@ export default function Show({ studyProgram }: Props) {
                                     </CardDescription>
                                 </div>
                             </div>
-                            <Button asChild className="gap-2">
+                            {/* <Button asChild className="gap-2">
                                 <a
                                     href={`/admin/study-programs/${studyProgram.id}/edit`}
                                 >
                                     <PiPencilSimpleDuotone className="h-4 w-4" />
                                     Edit Program Studi
                                 </a>
-                            </Button>
+                            </Button> */}
                         </div>
 
                         <div className="mt-2">

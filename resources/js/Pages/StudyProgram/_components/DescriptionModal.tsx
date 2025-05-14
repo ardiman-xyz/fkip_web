@@ -128,7 +128,7 @@ const DescriptionModal = ({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[800px]">
+            <DialogContent className="sm:max-w-[800px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         {initialData?.id ? "Edit" : "Tambah"} Deskripsi

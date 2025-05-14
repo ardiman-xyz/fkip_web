@@ -223,12 +223,12 @@ const ProgramList = ({ programs }: { programs: StudyProgram[] }) => {
                                     <PiEyeDuotone className="mr-2 h-4 w-4" />
                                     <span>Detail</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem
+                                {/* <DropdownMenuItem
                                     onClick={() => handleEdit(program.id)}
                                 >
                                     <PiPencilSimpleDuotone className="mr-2 h-4 w-4" />
                                     <span>Edit</span>
-                                </DropdownMenuItem>
+                                </DropdownMenuItem> */}
                                 <DropdownMenuItem
                                     onClick={() => handleDelete(program.id)}
                                     className="text-red-600 focus:text-red-600"
