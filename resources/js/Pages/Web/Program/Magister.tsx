@@ -27,8 +27,6 @@ interface ProgramProps {
 }
 
 const Magister = ({ programs = [] }: ProgramProps) => {
-    console.info(programs);
-
     return (
         <Guest2>
             <div className="min-h-screen bg-white py-12">
@@ -89,12 +87,21 @@ const Magister = ({ programs = [] }: ProgramProps) => {
                                                     </Badge>
                                                 </div>
 
-                                                {/* Deskripsi program studi */}
                                                 <div className="mb-6">
-                                                    <p className="text-gray-600 text-sm">
-                                                        {program.description ||
-                                                            "<p>Deskripsi program studi akan ditampilkan di sini.</p><p></p>"}
-                                                    </p>
+                                                    {program.description ? (
+                                                        <div
+                                                            className="text-gray-600 text-sm prose prose-sm max-w-none"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: program.description,
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <p className="text-muted-foreground text-sm">
+                                                            Deskripsi program
+                                                            studi akan
+                                                            ditampilkan di sini.
+                                                        </p>
+                                                    )}
                                                 </div>
 
                                                 {/* Icon dan Statistics dengan layout mirip screenshot */}
@@ -200,105 +207,6 @@ const Magister = ({ programs = [] }: ProgramProps) => {
                         <div className="md:col-span-4">
                             <div className="sticky top-20">
                                 <ProdiSidebar />
-
-                                {/* Benefit Program Magister */}
-                                <Card className="mt-6 border-2 border-green-100 bg-green-50">
-                                    <CardContent className="p-6">
-                                        <h3 className="font-bold text-lg mb-4 text-green-800">
-                                            Keunggulan Program Magister
-                                        </h3>
-                                        <ul className="space-y-3">
-                                            <li className="flex items-start gap-2">
-                                                <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center mt-0.5 flex-shrink-0">
-                                                    <span className="text-xs font-bold">
-                                                        1
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-gray-700">
-                                                    Dosen dengan kualifikasi
-                                                    Doktor dan Profesor
-                                                </p>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center mt-0.5 flex-shrink-0">
-                                                    <span className="text-xs font-bold">
-                                                        2
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-gray-700">
-                                                    Kelas perkuliahan yang
-                                                    fleksibel (weekend dan
-                                                    weekday)
-                                                </p>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center mt-0.5 flex-shrink-0">
-                                                    <span className="text-xs font-bold">
-                                                        3
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-gray-700">
-                                                    Akses ke perpustakaan
-                                                    digital dan jurnal ilmiah
-                                                    internasional
-                                                </p>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <div className="w-5 h-5 rounded-full bg-green-500 text-white flex items-center justify-center mt-0.5 flex-shrink-0">
-                                                    <span className="text-xs font-bold">
-                                                        4
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-gray-700">
-                                                    Peluang publikasi di jurnal
-                                                    nasional dan internasional
-                                                </p>
-                                            </li>
-                                        </ul>
-                                    </CardContent>
-                                </Card>
-
-                                {/* Info Card */}
-                                <Card className="mt-6">
-                                    <CardContent className="p-6">
-                                        <h3 className="font-semibold mb-4">
-                                            Informasi Pendaftaran
-                                        </h3>
-                                        <div className="space-y-3">
-                                            <div className="flex justify-between items-center pb-2 border-b border-dashed">
-                                                <span className="text-gray-700">
-                                                    Gelombang I
-                                                </span>
-                                                <span className="text-sm font-medium px-2 py-1 bg-yellow-100 text-yellow-800 rounded">
-                                                    Januari - Maret
-                                                </span>
-                                            </div>
-                                            <div className="flex justify-between items-center pb-2 border-b border-dashed">
-                                                <span className="text-gray-700">
-                                                    Gelombang II
-                                                </span>
-                                                <span className="text-sm font-medium px-2 py-1 bg-blue-100 text-blue-800 rounded">
-                                                    April - Juni
-                                                </span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-700">
-                                                    Gelombang III
-                                                </span>
-                                                <span className="text-sm font-medium px-2 py-1 bg-green-100 text-green-800 rounded">
-                                                    Juli - Agustus
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <Button
-                                            variant="outline"
-                                            className="w-full mt-4 border-green-600 text-green-700 hover:bg-green-50"
-                                        >
-                                            Download Brosur
-                                        </Button>
-                                    </CardContent>
-                                </Card>
                             </div>
                         </div>
                     </div>

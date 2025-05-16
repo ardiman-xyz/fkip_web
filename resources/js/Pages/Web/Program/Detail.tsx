@@ -67,7 +67,6 @@ const ProgramDetail = ({ program, dosen }: ProgramDetailProps) => {
         <Guest2>
             <div className="min-h-screen bg-gray-50 py-12">
                 <div className="container max-w-6xl mx-auto px-4">
-                    {/* Breadcrumb */}
                     <div className="flex items-center gap-2 text-sm mb-6 text-gray-600">
                         <a
                             href="/"
@@ -77,10 +76,16 @@ const ProgramDetail = ({ program, dosen }: ProgramDetailProps) => {
                         </a>
                         <span>&gt;</span>
                         <a
-                            href="/program/sarjana"
+                            href={
+                                program.level?.code === "s1"
+                                    ? "/program/sarjana"
+                                    : "/program/magister"
+                            }
                             className="hover:text-green-600 transition-colors"
                         >
-                            Program Studi
+                            {program.level?.code === "s1"
+                                ? "Program Sarjana"
+                                : "Program Magister"}
                         </a>
                         <span>&gt;</span>
                         <span className="text-gray-800 font-medium">
@@ -88,7 +93,7 @@ const ProgramDetail = ({ program, dosen }: ProgramDetailProps) => {
                         </span>
                     </div>
 
-                    {/* Header dengan banner */}
+                    {/* Header dengan banner yang dinamis berdasarkan jenjang pendidikan */}
                     <div className="bg-green-700 rounded-xl overflow-hidden mb-8 relative">
                         <div className="absolute inset-0 opacity-10 bg-[url('/images/patterns/pattern-dots.svg')] bg-repeat"></div>
                         <div className="relative z-10 p-8 md:p-10 flex flex-col md:flex-row items-center gap-8">
@@ -104,9 +109,45 @@ const ProgramDetail = ({ program, dosen }: ProgramDetailProps) => {
                                     {program.description?.description
                                         ?.substring(0, 200)
                                         ?.replace(/<[^>]*>/g, "") ||
-                                        "Program studi yang mempersiapkan pendidik profesional dengan pendekatan inovatif dan berbasis teknologi."}
+                                        `Program studi ${
+                                            program.level?.code === "S1"
+                                                ? "sarjana"
+                                                : "magister"
+                                        } yang mempersiapkan pendidik profesional dengan pendekatan inovatif dan berbasis teknologi.`}
                                     ...
                                 </p>
+
+                                {/* Informasi tambahan berdasarkan jenjang */}
+                                <div className="flex flex-wrap gap-4">
+                                    <div className="flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm">
+                                        <Clock4 className="w-4 h-4" />
+                                        <span>
+                                            Durasi{" "}
+                                            {program.level?.code === "S1"
+                                                ? "4"
+                                                : "2"}{" "}
+                                            Tahun
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm">
+                                        <GraduationCap className="w-4 h-4" />
+                                        <span>
+                                            Gelar{" "}
+                                            {program.level?.code === "S1"
+                                                ? "S.Pd"
+                                                : "M.Pd"}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 bg-white/20 text-white px-4 py-2 rounded-full text-sm">
+                                        <Award className="w-4 h-4" />
+                                        <span>{program.status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="md:w-1/4 flex items-center justify-center">
+                                <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
+                                    <GraduationCap className="w-16 h-16 text-white" />
+                                </div>
                             </div>
                         </div>
                     </div>

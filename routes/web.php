@@ -9,6 +9,8 @@ use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StudentAffairsController;
+use App\Http\Controllers\StudentOrganization;
 use App\Http\Controllers\StudyProgram;
 use App\Http\Controllers\StudyProgramContactController;
 use App\Http\Controllers\StudyProgramDescriptionController;
@@ -119,6 +121,24 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     Route::post('/study-program/{studyProgramId}/contact', [StudyProgramContactController::class, "store"])
                 ->name('study-program.contact.store');
+
+
+    Route::controller(StudentAffairsController::class)->prefix('student')->name('student.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::post('/organizations', 'storeOrganization')->name('organizations.store');
+
+        Route::get('/organizations', 'getOrganizations')->name('organizations.get');
+        // Route::post('/organizations', 'storeOrganization')->name('organizations.store');
+        // Route::get('/organizations/{organization}', 'showOrganization')->name('organizations.show');
+        Route::put('/organizations/{organization}', 'updateOrganization')->name('organizations.update');
+        Route::delete('/organizations/{organization}', 'deleteOrganization')->name('organizations.destroy');
+        
+        // // Organization officer routes
+        // Route::get('/organizations/{organization}/officers', 'getOrganizationOfficers')->name('organizations.officers.get');
+        // Route::post('/organizations/{organization}/officers', 'storeOrganizationOfficer')->name('organizations.officers.store');
+        // Route::put('/organizations/{organization}/officers/{officer}', 'updateOrganizationOfficer')->name('organizations.officers.update');
+        // Route::delete('/organizations/{organization}/officers/{officer}', 'deleteOrganizationOfficer')->name('organizations.officers.destroy');
+    });
      
 });
 
