@@ -9,6 +9,7 @@ use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ScholarshipController;
 use App\Http\Controllers\StudentAffairsController;
 use App\Http\Controllers\StudentOrganization;
 use App\Http\Controllers\StudyProgram;
@@ -128,19 +129,24 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::post('/organizations', 'storeOrganization')->name('organizations.store');
 
         Route::get('/organizations', 'getOrganizations')->name('organizations.get');
-        // Route::post('/organizations', 'storeOrganization')->name('organizations.store');
-        // Route::get('/organizations/{organization}', 'showOrganization')->name('organizations.show');
         Route::put('/organizations/{organization}', 'updateOrganization')->name('organizations.update');
         Route::delete('/organizations/{organization}', 'deleteOrganization')->name('organizations.destroy');
         
-        // // Organization officer routes
-        // Route::get('/organizations/{organization}/officers', 'getOrganizationOfficers')->name('organizations.officers.get');
-        // Route::post('/organizations/{organization}/officers', 'storeOrganizationOfficer')->name('organizations.officers.store');
-        // Route::put('/organizations/{organization}/officers/{officer}', 'updateOrganizationOfficer')->name('organizations.officers.update');
-        // Route::delete('/organizations/{organization}/officers/{officer}', 'deleteOrganizationOfficer')->name('organizations.officers.destroy');
+
+       
     });
-     
-});
+
+    Route::controller(ScholarshipController::class)->prefix('student/scholarships')->name('scholarships.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::get('/list', 'getScholarships')->name('get');
+        Route::post('/', 'storeScholarship')->name('store');
+        Route::get('/{scholarship}', 'showScholarship')->name('show');
+        Route::put('/{scholarship}', 'updateScholarship')->name('update');
+        Route::delete('/{scholarship}', 'deleteScholarship')->name('destroy');
+    });
+
+
+}); 
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

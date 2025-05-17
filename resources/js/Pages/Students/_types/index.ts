@@ -39,3 +39,26 @@ export type OrganizationOfficer = {
     is_active: boolean;
     order: number;
 };
+
+export type Scholarship = {
+    id: number;
+    name: string;
+    description: string | null;
+    provider: string;
+    amount: number | string | null;
+    amount_formatted?: string;
+    requirements: string | null;
+    start_date: string;
+    end_date: string;
+    application_deadline: string;
+    quota: number | null;
+    is_active: boolean;
+    is_featured: boolean;
+    contact_person: string | null;
+    contact_email: string | null;
+    contact_phone: string | null;
+    cover_image: string | Media | null;
+    cover_image_id?: number | null;
+    created_at: string;
+    updated_at: string;
+};
