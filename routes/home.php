@@ -34,6 +34,7 @@ Route::get('akademik/kalender', [ProdiController::class, 'kalenderAkdemik']);
 
 Route::prefix('kemahasiswaan')->name('kemahasiswaan.')->group(function () {
     Route::get('organisasi', [ProdiController::class, 'organisasi'])->name('organisasi');
+    Route::get('/organisasi/{slug}', [ProdiController::class, 'organizationDetail'])->name('kemahasiswaan.organisasi.detail');
     Route::get('beasiswa', [ProdiController::class, 'scholarship'])->name('scholarship');
     Route::get('prestasi', [ProdiController::class, 'achievement'])->name('achievement');
 });

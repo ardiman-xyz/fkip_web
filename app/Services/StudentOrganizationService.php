@@ -196,4 +196,17 @@ class StudentOrganizationService
         
         return $mapping[$locale] ?? 1; // Default to Indonesian
     }
+
+    public function getOrganizationBySlug($slug)
+    {
+        return StudentOrganization::with([
+            'translations',
+            'logo',
+            'coverImage',
+            'officers.image'
+        ])
+        ->where('slug', $slug)
+        ->where('is_active', true)
+        ->first();
+    }
 }
