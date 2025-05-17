@@ -60,7 +60,7 @@ class MediaController extends Controller
         try {
             $request->validate([
                 'files' => 'required|array',
-                'files.*' => 'required|file|max:2048|mimes:jpeg,png,jpg,gif,webp'
+                'files.*' => 'required|file|max:2048|mimes:jpeg,png,jpg,gif,webp,svg'
             ]);
 
             $result = $this->mediaService->create($request->file('files'), $userId);

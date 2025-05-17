@@ -100,8 +100,6 @@ export const LecturerFormDialog = ({
     onSuccess,
     initialData,
 }: LecturerFormDialogProps) => {
-    console.info(initialData);
-
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState<any | null>(null);

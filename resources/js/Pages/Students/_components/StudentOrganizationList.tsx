@@ -23,12 +23,12 @@ import {
     PiTrashDuotone,
     PiDotsThreeVerticalBold,
     PiEyeDuotone,
-    PiMagnifyingGlassDuotone,
     PiInstagramLogoDuotone,
 } from "react-icons/pi";
 import axios from "axios";
 import { toast } from "sonner";
 import CreateOrganizationModal from "./CreateOrganizationModal";
+import UpdateOrganizationModal from "./UpdateOrganizationModal";
 import { StudentOrganization } from "../_types";
 
 const StudentOrganizationList: React.FC = () => {
@@ -41,6 +41,9 @@ const StudentOrganizationList: React.FC = () => {
         StudentOrganization[]
     >([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+    const [selectedOrganization, setSelectedOrganization] =
+        useState<StudentOrganization | null>(null);
 
     useEffect(() => {
         loadOrganizations();
@@ -72,31 +75,50 @@ const StudentOrganizationList: React.FC = () => {
             if (response.data && response.data.status) {
                 setOrganizations(response.data.data);
                 setFilteredOrganizations(response.data.data);
-
-                console.info(response);
             } else {
                 console.warn("Received unexpected data format:", response.data);
                 toast.warning(
-                    "Received an unexpected response from the server"
+                    "Server merespon dengan format yang tidak diharapkan"
                 );
             }
         } catch (error) {
             console.error("Error loading organizations:", error);
-            toast.error("An error occurred while loading organizations");
+            toast.error("Terjadi kesalahan saat memuat data organisasi");
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleCreateSuccess = (newOrganization: StudentOrganization) => {
+        // Add the new organization to the top of the list
         setOrganizations([newOrganization, ...organizations]);
+        setFilteredOrganizations([newOrganization, ...filteredOrganizations]);
         toast.success("Organisasi berhasil ditambahkan");
+    };
+
+    const handleUpdateSuccess = (updatedOrganization: StudentOrganization) => {
+        // Update the existing organization in the list
+        const updateOrganizationInArray = (orgArray: StudentOrganization[]) => {
+            return orgArray.map((org) =>
+                org.id === updatedOrganization.id ? updatedOrganization : org
+            );
+        };
+
+        setOrganizations(updateOrganizationInArray(organizations));
+        setFilteredOrganizations(
+            updateOrganizationInArray(filteredOrganizations)
+        );
+        toast.success("Organisasi berhasil diperbarui");
+    };
+
+    const handleEditOrganization = (organization: StudentOrganization) => {
+        setSelectedOrganization(organization);
+        setIsUpdateModalOpen(true);
     };
 
     const handleDeleteOrganization = async (id: number) => {
         if (confirm("Apakah Anda yakin ingin menghapus organisasi ini?")) {
             try {
-                // In a real implementation, you would call your API
                 const response = await axios.delete(
                     route("admin.student.organizations.destroy", id)
                 );
@@ -136,7 +158,6 @@ const StudentOrganizationList: React.FC = () => {
         organization: StudentOrganization
     ) => {
         try {
-            // In a real implementation, you would call your API
             const response = await axios.put(
                 route("admin.student.organizations.update", organization.id),
                 {
@@ -145,34 +166,40 @@ const StudentOrganizationList: React.FC = () => {
                 }
             );
 
-            // For now, just update the state
-            const updatedOrgs = organizations.map((org) =>
-                org.id === organization.id
-                    ? { ...org, is_active: !org.is_active }
-                    : org
-            );
-            setOrganizations(updatedOrgs);
-            setFilteredOrganizations(
-                filteredOrganizations.map((org) =>
-                    org.id === organization.id
-                        ? { ...org, is_active: !org.is_active }
-                        : org
-                )
-            );
+            // Update state with the response data
+            if (response.data && response.data.status) {
+                const updatedOrg = response.data.data;
 
-            toast.success(
-                `Organisasi ${
-                    organization.is_active ? "dinonaktifkan" : "diaktifkan"
-                }`
-            );
+                // Update both arrays with the updated organization
+                const updateOrganizationInArray = (
+                    orgArray: StudentOrganization[]
+                ) => {
+                    return orgArray.map((org) =>
+                        org.id === updatedOrg.id ? updatedOrg : org
+                    );
+                };
+
+                setOrganizations(updateOrganizationInArray(organizations));
+                setFilteredOrganizations(
+                    updateOrganizationInArray(filteredOrganizations)
+                );
+
+                toast.success(
+                    `Organisasi ${
+                        organization.is_active ? "dinonaktifkan" : "diaktifkan"
+                    }`
+                );
+            } else {
+                toast.error("Gagal mengubah status organisasi");
+            }
         } catch (error) {
             console.error("Error updating organization status:", error);
+            toast.error("Gagal mengubah status organisasi");
         }
     };
 
     const toggleFeaturedStatus = async (organization: StudentOrganization) => {
         try {
-            // In a real implementation, you would call your API
             const response = await axios.put(
                 route("admin.student.organizations.update", organization.id),
                 {
@@ -181,26 +208,32 @@ const StudentOrganizationList: React.FC = () => {
                 }
             );
 
-            // For now, just update the state
-            const updatedOrgs = organizations.map((org) =>
-                org.id === organization.id
-                    ? { ...org, is_featured: !org.is_featured }
-                    : org
-            );
-            setOrganizations(updatedOrgs);
-            setFilteredOrganizations(
-                filteredOrganizations.map((org) =>
-                    org.id === organization.id
-                        ? { ...org, is_featured: !org.is_featured }
-                        : org
-                )
-            );
+            // Update state with the response data
+            if (response.data && response.data.status) {
+                const updatedOrg = response.data.data;
 
-            toast.success(
-                organization.is_featured
-                    ? "Organisasi dihapus dari daftar unggulan"
-                    : "Organisasi ditambahkan ke daftar unggulan"
-            );
+                // Update both arrays with the updated organization
+                const updateOrganizationInArray = (
+                    orgArray: StudentOrganization[]
+                ) => {
+                    return orgArray.map((org) =>
+                        org.id === updatedOrg.id ? updatedOrg : org
+                    );
+                };
+
+                setOrganizations(updateOrganizationInArray(organizations));
+                setFilteredOrganizations(
+                    updateOrganizationInArray(filteredOrganizations)
+                );
+
+                toast.success(
+                    organization.is_featured
+                        ? "Organisasi dihapus dari daftar unggulan"
+                        : "Organisasi ditambahkan ke daftar unggulan"
+                );
+            } else {
+                toast.error("Gagal mengubah status unggulan organisasi");
+            }
         } catch (error) {
             console.error(
                 "Error updating organization featured status:",
@@ -208,6 +241,12 @@ const StudentOrganizationList: React.FC = () => {
             );
             toast.error("Gagal mengubah status unggulan organisasi");
         }
+    };
+
+    const handleViewDetails = (organization: StudentOrganization) => {
+        // In a real application, you might navigate to a details page
+        // or open a modal with details
+        toast.info(`Melihat detail ${organization.name}`);
     };
 
     return (
@@ -322,13 +361,21 @@ const StudentOrganizationList: React.FC = () => {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem
-                                                        onClick={() => {}}
+                                                        onClick={() =>
+                                                            handleViewDetails(
+                                                                organization
+                                                            )
+                                                        }
                                                     >
                                                         <PiEyeDuotone className="mr-2 h-4 w-4" />
                                                         <span>Detail</span>
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
-                                                        onClick={() => {}}
+                                                        onClick={() =>
+                                                            handleEditOrganization(
+                                                                organization
+                                                            )
+                                                        }
                                                     >
                                                         <PiPencilSimpleDuotone className="mr-2 h-4 w-4" />
                                                         <span>Edit</span>
@@ -380,10 +427,19 @@ const StudentOrganizationList: React.FC = () => {
                 </CardContent>
             </Card>
 
+            {/* Modal untuk tambah organisasi */}
             <CreateOrganizationModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSuccess={handleCreateSuccess}
+            />
+
+            {/* Modal untuk edit organisasi */}
+            <UpdateOrganizationModal
+                isOpen={isUpdateModalOpen}
+                onClose={() => setIsUpdateModalOpen(false)}
+                onSuccess={handleUpdateSuccess}
+                organization={selectedOrganization}
             />
         </div>
     );

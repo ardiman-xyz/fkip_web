@@ -79,8 +79,6 @@ const LocationContact = () => {
             if (response.data.status && response.data.data) {
                 setFormData(response.data.data);
             }
-
-            console.info(response.data.data);
         } catch (error) {
             toast.error("Gagal memuat data");
         } finally {

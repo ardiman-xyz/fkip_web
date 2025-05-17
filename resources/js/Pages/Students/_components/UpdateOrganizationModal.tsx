@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/Components/ui/button";
 import {
     Dialog,
@@ -32,11 +32,24 @@ import {
     PiCalendarDuotone,
     PiFloppyDiskDuotone,
 } from "react-icons/pi";
-import { Media } from "@/types/app";
 import { MediaModal } from "@/Components/MediaModal";
+import { StudentOrganization } from "../_types";
 
-// Create form validation schema
-const organizationSchema = z.object({
+// Mendefinisikan tipe Media jika tidak tersedia di @/types/app
+interface Media {
+    id: number;
+    name: string;
+    file_name: string;
+    mime_type: string;
+    path: string;
+    size: number;
+    url: string;
+    created_at: string;
+    updated_at: string;
+}
+
+// Update form validation schema
+const updateOrganizationSchema = z.object({
     name: z.string().min(1, { message: "Nama organisasi harus diisi" }),
     description: z.string().nullable().optional(),
     logo_id: z.number().nullable().optional(),
@@ -52,16 +65,18 @@ const organizationSchema = z.object({
     is_featured: z.boolean().default(false),
 });
 
-interface CreateOrganizationModalProps {
+interface UpdateOrganizationModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSuccess: (organization: any) => void;
+    onSuccess: (organization: StudentOrganization) => void;
+    organization: StudentOrganization | null;
 }
 
-const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = ({
+const UpdateOrganizationModal: React.FC<UpdateOrganizationModalProps> = ({
     isOpen,
     onClose,
     onSuccess,
+    organization,
 }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
@@ -69,8 +84,8 @@ const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = ({
     const [selectedLogo, setSelectedLogo] = useState<Media | null>(null);
     const [selectedCover, setSelectedCover] = useState<Media | null>(null);
 
-    const form = useForm<z.infer<typeof organizationSchema>>({
-        resolver: zodResolver(organizationSchema),
+    const form = useForm<z.infer<typeof updateOrganizationSchema>>({
+        resolver: zodResolver(updateOrganizationSchema),
         defaultValues: {
             name: "",
             description: "",
@@ -84,28 +99,112 @@ const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = ({
         },
     });
 
-    const onSubmit = async (values: z.infer<typeof organizationSchema>) => {
+    // Update form values when organization changes
+    useEffect(() => {
+        if (organization) {
+            form.reset({
+                name: organization.name,
+                description: organization.description,
+                // Akses ID dari logo dan cover image. Umumnya object akan memiliki property ID
+                logo_id: organization.logo
+                    ? typeof organization.logo === "string"
+                        ? null
+                        : organization.logo.id
+                    : null,
+                cover_image_id: organization.cover_image
+                    ? typeof organization.cover_image === "string"
+                        ? null
+                        : organization.cover_image.id
+                    : null,
+                founding_year: organization.founding_year || "",
+                email: organization.email || "",
+                instagram: organization.instagram || "",
+                is_active: organization.is_active,
+                is_featured: organization.is_featured,
+            });
+
+            // Set logo preview jika tersedia
+            if (organization.logo) {
+                const logoPath =
+                    typeof organization.logo === "string"
+                        ? organization.logo
+                        : organization.logo.path || organization.logo.url || "";
+
+                const logoId =
+                    typeof organization.logo === "string"
+                        ? 0 // Menggunakan ID default jika tidak ada ID yang tersedia
+                        : organization.logo.id;
+
+                setSelectedLogo({
+                    id: logoId,
+                    path: logoPath,
+                    name: "Logo",
+                    file_name: "logo.jpg",
+                    mime_type: "image/jpeg",
+                    size: 0,
+                    url: logoPath,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                });
+            } else {
+                setSelectedLogo(null);
+            }
+
+            // Set cover preview jika tersedia
+            if (organization.cover_image) {
+                const coverPath =
+                    typeof organization.cover_image === "string"
+                        ? organization.cover_image
+                        : organization.cover_image.path ||
+                          organization.cover_image.url ||
+                          "";
+
+                const coverId =
+                    typeof organization.cover_image === "string"
+                        ? 0 // Menggunakan ID default jika tidak ada ID yang tersedia
+                        : organization.cover_image.id;
+
+                setSelectedCover({
+                    id: coverId,
+                    path: coverPath,
+                    name: "Cover",
+                    file_name: "cover.jpg",
+                    mime_type: "image/jpeg",
+                    size: 0,
+                    url: coverPath,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                });
+            } else {
+                setSelectedCover(null);
+            }
+        }
+    }, [organization, form, isOpen]);
+
+    const onSubmit = async (
+        values: z.infer<typeof updateOrganizationSchema>
+    ) => {
+        if (!organization) return;
+
         setIsSubmitting(true);
 
         try {
-            // Replace with your actual API endpoint
-            const response = await axios.post(
-                route("admin.student.organizations.store"),
+            const response = await axios.put(
+                route("admin.student.organizations.update", organization.id),
                 values
             );
 
             if (response.data.status) {
-                toast.success("Organisasi berhasil ditambahkan");
                 onSuccess(response.data.data);
-                form.reset();
                 onClose();
+                toast.success("Organisasi berhasil diperbarui");
             } else {
                 toast.error(
-                    response.data.message || "Gagal menyimpan data organisasi"
+                    response.data.message || "Gagal memperbarui data organisasi"
                 );
             }
         } catch (error: any) {
-            console.error("Error submitting form:", error);
+            console.error("Error updating organization:", error);
 
             if (error.response?.data?.errors) {
                 // Set form errors from response
@@ -116,7 +215,7 @@ const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = ({
                     }
                 );
             } else {
-                toast.error("Gagal menyimpan data organisasi");
+                toast.error("Gagal memperbarui data organisasi");
             }
         } finally {
             setIsSubmitting(false);
@@ -135,24 +234,14 @@ const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = ({
         setIsCoverModalOpen(false);
     };
 
-    const handleClose = () => {
-        form.reset();
-        setSelectedLogo(null);
-        setSelectedCover(null);
-        onClose();
-    };
-
     return (
         <>
-            <Dialog
-                open={isOpen}
-                onOpenChange={(open) => !open && handleClose()}
-            >
+            <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
                 <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Tambah Organisasi Baru</DialogTitle>
+                        <DialogTitle>Edit Organisasi</DialogTitle>
                         <DialogDescription>
-                            Tambahkan organisasi mahasiswa baru ke sistem
+                            Perbarui informasi organisasi mahasiswa
                         </DialogDescription>
                     </DialogHeader>
 
@@ -473,7 +562,7 @@ const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = ({
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={handleClose}
+                                    onClick={onClose}
                                     disabled={isSubmitting}
                                 >
                                     Batal
@@ -484,7 +573,9 @@ const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = ({
                                     className="gap-2"
                                 >
                                     <PiFloppyDiskDuotone className="h-4 w-4" />
-                                    {isSubmitting ? "Menyimpan..." : "Simpan"}
+                                    {isSubmitting
+                                        ? "Menyimpan..."
+                                        : "Simpan Perubahan"}
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -509,4 +600,4 @@ const CreateOrganizationModal: React.FC<CreateOrganizationModalProps> = ({
     );
 };
 
-export default CreateOrganizationModal;
+export default UpdateOrganizationModal;

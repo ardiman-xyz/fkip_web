@@ -19,8 +19,6 @@ import { useSharedData } from "@/lib/utils";
 const DesktopNav = () => {
     const { educationLevels } = useSharedData();
 
-    console.info(educationLevels);
-
     return (
         <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>

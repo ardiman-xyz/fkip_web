@@ -1,10 +1,12 @@
+import { Media } from "@/types/app";
+
 export type StudentOrganization = {
     id: number;
     name: string;
     slug: string;
     description: string | null;
-    logo: string | null;
-    cover_image: string | null;
+    logo: Media | null;
+    cover_image: Media | null;
     founding_year: string | null;
     email: string | null;
     instagram: string | null;
