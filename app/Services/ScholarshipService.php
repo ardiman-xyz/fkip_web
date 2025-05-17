@@ -92,37 +92,49 @@ class ScholarshipService
     public function updateScholarship(Scholarship $scholarship, array $data)
     {
         return DB::transaction(function () use ($scholarship, $data) {
-            // Hapus field yang tidak ada di tabel
-            unset($data['amount_formatted']);
+            // Daftar kolom yang valid di tabel scholarships
+            $validColumns = [
+                'name', 'slug', 'description', 'provider', 'amount', 'requirements',
+                'start_date', 'end_date', 'application_deadline', 'quota',
+                'contact_person', 'contact_email', 'contact_phone',
+                'cover_image_id', 'is_active', 'is_featured'
+            ];
             
-            // Jika cover_image adalah objek kompleks, ambil hanya ID-nya
+            // Buat array data baru yang hanya berisi kolom valid
+            $cleanData = [];
+            foreach ($validColumns as $column) {
+                if (array_key_exists($column, $data)) {
+                    $cleanData[$column] = $data[$column];
+                }
+            }
+            
+            // Jika cover_image ada dan berupa array, ekstrak ID-nya
             if (isset($data['cover_image']) && is_array($data['cover_image'])) {
-                $data['cover_image_id'] = $data['cover_image']['id'] ?? null;
-                unset($data['cover_image']);
+                $cleanData['cover_image_id'] = $data['cover_image']['id'] ?? null;
             }
             
             // Update the slug if name is changed
-            if (isset($data['name']) && $data['name'] !== $scholarship->name && (!isset($data['slug']) || empty($data['slug']))) {
-                $data['slug'] = Str::slug($data['name']);
+            if (isset($cleanData['name']) && $cleanData['name'] !== $scholarship->name && (!isset($cleanData['slug']) || empty($cleanData['slug']))) {
+                $cleanData['slug'] = Str::slug($cleanData['name']);
                 
                 // Make sure the slug is unique
-                $count = Scholarship::where('slug', $data['slug'])
+                $count = Scholarship::where('slug', $cleanData['slug'])
                     ->where('id', '!=', $scholarship->id)
                     ->count();
                 if ($count > 0) {
-                    $data['slug'] = $data['slug'] . '-' . ($count + 1);
+                    $cleanData['slug'] = $cleanData['slug'] . '-' . ($count + 1);
                 }
             }
             
             // Format dates
             foreach (['start_date', 'end_date', 'application_deadline'] as $dateField) {
-                if (isset($data[$dateField]) && !empty($data[$dateField])) {
-                    $data[$dateField] = Carbon::parse($data[$dateField])->format('Y-m-d');
+                if (isset($cleanData[$dateField]) && !empty($cleanData[$dateField])) {
+                    $cleanData[$dateField] = Carbon::parse($cleanData[$dateField])->format('Y-m-d');
                 }
             }
             
-            // Update the scholarship attributes
-            $scholarship->update($data);
+            // Update the scholarship attributes dengan data yang sudah dibersihkan
+            $scholarship->update($cleanData);
             
             return $scholarship->fresh(['coverImage']);
         });
