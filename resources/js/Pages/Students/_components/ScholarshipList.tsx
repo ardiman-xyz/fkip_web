@@ -32,6 +32,7 @@ import { toast } from "sonner";
 // Perbaikan import
 import CreateScholarshipModal from "./CreateScholarshipModal";
 import { Scholarship } from "../_types";
+import UpdateScholarshipModal from "./UpdateScholarshipModal";
 
 const ScholarshipList: React.FC = () => {
     const [scholarships, setScholarships] = useState<Scholarship[]>([]);
@@ -196,7 +197,7 @@ const ScholarshipList: React.FC = () => {
         if (confirm("Apakah Anda yakin ingin menghapus beasiswa ini?")) {
             try {
                 const response = await axios.delete(
-                    route("admin.student.scholarships.destroy", id)
+                    route("admin.scholarships.destroy", id)
                 );
 
                 // Validate successful response
@@ -242,7 +243,7 @@ const ScholarshipList: React.FC = () => {
     const toggleScholarshipStatus = async (scholarship: Scholarship) => {
         try {
             const response = await axios.put(
-                route("admin.student.scholarships.update", scholarship.id),
+                route("admin.scholarships.update", scholarship.id),
                 {
                     ...scholarship,
                     is_active: !scholarship.is_active,
@@ -304,7 +305,7 @@ const ScholarshipList: React.FC = () => {
     const toggleFeaturedStatus = async (scholarship: Scholarship) => {
         try {
             const response = await axios.put(
-                route("admin.student.scholarships.update", scholarship.id),
+                route("admin.scholarships.update", scholarship.id),
                 {
                     ...scholarship,
                     is_featured: !scholarship.is_featured,
@@ -583,12 +584,12 @@ const ScholarshipList: React.FC = () => {
                 onSuccess={handleCreateSuccess}
             />
 
-            {/* <UpdateScholarshipModal
+            <UpdateScholarshipModal
                 isOpen={isUpdateModalOpen}
                 onClose={() => setIsUpdateModalOpen(false)}
                 onSuccess={handleUpdateSuccess}
                 scholarship={selectedScholarship}
-            /> */}
+            />
         </div>
     );
 };

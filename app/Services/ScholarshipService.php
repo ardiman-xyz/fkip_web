@@ -92,6 +92,15 @@ class ScholarshipService
     public function updateScholarship(Scholarship $scholarship, array $data)
     {
         return DB::transaction(function () use ($scholarship, $data) {
+            // Hapus field yang tidak ada di tabel
+            unset($data['amount_formatted']);
+            
+            // Jika cover_image adalah objek kompleks, ambil hanya ID-nya
+            if (isset($data['cover_image']) && is_array($data['cover_image'])) {
+                $data['cover_image_id'] = $data['cover_image']['id'] ?? null;
+                unset($data['cover_image']);
+            }
+            
             // Update the slug if name is changed
             if (isset($data['name']) && $data['name'] !== $scholarship->name && (!isset($data['slug']) || empty($data['slug']))) {
                 $data['slug'] = Str::slug($data['name']);
