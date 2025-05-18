@@ -206,10 +206,10 @@ class ProdiController extends Controller
     }
 
 
-    public function achievement()
-    {
-        return Inertia::render("Web/Student/Achievement");
-    }
+    // public function achievement()
+    // {
+    //     return Inertia::render("Web/Student/Achievement");
+    // }
 
      /**
      * Menampilkan detail program studi
@@ -232,4 +232,194 @@ class ProdiController extends Controller
             'dosen' => $dosen
         ]);
     }
+
+    public function achievement()
+    {
+        // Query untuk mendapatkan berita dengan tag "prestasi" (bahasa Indonesia)
+        $achievements = \App\Models\News::query()
+            ->join('news_tags', 'news.id', '=', 'news_tags.news_id')
+            ->join('tags', 'news_tags.tag_id', '=', 'tags.id')
+            ->join('tag_translations', 'tags.id', '=', 'tag_translations.tag_id')
+            ->join('news_translations', 'news.id', '=', 'news_translations.news_id')
+            ->leftJoin('media', 'news.media_id', '=', 'media.id')
+            ->where('tag_translations.name', 'prestasi') // Tag "prestasi" dalam bahasa Indonesia
+            ->where('tag_translations.language_id', 1) // Pastikan bahasa Indonesia (ID = 1)
+            ->where('news_translations.language_id', 1) // Pastikan konten berita bahasa Indonesia
+            ->where('news.status', 'published')
+            ->select([
+                'news.id',
+                'news_translations.title',
+                'news_translations.slug',
+                'news_translations.content',
+                'news.publish_date as date',
+                'media.id as media_id',
+                'media.path',
+                'media.paths'
+            ])
+            ->orderBy('news.publish_date', 'desc')
+            ->get()
+            ->map(function ($item) {
+                // Ekstrak level (Nasional, Internasional, dll)
+                $level = $this->determineLevelFromContent($item->content);
+                
+                // Ekstrak kategori (Akademik, Non-Akademik, dll)
+                $category = $this->determineCategoryFromContent($item->content);
+                
+                // Ekstrak nama mahasiswa
+                $students = $this->extractStudentsFromContent($item->content);
+                
+                // Ekstrak nama event
+                $event = $this->extractEventFromContent($item->title, $item->content);
+                
+                return [
+                    'id' => $item->id,
+                    'title' => $item->title,
+                    'slug' => $item->slug,
+                    'content' => $item->content,
+                    'event' => $event,
+                    'level' => $level,
+                    'date' => $item->date,
+                    'students' => $students,
+                    'category' => $category,
+                    'image' => $item->media_id ? [
+                        'id' => $item->media_id,
+                        'path' => $item->path,
+                        'paths' => json_decode($item->paths, true)
+                    ] : null
+                ];
+            });
+
+        return Inertia::render("Web/Student/Achievement", [
+            'achievements' => $achievements
+        ]);
+    }
+
+    /**
+     * Ekstrak level prestasi (Internasional, Nasional, Regional, Lokal)
+     */
+    private function determineLevelFromContent($content)
+    {
+        $contentLower = strtolower($content);
+        
+        if (strpos($contentLower, 'internasional') !== false || 
+            strpos($contentLower, 'international') !== false) {
+            return 'Internasional';
+        } 
+        elseif (strpos($contentLower, 'nasional') !== false || 
+                strpos($contentLower, 'national') !== false) {
+            return 'Nasional';
+        }
+        elseif (strpos($contentLower, 'regional') !== false || 
+                strpos($contentLower, 'provinsi') !== false || 
+                strpos($contentLower, 'wilayah') !== false) {
+            return 'Regional';
+        }
+        else {
+            return 'Lokal'; // Default jika tidak ditemukan
+        }
+    }
+
+    /**
+     * Ekstrak kategori prestasi (Akademik, Non-Akademik, dll)
+     */
+    private function determineCategoryFromContent($content)
+    {
+        $contentLower = strtolower($content);
+        
+        if (strpos($contentLower, 'penelitian') !== false || 
+            strpos($contentLower, 'karya tulis') !== false || 
+            strpos($contentLower, 'paper') !== false) {
+            return 'Penelitian';
+        }
+        elseif (strpos($contentLower, 'olahraga') !== false || 
+                strpos($contentLower, 'sport') !== false || 
+                strpos($contentLower, 'bola') !== false || 
+                strpos($contentLower, 'karate') !== false || 
+                strpos($contentLower, 'atletik') !== false) {
+            return 'Non-Akademik';
+        }
+        elseif (strpos($contentLower, 'seni') !== false || 
+                strpos($contentLower, 'musik') !== false || 
+                strpos($contentLower, 'teater') !== false || 
+                strpos($contentLower, 'tari') !== false || 
+                strpos($contentLower, 'budaya') !== false) {
+            return 'Seni Budaya';
+        }
+        elseif (strpos($contentLower, 'inovasi') !== false || 
+                strpos($contentLower, 'teknologi') !== false || 
+                strpos($contentLower, 'aplikasi') !== false || 
+                strpos($contentLower, 'digital') !== false) {
+            return 'Inovasi';
+        }
+        else {
+            return 'Akademik'; // Default kategori
+        }
+    }
+
+    /**
+     * Ekstrak nama mahasiswa dari konten berita
+     */
+    private function extractStudentsFromContent($content)
+    {
+        // Implementasi sederhana, bisa disesuaikan dengan format konten
+        $students = [];
+        
+        // Coba cari nama yang disebutkan setelah kata "mahasiswa", "diraih oleh", dll
+        $patterns = [
+            '/mahasiswa[^\.,]*?(?:bernama|yaitu|adalah)\s*([^\.,:;]+)(?:,|\.|;)/i',
+            '/diraih\s+oleh\s+([^\.,:;]+)(?:,|\.|;)/i',
+            '/(?:tim|delegasi)[^\.,]*?(?:terdiri dari|beranggotakan)\s*([^\.,:;]+)(?:,|\.|;)/i'
+        ];
+        
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $content, $matches)) {
+                if (!empty($matches[1])) {
+                    // Pisahkan nama jika ada beberapa
+                    $namesRaw = preg_split('/\sdan\s|\s*,\s*/', trim($matches[1]));
+                    foreach ($namesRaw as $name) {
+                        $name = trim($name);
+                        if (!empty($name) && strlen($name) > 3) {
+                            $students[] = $name;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Jika tidak ditemukan nama, beri array kosong atau nama default
+        if (empty($students)) {
+            return ["Mahasiswa FKIP"];
+        }
+        
+        return array_unique($students);
+    }
+
+    /**
+     * Ekstrak nama event dari judul dan konten berita
+     */
+    private function extractEventFromContent($title, $content)
+    {
+        // Periksa judul untuk event
+        if (preg_match('/dalam\s+(.*?)(?:,|\.|$)/i', $title, $matches)) {
+            if (!empty($matches[1])) {
+                return trim($matches[1]);
+            }
+        }
+        
+        // Atau cek konten untuk event
+        $patterns = [
+            '/dalam\s+(lomba|kompetisi|kejuaraan|kontes|olimpiade|festival)[^\.]*?(?:yang|di|pada)?\s*([^\.]+)(?:,|\.|$)/i',
+            '/mengikuti\s+(lomba|kompetisi|kejuaraan|kontes|olimpiade|festival)[^\.]*?\s*([^\.]+)(?:,|\.|$)/i'
+        ];
+        
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $content, $matches) && !empty($matches[2])) {
+                return trim($matches[1] . ' ' . $matches[2]);
+            }
+        }
+        
+        // Jika tidak ditemukan, gunakan judul sebagai nama event
+        return $title;
+    }
+           
 }

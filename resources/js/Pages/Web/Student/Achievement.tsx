@@ -63,140 +63,7 @@ const Achievement = ({ achievements = [] }: AchievementProps) => {
     const [levelFilter, setLevelFilter] = useState("all");
 
     // Data dummy prestasi mahasiswa
-    const dummyAchievements =
-        achievements.length > 0
-            ? achievements
-            : [
-                  {
-                      id: 1,
-                      title: "Juara 1 Lomba Karya Tulis Ilmiah Nasional",
-                      slug: "juara-1-lktin-2025",
-                      content:
-                          'Tim mahasiswa FKIP UMK berhasil meraih juara pertama dalam Lomba Karya Tulis Ilmiah Nasional (LKTIN) 2025 yang diselenggarakan oleh Universitas Gadjah Mada. Karya tulis berjudul "Inovasi Model Pembelajaran Berbasis Kearifan Lokal" berhasil menyisihkan 150 tim dari seluruh Indonesia.',
-                      event: "Lomba Karya Tulis Ilmiah Nasional (LKTIN) 2025",
-                      level: "Nasional",
-                      date: "2025-03-15",
-                      students: ["Maria Putri", "Ahmad Fadli"],
-                      category: "Akademik",
-                      image: {
-                          id: 1,
-                          path: "/images/achievements/academic.jpg",
-                          paths: {
-                              thumbnail: "/images/achievements/academic.jpg",
-                              original: "/images/achievements/academic.jpg",
-                          },
-                      },
-                  },
-                  {
-                      id: 2,
-                      title: "Medali Emas Kejuaraan Karate Pekan Olahraga Mahasiswa Nasional",
-                      slug: "medali-emas-karate-pomnas-2024",
-                      content:
-                          "Mahasiswa FKIP UMK, Budi Santoso, berhasil meraih medali emas dalam cabang olahraga karate kategori kumite -67kg pada Pekan Olahraga Mahasiswa Nasional (POMNAS) XVII yang diselenggarakan di Surabaya. Prestasi ini merupakan yang pertama bagi Universitas Muhammadiyah Kendari dalam ajang POMNAS untuk cabang karate.",
-                      event: "Pekan Olahraga Mahasiswa Nasional (POMNAS) XVII",
-                      level: "Nasional",
-                      date: "2025-02-20",
-                      students: ["Budi Santoso"],
-                      category: "Non-Akademik",
-                      image: {
-                          id: 2,
-                          path: "/images/achievements/sports.jpg",
-                          paths: {
-                              thumbnail: "/images/achievements/sports.jpg",
-                              original: "/images/achievements/sports.jpg",
-                          },
-                      },
-                  },
-                  {
-                      id: 3,
-                      title: "Best Paper Award di International Conference on Education",
-                      slug: "best-paper-award-ice-2025",
-                      content:
-                          'Penelitian berjudul "Pengembangan Model Pembelajaran Interaktif untuk Anak Berkebutuhan Khusus di Daerah 3T" yang diajukan oleh mahasiswa FKIP UMK, Rina Wijaya, berhasil mendapatkan penghargaan Best Paper Award dalam International Conference on Education (ICE) 2025 yang diselenggarakan di Kuala Lumpur, Malaysia.',
-                      event: "International Conference on Education (ICE) 2025",
-                      level: "Internasional",
-                      date: "2025-01-25",
-                      students: ["Dr. Susilo (Pembimbing)", "Rina Wijaya"],
-                      category: "Penelitian",
-                      image: {
-                          id: 3,
-                          path: "/images/achievements/research.jpg",
-                          paths: {
-                              thumbnail: "/images/achievements/research.jpg",
-                              original: "/images/achievements/research.jpg",
-                          },
-                      },
-                  },
-                  {
-                      id: 4,
-                      title: "Juara 2 Kompetisi Debat Bahasa Inggris Tingkat Regional",
-                      slug: "juara-2-debat-bahasa-inggris-regional-2025",
-                      content:
-                          "Tim Debat Bahasa Inggris FKIP UMK berhasil meraih juara 2 dalam Kompetisi Debat Bahasa Inggris Tingkat Regional Sulawesi 2025. Tim yang terdiri dari tiga mahasiswa Program Studi Pendidikan Bahasa Inggris ini berhasil menunjukkan kemampuan berpikir kritis dan berbahasa Inggris yang memukau para juri.",
-                      event: "Kompetisi Debat Bahasa Inggris Tingkat Regional Sulawesi 2025",
-                      level: "Regional",
-                      date: "2025-04-05",
-                      students: [
-                          "Dina Amalia",
-                          "Reza Pratama",
-                          "Siti Nurhaliza",
-                      ],
-                      category: "Akademik",
-                      image: {
-                          id: 4,
-                          path: "/images/achievements/debate.jpg",
-                          paths: {
-                              thumbnail: "/images/achievements/debate.jpg",
-                              original: "/images/achievements/debate.jpg",
-                          },
-                      },
-                  },
-                  {
-                      id: 5,
-                      title: "Juara 1 Musikalisasi Puisi Festival Sastra Mahasiswa",
-                      slug: "juara-1-musikalisasi-puisi-2025",
-                      content:
-                          "UKM Sastra FKIP UMK berhasil meraih juara pertama dalam kategori Musikalisasi Puisi pada Festival Sastra Mahasiswa Nasional 2025 yang diselenggarakan oleh Kementerian Pendidikan dan Kebudayaan. Penampilan musikalisasi puisi berjudul 'Tanah Air Mata' karya Sutardji Calzoum Bachri mendapat apresiasi tinggi dari dewan juri.",
-                      event: "Festival Sastra Mahasiswa Nasional 2025",
-                      level: "Nasional",
-                      date: "2025-05-12",
-                      students: [
-                          "Fajar Anugrah",
-                          "Dewi Lestari",
-                          "Randi Pratama",
-                          "Melati Putri",
-                      ],
-                      category: "Seni Budaya",
-                      image: {
-                          id: 5,
-                          path: "/images/achievements/arts.jpg",
-                          paths: {
-                              thumbnail: "/images/achievements/arts.jpg",
-                              original: "/images/achievements/arts.jpg",
-                          },
-                      },
-                  },
-                  {
-                      id: 6,
-                      title: "Runner-up Kompetisi Inovasi Pembelajaran Digital",
-                      slug: "runner-up-inovasi-pembelajaran-digital-2025",
-                      content:
-                          "Tim mahasiswa Program Studi Teknologi Pendidikan FKIP UMK berhasil menjadi runner-up dalam Kompetisi Inovasi Pembelajaran Digital yang diselenggarakan oleh Telkom Indonesia. Aplikasi pembelajaran interaktif 'LearnFun' yang dikembangkan tim dinilai memiliki potensi besar untuk meningkatkan kualitas pembelajaran di daerah terpencil.",
-                      event: "Kompetisi Inovasi Pembelajaran Digital 2025",
-                      level: "Nasional",
-                      date: "2025-06-08",
-                      students: ["Arief Wicaksono", "Putri Ramadani"],
-                      category: "Inovasi",
-                      image: {
-                          id: 6,
-                          path: "/images/achievements/innovation.jpg",
-                          paths: {
-                              thumbnail: "/images/achievements/innovation.jpg",
-                              original: "/images/achievements/innovation.jpg",
-                          },
-                      },
-                  },
-              ];
+    const dummyAchievements = achievements;
 
     // Filter berdasarkan pencarian dan kategori
     const filteredAchievements = dummyAchievements.filter((achievement) => {
@@ -422,7 +289,7 @@ const Achievement = ({ achievements = [] }: AchievementProps) => {
                                                                     asChild
                                                                 >
                                                                     <a
-                                                                        href={`/kemahasiswaan/prestasi/${achievement.slug}`}
+                                                                        href={`/berita/${achievement.slug}`}
                                                                     >
                                                                         Selengkapnya{" "}
                                                                         <ChevronRight className="w-4 h-4 ml-1" />
