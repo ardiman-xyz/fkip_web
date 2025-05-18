@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EducationLevel;
 use App\Services\EducationLevelService;
+use App\Services\ScholarshipService;
 use App\Services\StudentOrganizationService;
 use App\Services\StudyProgramService;
 use Illuminate\Http\Request;
@@ -15,15 +16,18 @@ class ProdiController extends Controller
     protected $educationLevelService;
     protected $studyProgramService;
     protected $studentOrganizationService;
+    protected $scholarshipService;
 
     public function __construct(
         EducationLevelService $educationLevelService,
         StudyProgramService $studyProgramService,
-        StudentOrganizationService $studentOrganizationService
+        StudentOrganizationService $studentOrganizationService,
+        ScholarshipService $scholarshipService
     ){
         $this->educationLevelService = $educationLevelService;
         $this->studyProgramService = $studyProgramService;
         $this->studentOrganizationService = $studentOrganizationService;
+        $this->scholarshipService = $scholarshipService;
     }
 
     /**
@@ -174,10 +178,33 @@ class ProdiController extends Controller
         ]);
     }
 
+      /**
+     * Menampilkan halaman beasiswa
+     */
     public function scholarship()
     {
-        return Inertia::render("Web/Student/Scholarship");
+        // Ambil data beasiswa dari database menggunakan ScholarshipService
+        $scholarships = $this->scholarshipService->getAllScholarships();
+        
+        // Mengelompokkan beasiswa yang masih aktif di bagian atas
+        $activeScholarships = $scholarships->filter(function ($scholarship) {
+            return $scholarship['is_active'] && 
+                  (new \DateTime($scholarship['application_deadline'])) >= (new \DateTime());
+        });
+        
+        $inactiveScholarships = $scholarships->filter(function ($scholarship) {
+            return !$scholarship['is_active'] || 
+                  (new \DateTime($scholarship['application_deadline'])) < (new \DateTime());
+        });
+        
+        // Gabungkan beasiswa aktif di atas dan tidak aktif di bawah
+        $sortedScholarships = $activeScholarships->merge($inactiveScholarships);
+        
+        return Inertia::render("Web/Student/Scholarship", [
+            'scholarships' => $sortedScholarships->values()->toArray()
+        ]);
     }
+
 
     public function achievement()
     {

@@ -34,6 +34,7 @@ import {
 } from "@/Components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import { useState } from "react";
+import { PiInstagramLogoDuotone } from "react-icons/pi";
 
 interface OrganizationDetailProps {
     organization: {
@@ -355,7 +356,7 @@ const OrganizationDetail = ({ organization }: OrganizationDetailProps) => {
                                             {organization.instagram && (
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
-                                                        <Instagram className="w-5 h-5 text-pink-600" />
+                                                        <PiInstagramLogoDuotone className="w-5 h-5 text-pink-600" />
                                                     </div>
                                                     <div>
                                                         <p className="text-sm text-gray-500">
