@@ -8,7 +8,11 @@ import StatusBadge from "./StatusBadge";
 import PriorityBadge from "./PriorityBadge";
 import AnnouncementActionsDropdown from "./AnnouncementActionsDropdown";
 import { Announcement } from "../_types/announcement";
-import { PiClockDuotone, PiMapPinSimpleAreaDuotone } from "react-icons/pi";
+import {
+    PiClockDuotone,
+    PiMapPinSimpleAreaDuotone,
+    PiPushPinDuotone,
+} from "react-icons/pi";
 
 interface AnnouncementTableRowProps {
     announcement: Announcement;
@@ -119,7 +123,7 @@ export default function AnnouncementTableRow({
                                     : "bg-gray-100 text-gray-600"
                             }`}
                         >
-                            <PiMapPinSimpleAreaDuotone className="size-3" />
+                            <PiPushPinDuotone className="size-3" />
                             {isCurrentlyPinned
                                 ? "Pinned Aktif"
                                 : "Pinned Tidak Aktif"}
@@ -129,7 +133,7 @@ export default function AnnouncementTableRow({
 
                 {announcement.is_pinned && pinnedPeriod && (
                     <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
-                        <PiClockDuotone className="size-3" />
+                        <PiPushPinDuotone className="size-3" />
                         <span>{pinnedPeriod}</span>
                     </div>
                 )}
@@ -143,9 +147,9 @@ export default function AnnouncementTableRow({
                             variant={
                                 isCurrentlyPinned ? "default" : "secondary"
                             }
-                            className="text-xs"
+                            className="text-xs bg-orange-100 text-orange-800 hover:bg-orange-100 shadow-none"
                         >
-                            <PiMapPinSimpleAreaDuotone className="size-3 mr-1" />
+                            <PiPushPinDuotone className="size-3 mr-1" />
                             {isCurrentlyPinned ? "Pinned" : "Scheduled"}
                         </Badge>
                     )}

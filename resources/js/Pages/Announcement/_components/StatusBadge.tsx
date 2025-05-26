@@ -1,23 +1,41 @@
-// File: resources/js/Pages/Announcement/components/StatusBadge.tsx
-
-import React from "react";
+import {
+    PiGlobeDuotone,
+    PiNoteDuotone,
+    PiArchiveDuotone,
+} from "react-icons/pi";
 
 interface StatusBadgeProps {
     status: "draft" | "published" | "archived";
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
-    const colors = {
-        draft: "bg-gray-100 text-gray-800",
-        published: "bg-green-100 text-green-800",
-        archived: "bg-red-100 text-red-800",
+    const statusConfig = {
+        draft: {
+            color: "bg-gray-100 text-gray-800",
+            icon: PiNoteDuotone,
+            label: "Draft",
+        },
+        published: {
+            color: "bg-green-100 text-green-800 ",
+            icon: PiGlobeDuotone,
+            label: "Published",
+        },
+        archived: {
+            color: "bg-red-100 text-red-800",
+            icon: PiArchiveDuotone,
+            label: "Archived",
+        },
     };
+
+    const config = statusConfig[status];
+    const IconComponent = config.icon;
 
     return (
         <span
-            className={`px-2 py-1 rounded-full text-xs font-medium ${colors[status]}`}
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded  text-xs font-medium ${config.color}`}
         >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            <IconComponent className="size-3" />
+            {config.label}
         </span>
     );
 }

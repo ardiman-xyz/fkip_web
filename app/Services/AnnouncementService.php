@@ -359,6 +359,8 @@ class AnnouncementService
             'is_featured' => $announcement->is_featured,
             'is_pinned' => $announcement->is_pinned,
             'published_at' => $announcement->published_at?->format('Y-m-d\TH:i'),
+            'pinned_start_date' => $this->formatDateTime($announcement->pinned_start_date, 'Y-m-d\TH:i'),
+            'pinned_end_date' => $this->formatDateTime($announcement->pinned_end_date, 'Y-m-d\TH:i'),
             'action' => $announcement->action,
             'translations' => $translations,
             'media' => $announcement->media ? [

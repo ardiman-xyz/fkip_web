@@ -78,6 +78,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/', 'index')->name('index');
         Route::get('create', 'create')->name('create');
         Route::post('store', 'store')->name('store');
+        Route::get('/{announcement}/edit', 'edit')->name('edit');  
+        Route::put('/{announcement}', 'update')->name('update');   
         Route::delete('/{announcement}', 'destroy')->name('destroy'); 
         Route::patch('/{announcement}/toggle-pin', 'togglePin')->name('toggle-pin');
     });

@@ -91,7 +91,7 @@ const Create = ({ categories, tags }: Props) => {
             category_id: "",
             featured_image: null,
             is_featured: false,
-            status: "draft",
+            status: "published",
             publish_date: new Date().toISOString().split("T")[0],
             tags: [],
             featured_expired_date: new Date().toISOString().split("T")[0],
