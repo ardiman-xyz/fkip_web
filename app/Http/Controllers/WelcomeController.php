@@ -25,6 +25,7 @@ class WelcomeController extends Controller
         $featuredNews = $this->welcomeService->getFeaturedNews();
         $defaultSliders = $this->welcomeService->getActiveSliders();
 
+
         return Inertia::render('Welcome', [
             "news" => $news,
             "events" => $events,

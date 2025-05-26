@@ -106,7 +106,9 @@ const NewsIndex = ({
     };
 
     // Ekstrak excerpt dari konten HTML
-    const getExcerpt = (htmlContent: string, length = 120) => {
+    const getExcerpt = (htmlContent: string | undefined, length = 120) => {
+        if (!htmlContent) return "";
+
         const plainText = htmlContent.replace(/<[^>]+>/g, "");
         return plainText.length > length
             ? plainText.substring(0, length) + "..."
@@ -249,7 +251,7 @@ const NewsIndex = ({
                                                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                                                         {getExcerpt(
                                                             item.translations.id
-                                                                .content
+                                                                ?.content
                                                         )}
                                                     </p>
                                                     <Button
@@ -258,7 +260,7 @@ const NewsIndex = ({
                                                         asChild
                                                     >
                                                         <a
-                                                            href={`/berita/${item.translations.id.slug}`}
+                                                            href={`/berita/${item.translations.id?.slug}`}
                                                         >
                                                             Baca Selengkapnya
                                                             <ChevronRight className="w-4 h-4 ml-1" />
@@ -308,7 +310,7 @@ const NewsIndex = ({
                                                                     item
                                                                         .translations
                                                                         .id
-                                                                        .title
+                                                                        ?.title
                                                                 }
                                                                 className="w-full h-full object-cover rounded-lg"
                                                             />
@@ -330,13 +332,13 @@ const NewsIndex = ({
                                                         )}
                                                         <h4 className="font-medium mb-1 line-clamp-2">
                                                             <a
-                                                                href={`/berita/${item.translations.id.slug}`}
+                                                                href={`/berita/${item.translations.id?.slug}`}
                                                             >
                                                                 {
                                                                     item
                                                                         .translations
                                                                         .id
-                                                                        .title
+                                                                        ?.title
                                                                 }
                                                             </a>
                                                         </h4>
