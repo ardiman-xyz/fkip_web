@@ -1,7 +1,11 @@
 // File: resources/js/Pages/Announcement/components/AnnouncementTitleCell.tsx
 
 import React from "react";
-import { PiStarDuotone, PiPingPongDuotone } from "react-icons/pi";
+import {
+    PiStarDuotone,
+    PiPingPongDuotone,
+    PiMapPinSimpleAreaDuotone,
+} from "react-icons/pi";
 
 interface AnnouncementTitleCellProps {
     title: string;
@@ -20,7 +24,7 @@ export default function AnnouncementTitleCell({
         <div className="flex flex-col">
             <div className="flex items-center gap-2">
                 {isPinned && (
-                    <PiPingPongDuotone className="size-4 text-orange-500" />
+                    <PiMapPinSimpleAreaDuotone className="size-4 text-orange-500" />
                 )}
                 {isFeatured && (
                     <PiStarDuotone className="size-4 text-yellow-500" />

@@ -51,6 +51,8 @@ export interface Announcement {
     translations: AnnouncementTranslations;
     media: Media | null;
     author: string;
+    pinned_end_date: string | null;
+    pinned_start_date: string | null;
     tags: string[];
 }
 

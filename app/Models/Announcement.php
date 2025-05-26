@@ -30,7 +30,9 @@ class Announcement extends Model
         'published_at' => 'datetime',
         'expires_at' => 'datetime',
         'view_count' => 'integer',
-        'action' => 'array'
+        'action' => 'array',
+        'pinned_start_date' => 'datetime',  // Tambahkan cast untuk datetime
+        'pinned_end_date' => 'datetime',    
     ];
 
     // Relations

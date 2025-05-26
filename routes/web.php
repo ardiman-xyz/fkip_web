@@ -79,6 +79,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('create', 'create')->name('create');
         Route::post('store', 'store')->name('store');
         Route::delete('/{announcement}', 'destroy')->name('destroy'); 
+        Route::patch('/{announcement}/toggle-pin', 'togglePin')->name('toggle-pin');
     });
 
      // Media Management

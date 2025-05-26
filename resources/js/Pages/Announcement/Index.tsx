@@ -25,7 +25,7 @@ export default function Index({
         useState<Announcement[]>(initialAnnouncements);
     const [deletingIds, setDeletingIds] = useState<number[]>([]);
 
-    console.info(announcements);
+    const [togglingPinIds, setTogglingPinIds] = useState<number[]>([]);
 
     const handleDelete = async (id: number) => {
         if (confirm("Apakah Anda yakin ingin menghapus pengumuman ini?")) {
@@ -64,6 +64,95 @@ export default function Index({
         }
     };
 
+    // Tambahkan fungsi ini di Index.tsx
+    const handlePin = async (
+        id: number,
+        data: { pinned_start_date: string; pinned_end_date: string }
+    ) => {
+        try {
+            setTogglingPinIds((prev) => [...prev, id]);
+
+            const response = await axios.patch(
+                route("admin.announcements.toggle-pin", id),
+                {
+                    is_pinned: true,
+                    pinned_start_date: data.pinned_start_date,
+                    pinned_end_date: data.pinned_end_date,
+                }
+            );
+
+            if (response.data.status) {
+                setAnnouncements((prev) =>
+                    prev.map((announcement) =>
+                        announcement.id === id
+                            ? {
+                                  ...announcement,
+                                  is_pinned: true,
+                                  pinned_start_date: data.pinned_start_date,
+                                  pinned_end_date: data.pinned_end_date,
+                              }
+                            : announcement
+                    )
+                );
+                toast.success("Pengumuman berhasil di-pin");
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error: any) {
+            if (error.response) {
+                const errorMessage =
+                    error.response?.data?.message || "Gagal pin pengumuman";
+                toast.error(errorMessage);
+            } else {
+                toast.error("Terjadi kesalahan tidak terduga");
+            }
+        } finally {
+            setTogglingPinIds((prev) =>
+                prev.filter((togglingId) => togglingId !== id)
+            );
+        }
+    };
+
+    const handleUnpin = async (id: number) => {
+        try {
+            setTogglingPinIds((prev) => [...prev, id]);
+
+            const response = await axios.patch(
+                route("admin.announcements.toggle-pin", id),
+                { is_pinned: false }
+            );
+
+            if (response.data.status) {
+                setAnnouncements((prev) =>
+                    prev.map((announcement) =>
+                        announcement.id === id
+                            ? {
+                                  ...announcement,
+                                  is_pinned: false,
+                                  pinned_start_date: null,
+                                  pinned_end_date: null,
+                              }
+                            : announcement
+                    )
+                );
+                toast.success("Pengumuman berhasil di-unpin");
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error: any) {
+            if (error.response) {
+                const errorMessage =
+                    error.response?.data?.message || "Gagal unpin pengumuman";
+                toast.error(errorMessage);
+            } else {
+                toast.error("Terjadi kesalahan tidak terduka");
+            }
+        } finally {
+            setTogglingPinIds((prev) =>
+                prev.filter((togglingId) => togglingId !== id)
+            );
+        }
+    };
     return (
         <AuthenticatedLayout
             header={<h2 className="text-2xl font-black">Kelola Pengumuman</h2>}
@@ -81,7 +170,6 @@ export default function Index({
                                         <TableHead>Judul</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Prioritas</TableHead>
-                                        <TableHead>Tags</TableHead>
                                         <TableHead>Views</TableHead>
                                         <TableHead>Tanggal</TableHead>
                                         <TableHead className="w-[70px]">
@@ -105,7 +193,12 @@ export default function Index({
                                                 key={announcement.id}
                                                 announcement={announcement}
                                                 onDelete={handleDelete}
+                                                onPin={handlePin}
+                                                onUnpin={handleUnpin}
                                                 isDeleting={deletingIds.includes(
+                                                    announcement.id
+                                                )}
+                                                isTogglingPin={togglingPinIds.includes(
                                                     announcement.id
                                                 )}
                                             />

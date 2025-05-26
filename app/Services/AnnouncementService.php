@@ -299,8 +299,8 @@ class AnnouncementService
             'created_at' => $announcement->created_at->format('d M Y H:i'),
             'updated_at' => $announcement->updated_at->format('d M Y H:i'),
             'translations' => $translations,
-            'pinned_start_date' => $announcement->pinned_start_date?->format('Y-m-d\TH:i'),
-            'pinned_end_date' => $announcement->pinned_end_date?->format('Y-m-d\TH:i'),
+            'pinned_start_date' => $this->formatDateTime($announcement->pinned_start_date, 'd M Y '),
+            'pinned_end_date' => $this->formatDateTime($announcement->pinned_end_date, 'd M Y '),
             'media' => $announcement->media ? [
                 'id' => $announcement->media->id,
                 'name' => $announcement->media->name,
@@ -310,6 +310,32 @@ class AnnouncementService
             'author' => $announcement->user->name,
             'tags' => $announcement->tags->pluck('translations.0.name')->filter()->values()->toArray(),
         ];
+    }
+
+    /**
+     * Helper method to safely format datetime
+     */
+    private function formatDateTime($datetime, $format = 'Y-m-d H:i:s')
+    {
+        if (!$datetime) {
+            return null;
+        }
+
+        // Jika sudah Carbon instance
+        if ($datetime instanceof \Carbon\Carbon) {
+            return $datetime->format($format);
+        }
+
+        // Jika string, convert ke Carbon dulu
+        if (is_string($datetime)) {
+            try {
+                return Carbon::parse($datetime)->format($format);
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 
     /**

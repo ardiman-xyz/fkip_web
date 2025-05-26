@@ -66,4 +66,35 @@ class AnnouncementController extends Controller
             ], 500);
         }
     }
+
+
+    public function togglePin(Announcement $announcement, Request $request)
+    {
+        try {
+            $data = $request->validate([
+                'is_pinned' => 'required|boolean',
+                'pinned_start_date' => 'nullable|date',
+                'pinned_end_date' => 'nullable|date|after:pinned_start_date',
+            ]);
+
+            $announcement->update([
+                'is_pinned' => $data['is_pinned'],
+                'pinned_start_date' => $data['is_pinned'] ? $data['pinned_start_date'] : null,
+                'pinned_end_date' => $data['is_pinned'] ? $data['pinned_end_date'] : null,
+            ]);
+            
+            return response()->json([
+                'status' => true,
+                'message' => $data['is_pinned'] 
+                    ? 'Pengumuman berhasil di-pin' 
+                    : 'Pengumuman berhasil di-unpin'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal mengubah status pin pengumuman'
+            ], 500);
+        }
+    }
+
 }
