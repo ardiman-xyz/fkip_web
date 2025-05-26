@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactInfoController;
 use App\Http\Controllers\DefaultSliderController;
@@ -72,6 +73,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::delete('/{event}', 'destroy')->name('destroy');
     });
 
+
+    Route::controller(AnnouncementController::class)->prefix('announcements')->name('announcements.')->group(function() {
+        Route::get('/', 'index')->name('index');
+        Route::get('create', 'create')->name('create');
+    });
+
      // Media Management
     Route::controller(MediaController::class)->prefix('media')->name('media.')->group(function() {
         Route::get('/', 'index')->name('index');
@@ -131,8 +138,6 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::get('/organizations', 'getOrganizations')->name('organizations.get');
         Route::put('/organizations/{organization}', 'updateOrganization')->name('organizations.update');
         Route::delete('/organizations/{organization}', 'deleteOrganization')->name('organizations.destroy');
-        
-
        
     });
 
@@ -144,6 +149,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
         Route::put('/{scholarship}', 'updateScholarship')->name('update');
         Route::delete('/{scholarship}', 'deleteScholarship')->name('destroy');
     });
+    
 
 
 }); 

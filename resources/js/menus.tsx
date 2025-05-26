@@ -11,9 +11,10 @@ import {
     PiCalendarDuotone,
     PiSlideshowDuotone,
     PiBuildingsDuotone,
-    PiUserSquareDuotone,
     PiGraduationCapDuotone,
     PiStudentDuotone,
+    PiMegaphoneDuotone,
+    PiChartDonutDuotone,
 } from "react-icons/pi";
 
 type MenuItem = {
@@ -51,6 +52,27 @@ const menuItems: MenuItem[] = [
         label: "Agenda",
         icon: <PiCalendarDuotone className="size-5" />,
         href: "/admin/events",
+    },
+
+    // GRUP PENGUMUMAN - BARU
+    {
+        label: "separator",
+        icon: null,
+    },
+    {
+        label: "Pengumuman",
+        icon: <PiMegaphoneDuotone className="size-5" />,
+        href: "/admin/announcements",
+    },
+    {
+        label: "Analisis Pengumuman",
+        icon: <PiChartDonutDuotone className="size-5" />,
+        href: "/admin/announcement-categories",
+    },
+
+    {
+        label: "separator",
+        icon: null,
     },
     {
         label: "Categories",
@@ -103,7 +125,6 @@ const menuItems: MenuItem[] = [
     {
         label: "separator",
         icon: null,
-        // href: undefined
     },
     {
         label: "Settings",

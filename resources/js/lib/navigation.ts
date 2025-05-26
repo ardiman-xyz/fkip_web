@@ -100,18 +100,6 @@ export const navigationMenus = {
                 url: "https://journal.umkendari.ac.id/",
             },
         ],
-        // Fasilitas: [
-        //     {
-        //         title: "Laboratorium",
-        //         icon: FlaskConical,
-        //         url: "/fasilitas/laboratorium",
-        //     },
-        //     {
-        //         title: "Pusat Kajian",
-        //         icon: Library,
-        //         url: "/fasilitas/pusat-kajian",
-        //     },
-        // ],
     },
     Kemahasiswaan: {
         Layanan: [
