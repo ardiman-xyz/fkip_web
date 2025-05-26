@@ -9,6 +9,9 @@ import HeroSection from "@/Components/web/HeroSection";
 import VideoSection from "@/Components/web/VideoSection";
 import { FeaturedNewsList } from "@/Pages/News/_types/featured-images";
 import { Slider } from "@/Pages/Slider/_types";
+import FeaturedProgramsSection from "./Web/_components/FeaturedProgramsSection";
+import ImportantInfoSection from "./Web/_components/ImportantInfoSection";
+import AnnouncementSection from "./Web/_components/AnnouncementSection";
 
 interface WelcomeProps {
     news: News[];
@@ -30,7 +33,9 @@ export default function Welcome({
                 featuredNews={featuredNews}
                 defaultSliders={defaultSliders}
             />
-            <FeaturesSection />
+            <AnnouncementSection />
+            <FeaturedProgramsSection />
+            <ImportantInfoSection />
             <NewsSection news={news} />
             <EventSection events={events} />
             {/*<VideoSection />*/}

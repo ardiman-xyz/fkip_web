@@ -25,6 +25,8 @@ interface ProgramProps {
 }
 
 const Undergraduate = ({ programs = [] }: ProgramProps) => {
+    console.info(programs);
+
     return (
         <Guest2>
             <div className="min-h-screen bg-white py-12">

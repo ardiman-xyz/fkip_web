@@ -136,48 +136,6 @@ const Achievement = ({ achievements = [] }: AchievementProps) => {
                                             }
                                         />
                                     </div>
-                                    <div className="flex gap-2">
-                                        <Select
-                                            value={categoryFilter}
-                                            onValueChange={setCategoryFilter}
-                                        >
-                                            <SelectTrigger className="w-[180px]">
-                                                <SelectValue placeholder="Kategori" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {categories.map((category) => (
-                                                    <SelectItem
-                                                        key={category}
-                                                        value={category}
-                                                    >
-                                                        {category === "all"
-                                                            ? "Semua Kategori"
-                                                            : category}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <Select
-                                            value={levelFilter}
-                                            onValueChange={setLevelFilter}
-                                        >
-                                            <SelectTrigger className="w-[180px]">
-                                                <SelectValue placeholder="Tingkat" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {levels.map((level) => (
-                                                    <SelectItem
-                                                        key={level}
-                                                        value={level}
-                                                    >
-                                                        {level === "all"
-                                                            ? "Semua Tingkat"
-                                                            : `Tingkat ${level}`}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
                                 </div>
 
                                 {/* Achievement Cards */}
@@ -244,11 +202,13 @@ const Achievement = ({ achievements = [] }: AchievementProps) => {
                                                                 </span>
                                                             </div>
 
-                                                            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                                                                {
-                                                                    achievement.content
-                                                                }
-                                                            </p>
+                                                            <div className="text-gray-600 text-sm mb-4 line-clamp-2">
+                                                                <div
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html: achievement.content,
+                                                                    }}
+                                                                />
+                                                            </div>
 
                                                             <div className="mb-4">
                                                                 <p className="text-sm font-medium mb-1">

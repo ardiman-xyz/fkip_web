@@ -63,6 +63,8 @@ type ProgramDetailProps = {
 };
 
 const ProgramDetail = ({ program, dosen }: ProgramDetailProps) => {
+    console.info(program);
+
     return (
         <Guest2>
             <div className="min-h-screen bg-gray-50 py-12">
@@ -110,7 +112,7 @@ const ProgramDetail = ({ program, dosen }: ProgramDetailProps) => {
                                         ?.substring(0, 200)
                                         ?.replace(/<[^>]*>/g, "") ||
                                         `Program studi ${
-                                            program.level?.code === "S1"
+                                            program.level?.code === "s1"
                                                 ? "sarjana"
                                                 : "magister"
                                         } yang mempersiapkan pendidik profesional dengan pendekatan inovatif dan berbasis teknologi.`}
@@ -123,7 +125,7 @@ const ProgramDetail = ({ program, dosen }: ProgramDetailProps) => {
                                         <Clock4 className="w-4 h-4" />
                                         <span>
                                             Durasi{" "}
-                                            {program.level?.code === "S1"
+                                            {program.level?.code === "s1"
                                                 ? "4"
                                                 : "2"}{" "}
                                             Tahun
@@ -133,7 +135,7 @@ const ProgramDetail = ({ program, dosen }: ProgramDetailProps) => {
                                         <GraduationCap className="w-4 h-4" />
                                         <span>
                                             Gelar{" "}
-                                            {program.level?.code === "S1"
+                                            {program.level?.code === "s1"
                                                 ? "S.Pd"
                                                 : "M.Pd"}
                                         </span>
