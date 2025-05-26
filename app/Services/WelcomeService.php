@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Announcement;
 use App\Models\Category;
 use App\Models\DefaultSlider;
 use App\Models\Event;
@@ -443,6 +444,60 @@ class WelcomeService
                 'name' => $news->category->translations->firstWhere('language_id', 1)->name ?? '',
                 'slug' => $news->category->translations->firstWhere('language_id', 1)->slug ?? '',
             ] : null,
+            'translations' => $translations,
+        ];
+    }
+
+
+
+    public function getLatestAnnouncements($limit = 6)
+    {
+        return Announcement::with([
+            'translations' => function ($query) {
+                $query->with('language');
+            },
+            'media',
+            'user'
+        ])
+        ->where('status', 'published')
+        ->where(function ($query) {
+            $query->whereNull('published_at')
+                ->orWhere('published_at', '<=', now());
+        })
+        ->orderBy('priority', 'desc') // urgent, high, normal, low
+        ->orderBy('created_at', 'desc')
+        ->limit($limit)
+        ->get()
+        ->map(function ($announcement) {
+            return $this->formatAnnouncementData($announcement);
+        });
+    }
+
+    private function formatAnnouncementData($announcement)
+    {
+        $translations = [];
+        foreach ($announcement->translations as $translation) {
+            $translations[$translation->language->code] = [
+                'title' => $translation->title,
+                'content' => $translation->content,
+                'excerpt' => $translation->excerpt,
+            ];
+        }
+
+        // Determine if announcement is new (within 7 days)
+        $isNew = $announcement->created_at->gte(now()->subDays(7));
+
+        return [
+            'id' => $announcement->id,
+            'title' => $translations['id']['title'] ?? $translations['en']['title'] ?? 'Untitled',
+            'content' => $translations['id']['content'] ?? $translations['en']['content'] ?? null,
+            'excerpt' => $translations['id']['excerpt'] ?? $translations['en']['excerpt'] ?? null,
+            'image' => $announcement->media ? $announcement->media->path : null,
+            'priority' => $announcement->priority,
+            'date' => $announcement->created_at->format('Y-m-d'),
+            'formatted_date' => $announcement->created_at->format('d M Y'),
+            'isNew' => $isNew,
+            'action' => $announcement->action,
             'translations' => $translations,
         ];
     }

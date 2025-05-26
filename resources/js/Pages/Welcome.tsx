@@ -11,11 +11,41 @@ import FeaturedProgramsSection from "./Web/_components/FeaturedProgramsSection";
 import ImportantInfoSection from "./Web/_components/ImportantInfoSection";
 import AnnouncementSection from "./Web/_components/AnnouncementSection";
 
+interface Announcement {
+    id: number;
+    title: string;
+    content?: string;
+    excerpt?: string;
+    image?: string;
+    priority: "low" | "normal" | "high" | "urgent";
+    date: string;
+    formatted_date: string;
+    isNew: boolean;
+    action?: {
+        type: "download" | "view" | "register";
+        url: string;
+        label: string;
+    };
+    translations: {
+        id?: {
+            title: string;
+            content: string;
+            excerpt: string;
+        };
+        en?: {
+            title: string;
+            content: string;
+            excerpt: string;
+        };
+    };
+}
+
 interface WelcomeProps {
     news: News[];
     events: Event[];
     featuredNews: FeaturedNewsList;
     defaultSliders: Slider[];
+    announcements: Announcement[];
 }
 
 export default function Welcome({
@@ -23,6 +53,7 @@ export default function Welcome({
     events,
     featuredNews,
     defaultSliders,
+    announcements,
 }: WelcomeProps) {
     return (
         <Guest2>
@@ -33,7 +64,7 @@ export default function Welcome({
             />
             <FeaturedProgramsSection />
             <ImportantInfoSection />
-            <AnnouncementSection />
+            <AnnouncementSection announcements={announcements} />
             <NewsSection news={news} />
             <EventSection events={events} />
         </Guest2>
