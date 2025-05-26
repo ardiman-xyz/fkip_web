@@ -25,12 +25,12 @@ type MenuItem = {
 
 const menuItems: MenuItem[] = [
     {
-        label: "Dashboard",
+        label: "Dasbor",
         icon: <PiLayoutDuotone className="size-5" />,
         href: "/dashboard",
     },
     {
-        label: "Analytics",
+        label: "Analitik",
         icon: <PiChartLineDuotone className="size-5" />,
         href: "/analytics",
     },
@@ -44,7 +44,7 @@ const menuItems: MenuItem[] = [
         href: "/admin/slider",
     },
     {
-        label: "News",
+        label: "Berita",
         icon: <PiNewspaperDuotone className="size-5" />,
         href: "/admin/news",
     },
@@ -75,12 +75,12 @@ const menuItems: MenuItem[] = [
         icon: null,
     },
     {
-        label: "Categories",
+        label: "Kategori",
         icon: <PiFolderOpenDuotone className="size-5" />,
         href: "/admin/category",
     },
     {
-        label: "Tags",
+        label: "Tag",
         icon: <PiTagSimpleDuotone className="size-5" />,
         href: "/admin/tags",
     },
@@ -90,7 +90,7 @@ const menuItems: MenuItem[] = [
     },
 
     {
-        label: "About Us",
+        label: "Tentang Kami",
         icon: <PiBuildingsDuotone className="size-5" />,
         href: "/admin/about-us",
     },
@@ -112,12 +112,12 @@ const menuItems: MenuItem[] = [
         icon: null,
     },
     {
-        label: "Media Library",
+        label: "Pustaka Media",
         icon: <PiImageDuotone className="size-5" />,
         href: "/admin/media/view",
     },
     {
-        label: "Authors",
+        label: "Pengguna",
         icon: <PiUserCircleDuotone className="size-5" />,
         href: "/authors",
     },
@@ -127,12 +127,12 @@ const menuItems: MenuItem[] = [
         icon: null,
     },
     {
-        label: "Settings",
+        label: "Pengaturan",
         icon: <PiGearDuotone className="size-5" />,
         href: "/settings",
     },
     {
-        label: "Help Center",
+        label: "Pusat bantuan",
         icon: <PiQuestionDuotone className="size-5" />,
         href: "/help",
     },

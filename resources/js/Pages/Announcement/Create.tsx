@@ -1,4 +1,4 @@
-// File: resources/js/Pages/Admin/Announcement/Create.tsx
+// File: resources/js/Pages/Announcement/Create.tsx - Updated with InfoTooltip
 
 import React, { useState } from "react";
 import { Head, router } from "@inertiajs/react";
@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { Input } from "@/Components/ui/input";
 import { Label } from "@/Components/ui/label";
 import { Textarea } from "@/Components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
 import {
     Select,
     SelectContent,
@@ -37,6 +38,7 @@ import {
     PiImageDuotone,
     PiArchiveDuotone,
     PiCheckFatDuotone,
+    PiFlagDuotone,
 } from "react-icons/pi";
 import {
     DropdownMenu,
@@ -45,22 +47,42 @@ import {
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { AnnouncementCreateProps, Media } from "./_types/announcement";
+import InfoTooltip from "@/Components/InfoTooltip";
 
 // Form validation schema
 const announcementSchema = z.object({
-    title: z
+    // Indonesian fields
+    title_id: z
         .string()
-        .min(1, "Judul wajib diisi")
+        .min(1, "Judul bahasa Indonesia wajib diisi")
         .max(255, "Judul maksimal 255 karakter"),
-    content: z.string().optional(),
-    excerpt: z.string().max(500, "Ringkasan maksimal 500 karakter").optional(),
+    content_id: z.string().optional(),
+    excerpt_id: z
+        .string()
+        .max(500, "Ringkasan maksimal 500 karakter")
+        .optional(),
+
+    // English fields
+    title_en: z
+        .string()
+        .min(1, "English title is required")
+        .max(255, "Title maximum 255 characters"),
+    content_en: z.string().optional(),
+    excerpt_en: z
+        .string()
+        .max(500, "Excerpt maximum 500 characters")
+        .optional(),
+
+    // Common fields
     status: z.enum(["draft", "published", "archived"]),
     priority: z.enum(["low", "normal", "high", "urgent"]),
     is_featured: z.boolean().default(false),
     is_pinned: z.boolean().default(false),
     media_id: z.number().optional(),
     published_at: z.string().optional(),
-    expires_at: z.string().optional(),
+    pinned_start_date: z.string().optional(),
+    pinned_end_date: z.string().optional(),
     action_type: z.enum(["download", "view", "register"]).optional(),
     action_url: z.string().url("URL tidak valid").optional(),
     action_label: z.string().max(100, "Label maksimal 100 karakter").optional(),
@@ -68,35 +90,35 @@ const announcementSchema = z.object({
 
 type AnnouncementFormData = z.infer<typeof announcementSchema>;
 
-interface Media {
-    id: number;
-    name: string;
-    path: string;
-    paths?: any;
-}
-
-export default function Create() {
+export default function Create({ tags = [] }: AnnouncementCreateProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
+    const [activeTab, setActiveTab] = useState("indonesian");
 
     const form = useForm<AnnouncementFormData>({
         resolver: zodResolver(announcementSchema),
         defaultValues: {
-            title: "",
-            content: "",
-            excerpt: "",
+            title_id: "",
+            content_id: "",
+            excerpt_id: "",
+            title_en: "",
+            content_en: "",
+            excerpt_en: "",
             status: "draft",
             priority: "normal",
             is_featured: false,
             is_pinned: false,
             published_at: "",
-            expires_at: "",
+            pinned_start_date: "",
+            pinned_end_date: "",
             action_type: undefined,
             action_url: "",
             action_label: "",
         },
     });
+
+    const watchIsPinned = form.watch("is_pinned");
 
     const onSubmit = async (data: AnnouncementFormData, status?: string) => {
         if (isSubmitting) return;
@@ -104,12 +126,32 @@ export default function Create() {
         try {
             setIsSubmitting(true);
 
-            // Prepare form data
+            // Prepare form data with translations
             const formData = {
-                ...data,
                 status: status || data.status,
+                priority: data.priority,
+                is_featured: data.is_featured,
+                is_pinned: data.is_pinned,
+                published_at: data.published_at,
+                pinned_start_date: data.pinned_start_date,
+                pinned_end_date: data.pinned_end_date,
                 media_id: selectedMedia?.id || null,
-                // Only include action if all fields are filled
+
+                // Translations
+                translations: {
+                    id: {
+                        title: data.title_id,
+                        content: data.content_id,
+                        excerpt: data.excerpt_id,
+                    },
+                    en: {
+                        title: data.title_en,
+                        content: data.content_en,
+                        excerpt: data.excerpt_en,
+                    },
+                },
+
+                // Action
                 action:
                     data.action_type && data.action_url
                         ? {
@@ -227,64 +269,168 @@ export default function Create() {
                             <div className="grid grid-cols-3 gap-6">
                                 {/* Main Content */}
                                 <div className="col-span-2 space-y-6">
-                                    <FormField
-                                        control={form.control}
-                                        name="title"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Judul Pengumuman *
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        {...field}
-                                                        placeholder="Masukkan judul pengumuman"
-                                                        className="text-lg"
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                    {/* Multi-Language Tabs */}
+                                    <Tabs
+                                        value={activeTab}
+                                        onValueChange={setActiveTab}
+                                    >
+                                        <TabsList className="grid w-full grid-cols-2">
+                                            <TabsTrigger
+                                                value="indonesian"
+                                                className="flex items-center gap-2"
+                                            >
+                                                <PiFlagDuotone className="size-4" />
+                                                Indonesian
+                                            </TabsTrigger>
+                                            <TabsTrigger
+                                                value="english"
+                                                className="flex items-center gap-2"
+                                            >
+                                                <PiFlagDuotone className="size-4" />
+                                                English
+                                            </TabsTrigger>
+                                        </TabsList>
 
-                                    <FormField
-                                        control={form.control}
-                                        name="excerpt"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Ringkasan</FormLabel>
-                                                <FormControl>
-                                                    <Textarea
-                                                        {...field}
-                                                        placeholder="Ringkasan singkat pengumuman (opsional)"
-                                                        rows={3}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                        {/* Indonesian Content */}
+                                        <TabsContent
+                                            value="indonesian"
+                                            className="space-y-6"
+                                        >
+                                            <FormField
+                                                control={form.control}
+                                                name="title_id"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Judul Pengumuman *
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                placeholder="Masukkan judul pengumuman dalam bahasa Indonesia"
+                                                                className="text-lg"
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
 
-                                    <FormField
-                                        control={form.control}
-                                        name="content"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Konten</FormLabel>
-                                                <FormControl>
-                                                    <TiptapEditor
-                                                        content={
-                                                            field.value || ""
-                                                        }
-                                                        onChange={
-                                                            field.onChange
-                                                        }
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                            <FormField
+                                                control={form.control}
+                                                name="excerpt_id"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Ringkasan
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                {...field}
+                                                                placeholder="Ringkasan singkat pengumuman dalam bahasa Indonesia"
+                                                                rows={3}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="content_id"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Konten
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <TiptapEditor
+                                                                content={
+                                                                    field.value ||
+                                                                    ""
+                                                                }
+                                                                onChange={
+                                                                    field.onChange
+                                                                }
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </TabsContent>
+
+                                        {/* English Content */}
+                                        <TabsContent
+                                            value="english"
+                                            className="space-y-6"
+                                        >
+                                            <FormField
+                                                control={form.control}
+                                                name="title_en"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Announcement Title *
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                placeholder="Enter announcement title in English"
+                                                                className="text-lg"
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="excerpt_en"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Summary
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Textarea
+                                                                {...field}
+                                                                placeholder="Brief summary of the announcement in English"
+                                                                rows={3}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="content_en"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Content
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <TiptapEditor
+                                                                content={
+                                                                    field.value ||
+                                                                    ""
+                                                                }
+                                                                onChange={
+                                                                    field.onChange
+                                                                }
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </TabsContent>
+                                    </Tabs>
                                 </div>
 
                                 {/* Sidebar */}
@@ -292,7 +438,6 @@ export default function Create() {
                                     <h3 className="text-lg font-semibold">
                                         Pengaturan Pengumuman
                                     </h3>
-
                                     {/* Featured Image */}
                                     <div>
                                         <Label className="text-sm font-medium">
@@ -354,7 +499,6 @@ export default function Create() {
                                             )}
                                         </div>
                                     </div>
-
                                     {/* Status */}
                                     <FormField
                                         control={form.control}
@@ -389,7 +533,6 @@ export default function Create() {
                                             </FormItem>
                                         )}
                                     />
-
                                     {/* Priority */}
                                     <FormField
                                         control={form.control}
@@ -427,8 +570,28 @@ export default function Create() {
                                             </FormItem>
                                         )}
                                     />
+                                    {/* Dates */}
+                                    <FormField
+                                        control={form.control}
+                                        name="published_at"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Tanggal Publikasi
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="datetime-local"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    {/* Checkboxes with Info Icons */}
 
-                                    {/* Checkboxes */}
+                                    {/* Checkboxes with Info Icons */}
                                     <div className="space-y-3">
                                         <FormField
                                             control={form.control}
@@ -446,9 +609,12 @@ export default function Create() {
                                                         />
                                                     </FormControl>
                                                     <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Featured
-                                                        </FormLabel>
+                                                        <div className="flex items-center gap-2">
+                                                            <FormLabel>
+                                                                Featured
+                                                            </FormLabel>
+                                                            <InfoTooltip content="Featured: Pengumuman akan ditampilkan di section unggulan di website dengan highlight khusus dan prioritas tampil lebih tinggi." />
+                                                        </div>
                                                         <p className="text-sm text-muted-foreground">
                                                             Tampilkan di section
                                                             unggulan
@@ -474,58 +640,67 @@ export default function Create() {
                                                         />
                                                     </FormControl>
                                                     <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Pinned
-                                                        </FormLabel>
+                                                        <div className="flex items-center gap-2">
+                                                            <FormLabel>
+                                                                Pinned
+                                                            </FormLabel>
+                                                            <InfoTooltip content="Pinned: Pengumuman akan muncul sebagai popup/banner di atas website dalam periode waktu tertentu. Sangat mencolok dan langsung terlihat pengunjung." />
+                                                        </div>
                                                         <p className="text-sm text-muted-foreground">
-                                                            Sematkan di bagian
-                                                            atas
+                                                            Tampilkan sebagai
+                                                            popup/banner
                                                         </p>
                                                     </div>
                                                 </FormItem>
                                             )}
                                         />
                                     </div>
+                                    {/* Pinned Date Range - Show only when pinned is checked */}
+                                    {watchIsPinned && (
+                                        <div className="space-y-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                                            <Label className="text-sm font-medium text-orange-800">
+                                                Periode Pinned
+                                            </Label>
 
-                                    {/* Dates */}
-                                    <FormField
-                                        control={form.control}
-                                        name="published_at"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Tanggal Publikasi
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="datetime-local"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                            <FormField
+                                                control={form.control}
+                                                name="pinned_start_date"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-sm">
+                                                            Tanggal Mulai
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="datetime-local"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
 
-                                    <FormField
-                                        control={form.control}
-                                        name="expires_at"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Tanggal Kadaluarsa
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="datetime-local"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
+                                            <FormField
+                                                control={form.control}
+                                                name="pinned_end_date"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-sm">
+                                                            Tanggal Berakhir
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                type="datetime-local"
+                                                                {...field}
+                                                            />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    )}
                                     {/* Action Button */}
                                     <div className="space-y-3">
                                         <Label className="text-sm font-medium">

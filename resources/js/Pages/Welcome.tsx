@@ -4,9 +4,7 @@ import { News } from "@/Pages/News/_types";
 import { Event } from "@/Pages/Event/_types";
 import { NewsSection } from "@/Components/web/News";
 import { EventSection } from "@/Components/web/EventSection";
-import { FeaturesSection } from "@/Components/web/Features";
 import HeroSection from "@/Components/web/HeroSection";
-import VideoSection from "@/Components/web/VideoSection";
 import { FeaturedNewsList } from "@/Pages/News/_types/featured-images";
 import { Slider } from "@/Pages/Slider/_types";
 import FeaturedProgramsSection from "./Web/_components/FeaturedProgramsSection";
@@ -33,12 +31,11 @@ export default function Welcome({
                 featuredNews={featuredNews}
                 defaultSliders={defaultSliders}
             />
-            <AnnouncementSection />
             <FeaturedProgramsSection />
             <ImportantInfoSection />
+            <AnnouncementSection />
             <NewsSection news={news} />
             <EventSection events={events} />
-            {/*<VideoSection />*/}
         </Guest2>
     );
 }

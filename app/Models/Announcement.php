@@ -51,10 +51,6 @@ class Announcement extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function translations(): HasMany
-    {
-        return $this->hasMany(AnnouncementTranslation::class);
-    }
 
     public function views(): HasMany
     {
@@ -64,6 +60,14 @@ class Announcement extends Model
     public function attachments(): HasMany
     {
         return $this->hasMany(AnnouncementAttachment::class);
+    }
+
+      /**
+     * Get the translations for the announcement
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(AnnouncementTranslation::class);
     }
 
     

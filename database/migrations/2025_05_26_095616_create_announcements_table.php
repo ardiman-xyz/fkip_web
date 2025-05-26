@@ -22,7 +22,6 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_pinned')->default(false);
             $table->datetime('published_at')->nullable();
-            $table->datetime('expires_at')->nullable();
             $table->integer('view_count')->default(0);
             $table->json('action')->nullable();
             $table->timestamps();

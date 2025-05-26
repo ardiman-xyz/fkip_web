@@ -77,6 +77,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::controller(AnnouncementController::class)->prefix('announcements')->name('announcements.')->group(function() {
         Route::get('/', 'index')->name('index');
         Route::get('create', 'create')->name('create');
+        Route::post('store', 'store')->name('store');
+        Route::delete('/{announcement}', 'destroy')->name('destroy'); 
     });
 
      // Media Management

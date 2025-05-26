@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('announcement_id')->constrained()->onDelete('cascade');
             $table->foreignId('language_id')->constrained()->onDelete('cascade');
-            $table->string('title');
+            $table->string('title')->nullable();
             $table->string('slug')->nullable();
             $table->longText('content')->nullable();
             $table->text('excerpt')->nullable();
