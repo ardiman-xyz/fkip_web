@@ -1,11 +1,8 @@
-// Web/News/AllNews.tsx
+import React, { useState } from "react";
+import { Head, router, useForm } from "@inertiajs/react";
 import Guest2 from "@/Layouts/GuestLayout2";
-import { Card, CardContent } from "@/Components/ui/card";
+import { Clock } from "lucide-react";
 import { Button } from "@/Components/ui/button";
-import { Calendar, ChevronRight } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useForm } from "@inertiajs/react";
-
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -14,8 +11,12 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb";
-import { formatDate } from "@/lib/utils";
-import { Pagination } from "../_components/pagination";
+
+// Import your components (you'll need to create these based on the artifacts above)
+import NewsHeroSection from "./_components/NewsHeroSection";
+import NewsStatsCards from "./_components/NewsStatsCards";
+import NewsCategoryTabs from "./_components/NewsCategoryTabs";
+import NewsCard from "./_components/NewsCard";
 
 interface Category {
     id: number;
@@ -33,6 +34,7 @@ interface NewsItem {
         path: string;
         paths: {
             thumbnail: string;
+            blur?: string;
         };
     } | null;
     category: {
@@ -52,6 +54,7 @@ interface NewsItem {
             content: string;
         };
     };
+    view_count?: number;
 }
 
 interface NewsIndexProps {
@@ -62,6 +65,8 @@ interface NewsIndexProps {
         last_page: number;
         per_page: number;
         total: number;
+        from: number;
+        to: number;
     };
     categories: Category[];
     popularNews: NewsItem[];
@@ -72,32 +77,48 @@ interface NewsIndexProps {
     };
 }
 
-const NewsIndex = ({
+const RedesignedAllNews: React.FC<NewsIndexProps> = ({
     news,
     categories,
     popularNews,
     filters,
-}: NewsIndexProps) => {
+}) => {
+    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+    const [sortBy, setSortBy] = useState("latest");
+    const [selectedCategory, setSelectedCategory] = useState<string>(
+        filters.category ? filters.category.toString() : "all"
+    );
+
     const { data, setData, get } = useForm({
         search: filters.search || "",
         category: filters.category || "",
         page: 1,
     });
 
-    const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    // Handle search
+    const handleSearch = (query: string) => {
+        setData("search", query);
         get("/berita", {
             preserveState: true,
         });
     };
 
-    const handleCategoryFilter = (categoryId: number | string) => {
-        setData("category", categoryId);
+    // Handle category change
+    const handleCategoryChange = (category: string) => {
+        setSelectedCategory(category);
+        setData("category", category === "all" ? "" : category);
         get("/berita", {
             preserveState: true,
         });
     };
 
+    // Handle sort change
+    const handleSortChange = (sort: string) => {
+        setSortBy(sort);
+        // Implement sorting logic here
+    };
+
+    // Handle pagination
     const handlePageChange = (page: number) => {
         setData("page", page);
         get("/berita", {
@@ -105,20 +126,42 @@ const NewsIndex = ({
         });
     };
 
-    // Ekstrak excerpt dari konten HTML
-    const getExcerpt = (htmlContent: string | undefined, length = 120) => {
-        if (!htmlContent) return "";
+    // Handle bookmark (placeholder)
+    const handleBookmark = (id: number) => {
+        console.log("Bookmark news:", id);
+        // Implement bookmark functionality
+    };
 
-        const plainText = htmlContent.replace(/<[^>]+>/g, "");
-        return plainText.length > length
-            ? plainText.substring(0, length) + "..."
-            : plainText;
+    // Handle share (placeholder)
+    const handleShare = (item: NewsItem) => {
+        if (navigator.share) {
+            navigator.share({
+                title: item.translations.id.title,
+                url: `/berita/${item.translations.id.slug}`,
+            });
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(
+                `${window.location.origin}/berita/${item.translations.id.slug}`
+            );
+        }
     };
 
     return (
         <Guest2>
-            <div className="min-h-screen bg-white py-12">
-                <div className="container max-w-6xl mx-auto px-4">
+            <Head title="Semua Berita - FKIP UMK" />
+
+            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+                {/* Hero Section */}
+                <NewsHeroSection
+                    onSearch={handleSearch}
+                    searchQuery={data.search}
+                    totalNews={news.total}
+                    categories={categories}
+                />
+
+                <div className="container max-w-7xl mx-auto px-4 py-12">
+                    {/* Breadcrumb */}
                     <div className="mb-8">
                         <Breadcrumb>
                             <BreadcrumbList>
@@ -134,233 +177,187 @@ const NewsIndex = ({
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
-                    {/* Header */}
-                    <div className="mb-12">
-                        <h1 className="text-3xl font-bold mb-4">Berita </h1>
-                        <p className="text-gray-600">
-                            Informasi terkini seputar kegiatan akademik,
-                            prestasi, dan berbagai program di FKIP UMK.
-                        </p>
-                    </div>
 
-                    <div className="mb-12">
-                        <h2 className="text-xl font-semibold mb-4">
-                            Kategori Berita
-                        </h2>
-                        <div className="flex flex-wrap gap-3">
-                            <Button
-                                variant={!data.category ? "default" : "outline"}
-                                className="hover:bg-green-50"
-                                onClick={() => handleCategoryFilter("")}
+                    {/* News Grid/List */}
+                    {news.data.length > 0 ? (
+                        <>
+                            <div
+                                className={`grid gap-8 mb-12 ${
+                                    viewMode === "grid"
+                                        ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                                        : "grid-cols-1"
+                                }`}
                             >
-                                Semua
-                            </Button>
-                            {categories.map((category) => (
-                                <Button
-                                    key={category.id}
-                                    variant={
-                                        data.category == category.id
-                                            ? "default"
-                                            : "outline"
-                                    }
-                                    className="hover:bg-green-50"
-                                    onClick={() =>
-                                        handleCategoryFilter(category.id)
-                                    }
-                                >
-                                    {category.name}
-                                    <span className="ml-2 text-sm text-gray-500">
-                                        ({category.count})
-                                    </span>
-                                </Button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-12 gap-8 mb-12">
-                        <div className="col-span-12 lg:col-span-8">
-                            <div className="mb-6">
-                                <form
-                                    onSubmit={handleSearch}
-                                    className="flex gap-2"
-                                >
-                                    <input
-                                        type="text"
-                                        placeholder="Cari berita..."
-                                        className="flex-1 px-4 py-2 border rounded-md"
-                                        value={data.search}
-                                        onChange={(e) =>
-                                            setData("search", e.target.value)
-                                        }
+                                {news.data.map((item) => (
+                                    <NewsCard
+                                        key={item.id}
+                                        item={item}
+                                        viewMode={viewMode}
+                                        onBookmark={handleBookmark}
+                                        onShare={handleShare}
                                     />
-                                    <Button type="submit">Cari</Button>
-                                </form>
+                                ))}
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-6">
-                                {news.data.length > 0 ? (
-                                    news.data.map((item) => (
-                                        <Card key={item.id}>
-                                            <CardContent className="p-0">
-                                                <div className="aspect-video relative">
-                                                    {item.media ? (
-                                                        <img
-                                                            src={
-                                                                item.media
-                                                                    ?.paths
-                                                                    .thumbnail
-                                                            }
-                                                            alt={
-                                                                item
-                                                                    .translations
-                                                                    ?.id
-                                                                    ?.title ||
-                                                                "News image"
-                                                            }
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                                            No Image
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="p-6">
-                                                    <div className="flex items-center gap-2 mb-2">
-                                                        {item.category && (
-                                                            <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-sm">
-                                                                {
-                                                                    item
-                                                                        .category
-                                                                        .name
-                                                                }
-                                                            </span>
-                                                        )}
-                                                        <span className="text-sm text-gray-500">
-                                                            {formatDate(
-                                                                item.publish_date
-                                                            )}
-                                                        </span>
-                                                    </div>
-                                                    <h3 className="font-semibold mb-2 line-clamp-2">
-                                                        {
-                                                            item.translations
-                                                                ?.id?.title
-                                                        }
-                                                    </h3>
-                                                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                                                        {getExcerpt(
-                                                            item.translations.id
-                                                                ?.content
-                                                        )}
-                                                    </p>
-                                                    <Button
-                                                        variant="outline"
-                                                        className="w-full"
-                                                        asChild
-                                                    >
-                                                        <a
-                                                            href={`/berita/${item.translations.id?.slug}`}
-                                                        >
-                                                            Baca Selengkapnya
-                                                            <ChevronRight className="w-4 h-4 ml-1" />
-                                                        </a>
-                                                    </Button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))
-                                ) : (
-                                    <div className="col-span-2 py-12 text-center text-gray-500">
-                                        Tidak ada berita yang ditemukan
-                                    </div>
-                                )}
-                            </div>
-
+                            {/* Pagination */}
                             {news.last_page > 1 && (
-                                <div className="mt-8 flex justify-center">
-                                    <Pagination
-                                        totalPages={news.last_page}
-                                        currentPage={news.current_page}
-                                        onPageChange={handlePageChange}
-                                    />
+                                <div className="flex items-center justify-center gap-2">
+                                    <Button
+                                        variant="outline"
+                                        disabled={news.current_page === 1}
+                                        onClick={() =>
+                                            handlePageChange(
+                                                news.current_page - 1
+                                            )
+                                        }
+                                        className="bg-white/80 backdrop-blur-sm border-0 shadow-lg"
+                                    >
+                                        Sebelumnya
+                                    </Button>
+
+                                    {Array.from(
+                                        { length: Math.min(5, news.last_page) },
+                                        (_, i) => {
+                                            const page = i + 1;
+                                            return (
+                                                <Button
+                                                    key={page}
+                                                    variant={
+                                                        page ===
+                                                        news.current_page
+                                                            ? "default"
+                                                            : "outline"
+                                                    }
+                                                    onClick={() =>
+                                                        handlePageChange(page)
+                                                    }
+                                                    className={
+                                                        page ===
+                                                        news.current_page
+                                                            ? "bg-blue-600 hover:bg-blue-700"
+                                                            : "bg-white/80 backdrop-blur-sm border-0 shadow-lg"
+                                                    }
+                                                >
+                                                    {page}
+                                                </Button>
+                                            );
+                                        }
+                                    )}
+
+                                    <Button
+                                        variant="outline"
+                                        disabled={
+                                            news.current_page === news.last_page
+                                        }
+                                        onClick={() =>
+                                            handlePageChange(
+                                                news.current_page + 1
+                                            )
+                                        }
+                                        className="bg-white/80 backdrop-blur-sm border-0 shadow-lg"
+                                    >
+                                        Selanjutnya
+                                    </Button>
                                 </div>
                             )}
-                        </div>
-
-                        <div className="col-span-12 lg:col-span-4">
-                            <div className="sticky top-20">
-                                <h3 className="font-semibold text-lg mb-4">
-                                    Berita Populer
-                                </h3>
-                                <div className="space-y-4">
-                                    {popularNews.map((item) => (
-                                        <Card key={item.id}>
-                                            <CardContent className="p-4">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-20 h-20 bg-gray-100 rounded-lg flex-shrink-0">
-                                                        {item.media ? (
-                                                            <img
-                                                                src={
-                                                                    item.media
-                                                                        .paths
-                                                                        .thumbnail
-                                                                }
-                                                                alt={
-                                                                    item
-                                                                        .translations
-                                                                        .id
-                                                                        ?.title
-                                                                }
-                                                                className="w-full h-full object-cover rounded-lg"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 rounded-lg">
-                                                                No Image
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        {item.category && (
-                                                            <span className="text-sm text-green-600 mb-1 block">
-                                                                {
-                                                                    item
-                                                                        .category
-                                                                        .name
-                                                                }
-                                                            </span>
-                                                        )}
-                                                        <h4 className="font-medium mb-1 line-clamp-2">
-                                                            <a
-                                                                href={`/berita/${item.translations.id?.slug}`}
-                                                            >
-                                                                {
-                                                                    item
-                                                                        .translations
-                                                                        .id
-                                                                        ?.title
-                                                                }
-                                                            </a>
-                                                        </h4>
-                                                        <div className="flex items-center text-sm text-gray-500">
-                                                            <Calendar className="w-4 h-4 mr-1" />
-                                                            {formatDate(
-                                                                item.publish_date
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
+                        </>
+                    ) : (
+                        /* Empty State */
+                        <div className="text-center py-16">
+                            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <Clock className="w-12 h-12 text-gray-400" />
                             </div>
+                            <h3 className="text-2xl font-semibold text-gray-700 mb-2">
+                                {data.search || data.category
+                                    ? "Tidak ada berita yang sesuai"
+                                    : "Belum ada berita"}
+                            </h3>
+                            <p className="text-gray-500 mb-6 max-w-md mx-auto">
+                                {data.search || data.category
+                                    ? "Coba ubah kata kunci pencarian atau filter yang digunakan"
+                                    : "Berita akan ditampilkan di sini ketika tersedia"}
+                            </p>
+                            {(data.search || data.category) && (
+                                <Button
+                                    onClick={() => {
+                                        setData({
+                                            search: "",
+                                            category: "",
+                                            page: 1,
+                                        });
+                                        setSelectedCategory("all");
+                                        get("/berita", { preserveState: true });
+                                    }}
+                                    className="bg-blue-600 hover:bg-blue-700"
+                                >
+                                    Hapus semua filter
+                                </Button>
+                            )}
                         </div>
-                    </div>
+                    )}
                 </div>
+                {/* {popularNews.length > 0 && (
+                    <div className="fixed right-4 top-1/2 transform -translate-y-1/2 w-80 bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-6 hidden xl:block z-10">
+                        <h3 className="font-bold text-lg mb-4 text-gray-800">
+                            Berita Populer
+                        </h3>
+                        <div className="space-y-4 max-h-96 overflow-y-auto">
+                            {popularNews.slice(0, 3).map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="flex gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                                >
+                                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                                        {item.media ? (
+                                            <img
+                                                src={item.media.paths.thumbnail}
+                                                alt={
+                                                    item.translations?.id.title
+                                                }
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                                <Clock className="w-6 h-6 text-gray-400" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <h4 className="font-medium text-sm line-clamp-2 mb-1">
+                                            <a
+                                                href={`/berita/${item.translations?.id.slug}`}
+                                                className="hover:text-blue-600 transition-colors"
+                                            >
+                                                {item.translations?.id.title}
+                                            </a>
+                                        </h4>
+                                        <div className="flex items-center text-xs text-gray-500">
+                                            <Clock className="w-3 h-3 mr-1" />
+                                            <span>
+                                                {new Date(
+                                                    item.publish_date
+                                                ).toLocaleDateString("id-ID")}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full mt-4"
+                            asChild
+                        >
+                            <a href="/berita?sort=popular">
+                                Lihat Semua Berita Populer
+                            </a>
+                        </Button>
+                    </div>
+                )} */}
             </div>
         </Guest2>
     );
 };
 
-export default NewsIndex;
+export default RedesignedAllNews;

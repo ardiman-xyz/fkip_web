@@ -342,40 +342,104 @@ class WelcomeService
     }
 
 
-     /**
-     * Mendapatkan semua berita dengan paginasi
-     */
-    public function getAllNews(int $perPage = 10, array $filters = []): LengthAwarePaginator
-    {
-        $query = News::with(['translations', 'media', 'category.translations', 'tags.translations'])
-            ->where('status', 'published')
-            ->where('publish_date', '<=', now())
-            ->orderByDesc('publish_date');
 
-        // Filter berdasarkan kategori
-        if (!empty($filters['category'])) {
-            $query->whereHas('category', function ($q) use ($filters) {
-                $q->where('id', $filters['category']);
+        public function getAllNews(int $perPage = 10, array $filters = []): LengthAwarePaginator
+        {
+            $query = News::with([
+                'translations.language',
+                'media',
+                'category.translations.language',
+                'tags.translations.language'
+            ])
+                ->where('status', 'published')
+                ->where('publish_date', '<=', now())
+                ->orderByDesc('publish_date');
+
+            // Filter berdasarkan kategori
+            if (!empty($filters['category'])) {
+                $query->whereHas('category', function ($q) use ($filters) {
+                    $q->where('id', $filters['category']);
+                });
+            }
+
+            // Filter berdasarkan tag
+            if (!empty($filters['tag'])) {
+                $query->whereHas('tags', function ($q) use ($filters) {
+                    $q->where('id', $filters['tag']);
+                });
+            }
+
+            // Filter berdasarkan pencarian
+            if (!empty($filters['search'])) {
+                $query->whereHas('translations', function ($q) use ($filters) {
+                    $q->where('title', 'like', '%' . $filters['search'] . '%')
+                    ->orWhere('content', 'like', '%' . $filters['search'] . '%');
+                });
+            }
+
+            $paginator = $query->paginate($perPage);
+
+            $mapped = $paginator->getCollection()->map(function ($news) {
+                $translations = $news->translations->reduce(function ($acc, $translation) {
+                    $langCode = $translation->language->code;
+                    $acc[$langCode] = [
+                        'title' => $translation->title,
+                        'slug' => $translation->slug,
+                        'excerpt' => $translation->excerpt,
+                        'content' => $translation->content,
+                    ];
+                    return $acc;
+                }, []);
+
+                $categoryTranslations = $news->category?->translations->reduce(function ($acc, $translation) {
+                    $langCode = $translation->language->code;
+                    $acc[$langCode] = [
+                        'name' => $translation->name,
+                        'slug' => $translation->slug,
+                    ];
+                    return $acc;
+                }, []);
+
+                return [
+                    'id' => $news->id,
+                    'translations' => $translations,
+                    'media' => $news->media ? [
+                        'id' => $news->media->id,
+                        'file_name' => $news->media->file_name,
+                        'mime_type' => $news->media->mime_type,
+                        'path' => $news->media->path,
+                        'paths' => $news->media->paths,
+                        'size' => $news->media->size,
+                        'url' => $news->media->url,
+                    ] : null,
+                    'category' => $news->category ? [
+                        'id' => $news->category->id,
+                        'translations' => $categoryTranslations
+                    ] : null,
+                    'tags' => $news->tags->map(function ($tag) {
+                        return [
+                            'value' => (string) $tag->id,
+                            'label' => $tag->translations->first()?->name ?? $tag->name
+                        ];
+                    })->toArray(),
+                    'status' => $news->status,
+                    'path' => $news->path,
+                    'is_featured' => (bool) $news->is_featured,
+                    'publish_date' => $news->publish_date?->format('Y-m-d'),
+                    'created_at' => $news->created_at,
+                    'updated_at' => $news->updated_at,
+                ];
             });
-        }
 
-        // Filter berdasarkan tag
-        if (!empty($filters['tag'])) {
-            $query->whereHas('tags', function ($q) use ($filters) {
-                $q->where('id', $filters['tag']);
-            });
+            // Set collection hasil mapping ke dalam paginator yang sama
+            return new LengthAwarePaginator(
+                $mapped,
+                $paginator->total(),
+                $paginator->perPage(),
+                $paginator->currentPage(),
+                ['path' => request()->url(), 'query' => request()->query()]
+            );
         }
-
-        // Filter berdasarkan pencarian
-        if (!empty($filters['search'])) {
-            $query->whereHas('translations', function ($q) use ($filters) {
-                $q->where('title', 'like', '%' . $filters['search'] . '%')
-                  ->orWhere('content', 'like', '%' . $filters['search'] . '%');
-            });
-        }
-
-        return $query->paginate($perPage);
-    }
 
     /**
      * Mendapatkan semua kategori berita dengan jumlah berita
@@ -403,51 +467,77 @@ class WelcomeService
      */
     public function getPopularNews($limit = 5)
     {
-        // Implementasi ini sederhana, Anda bisa mengembangkannya dengan
-        // logika yang lebih kompleks (misalnya berdasarkan view count atau interaksi)
-        return News::with(['translations', 'media', 'category.translations'])
+        return News::with([
+                'translations.language',
+                'media',
+                'category.translations.language',
+                'tags.translations.language'
+            ])
             ->where('status', 'published')
             ->where('publish_date', '<=', now())
-            ->orderByDesc('publish_date')
+            ->orderByDesc('publish_date') // bisa diganti dengan orderBy('views', 'desc') jika ada kolom views
             ->limit($limit)
             ->get()
-            ->map(function ($news) {
-                return $this->formatNewsData($news);
-            });
+            ->map(fn($news) => $this->formatNewsData($news));
     }
+    
 
     /**
      * Format data berita untuk response
      */
-    private function formatNewsData($news)
+    private function formatNewsData($news): array
     {
-        $translations = $news->translations->mapWithKeys(function ($translation) {
-            return [$translation->language->locale => [
+        $translations = $news->translations->reduce(function ($acc, $translation) {
+            $langCode = $translation->language->code;
+            $acc[$langCode] = [
                 'title' => $translation->title,
                 'slug' => $translation->slug,
+                'excerpt' => $translation->excerpt,
                 'content' => $translation->content,
-            ]];
-        })->toArray();
-
+            ];
+            return $acc;
+        }, []);
+    
+        $categoryTranslations = $news->category?->translations->reduce(function ($acc, $translation) {
+            $langCode = $translation->language->code;
+            $acc[$langCode] = [
+                'name' => $translation->name,
+                'slug' => $translation->slug,
+            ];
+            return $acc;
+        }, []);
+    
         return [
             'id' => $news->id,
-            'publish_date' => $news->publish_date->format('Y-m-d'),
-            'is_featured' => $news->is_featured,
+            'translations' => $translations,
             'media' => $news->media ? [
                 'id' => $news->media->id,
+                'file_name' => $news->media->file_name,
+                'mime_type' => $news->media->mime_type,
                 'path' => $news->media->path,
-                'paths' => [
-                    'thumbnail' => $news->media->path, // Idealnya gunakan path thumbnail jika tersedia
-                ]
+                'paths' => $news->media->paths,
+                'size' => $news->media->size,
+                'url' => $news->media->url,
             ] : null,
             'category' => $news->category ? [
                 'id' => $news->category->id,
-                'name' => $news->category->translations->firstWhere('language_id', 1)->name ?? '',
-                'slug' => $news->category->translations->firstWhere('language_id', 1)->slug ?? '',
+                'translations' => $categoryTranslations
             ] : null,
-            'translations' => $translations,
+            'tags' => $news->tags->map(function ($tag) {
+                return [
+                    'value' => (string) $tag->id,
+                    'label' => $tag->translations->first()?->name ?? $tag->name
+                ];
+            })->toArray(),
+            'status' => $news->status,
+            'path' => $news->path,
+            'is_featured' => (bool) $news->is_featured,
+            'publish_date' => $news->publish_date?->format('Y-m-d'),
+            'created_at' => $news->created_at,
+            'updated_at' => $news->updated_at,
         ];
     }
+    
 
 
 
