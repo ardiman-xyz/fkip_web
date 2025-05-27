@@ -214,16 +214,15 @@ export default function AllAnnouncements({
 
             <div className="min-h-screen bg-gray-50">
                 {/* Header */}
-                <div className="bg-white border-b border-gray-200">
+                <div className="bg-gradient-to-r  from-green-600 to-blue-600 border-b border-gray-200">
                     <div className="container max-w-6xl mx-auto px-4 py-8">
                         <div className="text-center mb-8">
                             <div className="flex items-center justify-center gap-2 mb-4">
-                                <PiMegaphoneDuotone className="w-8 h-8 text-blue-600" />
-                                <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
+                                <h1 className="text-3xl md:text-4xl font-bold text-white">
                                     Semua Pengumuman
                                 </h1>
                             </div>
-                            <p className="text-gray-600 max-w-2xl mx-auto">
+                            <p className="text-white max-w-2xl mx-auto">
                                 Informasi lengkap dan pengumuman terkini dari
                                 Fakultas Keguruan dan Ilmu Pendidikan
                             </p>
@@ -239,7 +238,7 @@ export default function AllAnnouncements({
                                     onChange={(e) =>
                                         setSearchQuery(e.target.value)
                                     }
-                                    onKeyPress={(e) =>
+                                    onKeyDown={(e) =>
                                         e.key === "Enter" && handleSearch(e)
                                     }
                                     placeholder="Cari pengumuman..."
@@ -254,61 +253,6 @@ export default function AllAnnouncements({
                                     Cari
                                 </button>
                             </div>
-
-                            {/* Filter Toggle */}
-                            <div className="flex justify-center">
-                                <button
-                                    onClick={() => setShowFilters(!showFilters)}
-                                    className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
-                                >
-                                    <PiFunnelDuotone className="w-4 h-4" />
-                                    <span>Filter</span>
-                                </button>
-                            </div>
-
-                            {/* Filters */}
-                            {showFilters && (
-                                <div className="bg-gray-50 rounded-lg p-4">
-                                    <div className="flex flex-wrap justify-center gap-2 mb-4">
-                                        {priorityOptions.map((option) => (
-                                            <button
-                                                key={option.value}
-                                                onClick={() =>
-                                                    handleFilterChange(
-                                                        option.value
-                                                    )
-                                                }
-                                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                                                    selectedPriority ===
-                                                    option.value
-                                                        ? `${
-                                                              option.bgColor ||
-                                                              "bg-blue-100"
-                                                          } ${
-                                                              option.color ||
-                                                              "text-blue-600"
-                                                          }`
-                                                        : "bg-white text-gray-600 hover:bg-gray-100"
-                                                }`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    {(searchQuery || selectedPriority) && (
-                                        <div className="text-center">
-                                            <button
-                                                onClick={clearFilters}
-                                                className="flex items-center gap-1 mx-auto text-sm text-gray-500 hover:text-gray-700 transition-colors duration-200"
-                                            >
-                                                <PiXDuotone className="w-4 h-4" />
-                                                <span>Hapus semua filter</span>
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>

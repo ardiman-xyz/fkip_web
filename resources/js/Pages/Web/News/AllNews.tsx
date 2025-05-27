@@ -296,65 +296,6 @@ const RedesignedAllNews: React.FC<NewsIndexProps> = ({
                         </div>
                     )}
                 </div>
-                {/* {popularNews.length > 0 && (
-                    <div className="fixed right-4 top-1/2 transform -translate-y-1/2 w-80 bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-6 hidden xl:block z-10">
-                        <h3 className="font-bold text-lg mb-4 text-gray-800">
-                            Berita Populer
-                        </h3>
-                        <div className="space-y-4 max-h-96 overflow-y-auto">
-                            {popularNews.slice(0, 3).map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="flex gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
-                                        {item.media ? (
-                                            <img
-                                                src={item.media.paths.thumbnail}
-                                                alt={
-                                                    item.translations?.id.title
-                                                }
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                                                <Clock className="w-6 h-6 text-gray-400" />
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-medium text-sm line-clamp-2 mb-1">
-                                            <a
-                                                href={`/berita/${item.translations?.id.slug}`}
-                                                className="hover:text-blue-600 transition-colors"
-                                            >
-                                                {item.translations?.id.title}
-                                            </a>
-                                        </h4>
-                                        <div className="flex items-center text-xs text-gray-500">
-                                            <Clock className="w-3 h-3 mr-1" />
-                                            <span>
-                                                {new Date(
-                                                    item.publish_date
-                                                ).toLocaleDateString("id-ID")}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full mt-4"
-                            asChild
-                        >
-                            <a href="/berita?sort=popular">
-                                Lihat Semua Berita Populer
-                            </a>
-                        </Button>
-                    </div>
-                )} */}
             </div>
         </Guest2>
     );

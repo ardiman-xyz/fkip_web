@@ -29,7 +29,7 @@ const NewsHeroSection: React.FC<NewsHeroSectionProps> = ({
     };
 
     return (
-        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 text-white">
+        <div className="bg-gradient-to-r  from-green-600 to-blue-600  text-white">
             <div className="container max-w-7xl mx-auto px-4 py-16">
                 <div className="text-center">
                     {/* Badge */}

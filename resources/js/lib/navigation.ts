@@ -12,7 +12,10 @@ import {
     Library,
     ClipboardCheck,
     FlaskConical,
+    Newspaper,
+    CalendarClock,
 } from "lucide-react";
+import { PiMegaphoneDuotone } from "react-icons/pi";
 
 export const navigationMenus = {
     "Tentang Kami": {
@@ -46,6 +49,21 @@ export const navigationMenus = {
                 title: "Tenaga Kependidikan",
                 icon: Users,
                 url: "/fakultas/tendik",
+            },
+        ],
+
+        Informasi: [
+            { title: "Berita", icon: Newspaper, url: "/berita" },
+            {
+                title: "Pengumuman",
+                icon: PiMegaphoneDuotone,
+                url: "/pengumuman",
+            },
+
+            {
+                title: "Agenda",
+                icon: CalendarClock,
+                url: "/agenda",
             },
         ],
     },

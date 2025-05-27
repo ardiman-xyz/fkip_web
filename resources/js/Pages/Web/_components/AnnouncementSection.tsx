@@ -106,7 +106,6 @@ const AnnouncementSection: React.FC<AnnouncementSectionProps> = ({
                 {/* Section Header */}
                 <div className="text-center mb-12">
                     <div className="flex items-center justify-center gap-2 mb-4">
-                        <PiMegaphoneDuotone className="w-8 h-8 text-blue-600" />
                         <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
                             Pengumuman
                         </h2>
