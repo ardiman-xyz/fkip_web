@@ -485,7 +485,6 @@ class WelcomeService
             ];
         }
 
-        // Determine if announcement is new (within 7 days)
         $isNew = $announcement->created_at->gte(now()->subDays(7));
 
         return [
@@ -493,13 +492,24 @@ class WelcomeService
             'title' => $translations['id']['title'] ?? $translations['en']['title'] ?? 'Untitled',
             'content' => $translations['id']['content'] ?? $translations['en']['content'] ?? null,
             'excerpt' => $translations['id']['excerpt'] ?? $translations['en']['excerpt'] ?? null,
-            'image' => $announcement->media ? $announcement->media->path : null,
             'priority' => $announcement->priority,
             'date' => $announcement->created_at->format('Y-m-d'),
             'formatted_date' => $announcement->created_at->format('d M Y'),
             'isNew' => $isNew,
             'action' => $announcement->action,
             'translations' => $translations,
+            // Update media structure
+            'media' => $announcement->media ? [
+                'id' => $announcement->media->id,
+                'file_name' => $announcement->media->file_name,
+                'mime_type' => $announcement->media->mime_type,
+                'path' => $announcement->media->path,
+                'paths' => $announcement->media->paths,
+                'size' => $announcement->media->size,
+                'url' => $announcement->media->url,
+            ] : null,
+            // Keep backward compatibility
+            'image' => $announcement->media ? $announcement->media->path : null,
         ];
     }
 
@@ -580,7 +590,16 @@ class WelcomeService
             'title' => $translations['id']['title'] ?? $translations['en']['title'] ?? 'Untitled',
             'content' => $translations['id']['content'] ?? $translations['en']['content'] ?? '',
             'excerpt' => $translations['id']['excerpt'] ?? $translations['en']['excerpt'] ?? null,
-            'image' => $announcement->media ? $announcement->media->path : null,
+            // Handle media yang bisa null
+            'media' => $announcement->media ? [
+                'id' => $announcement->media->id,
+                'file_name' => $announcement->media->file_name,
+                'mime_type' => $announcement->media->mime_type,
+                'path' => $announcement->media->path,
+                'paths' => $announcement->media->paths,
+                'size' => $announcement->media->size,
+                'url' => $announcement->media->url,
+            ] : null,
             'priority' => $announcement->priority,
             'date' => $announcement->created_at->format('Y-m-d'),
             'formatted_date' => $announcement->created_at->format('d M Y'),

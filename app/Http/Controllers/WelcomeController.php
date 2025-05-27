@@ -128,7 +128,7 @@ class WelcomeController extends Controller
                 'meta' => [
                     'title' => $translation['title'] ?? config('app.name'),
                     'description' => $translation ? Str::limit(strip_tags($translation['content']), 160) : '',
-                    'image' => $announcement['image'] ?? '',
+                    'image' => $announcement['media']['paths']['thumbnail'] ?? '',
                     'url' => url()->current(),
                     'type' => 'article'
                 ]
