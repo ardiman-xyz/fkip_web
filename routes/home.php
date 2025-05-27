@@ -38,3 +38,6 @@ Route::prefix('kemahasiswaan')->name('kemahasiswaan.')->group(function () {
     Route::get('beasiswa', [ProdiController::class, 'scholarship'])->name('scholarship');
     Route::get('prestasi', [ProdiController::class, 'achievement'])->name('achievement');
 });
+
+Route::get('/pengumuman', [WelcomeController::class, 'announcements'])->name('announcements');
+Route::get('/pengumuman/{slug}', [WelcomeController::class, 'announcementDetail'])->name('announcements.detail');

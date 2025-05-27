@@ -10,6 +10,7 @@ use App\Models\News;
 use App\Models\Language;
 use App\Models\NewsTranslation;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 
 class WelcomeService
 {
@@ -497,6 +498,95 @@ class WelcomeService
             'date' => $announcement->created_at->format('Y-m-d'),
             'formatted_date' => $announcement->created_at->format('d M Y'),
             'isNew' => $isNew,
+            'action' => $announcement->action,
+            'translations' => $translations,
+        ];
+    }
+
+
+
+    public function getAllAnnouncements($perPage = 12, $filters = [])
+    {
+        $query = Announcement::with([
+            'translations' => function ($query) {
+                $query->with('language');
+            },
+            'media',
+            'user'
+        ])
+        ->where('status', 'published')
+        ->where(function ($query) {
+            $query->whereNull('published_at')
+                ->orWhere('published_at', '<=', now());
+        });
+
+        // Apply filters
+        if (!empty($filters['priority'])) {
+            $query->where('priority', $filters['priority']);
+        }
+
+        if (!empty($filters['search'])) {
+            $query->whereHas('translations', function ($q) use ($filters) {
+                $q->where('title', 'like', '%' . $filters['search'] . '%')
+                ->orWhere('content', 'like', '%' . $filters['search'] . '%');
+            });
+        }
+
+        return $query->orderBy('priority', 'desc')
+                    ->orderBy('created_at', 'desc')
+                    ->paginate($perPage)
+                    ->through(function ($announcement) {
+                        return $this->formatAnnouncementData($announcement);
+                    });
+    }
+
+    public function getAnnouncementDetail(string $slug)
+    {
+        // Extract ID from slug (slug format: title-slug-123)
+        $id = (int) Str::afterLast($slug, '-');
+        
+        $announcement = Announcement::with([
+            'translations' => function ($query) {
+                $query->with('language');
+            },
+            'media',
+            'user'
+        ])
+        ->where('id', $id)
+        ->where('status', 'published')
+        ->firstOrFail();
+
+        // Increment view count
+        $announcement->increment('view_count');
+
+        return $this->formatAnnouncementDetailData($announcement);
+    }
+
+    private function formatAnnouncementDetailData($announcement)
+    {
+        $translations = [];
+        foreach ($announcement->translations as $translation) {
+            $translations[$translation->language->code] = [
+                'title' => $translation->title,
+                'content' => $translation->content,
+                'excerpt' => $translation->excerpt,
+            ];
+        }
+
+        $isNew = $announcement->created_at->gte(now()->subDays(7));
+
+        return [
+            'id' => $announcement->id,
+            'title' => $translations['id']['title'] ?? $translations['en']['title'] ?? 'Untitled',
+            'content' => $translations['id']['content'] ?? $translations['en']['content'] ?? '',
+            'excerpt' => $translations['id']['excerpt'] ?? $translations['en']['excerpt'] ?? null,
+            'image' => $announcement->media ? $announcement->media->path : null,
+            'priority' => $announcement->priority,
+            'date' => $announcement->created_at->format('Y-m-d'),
+            'formatted_date' => $announcement->created_at->format('d M Y'),
+            'isNew' => $isNew,
+            'author' => $announcement->user->name,
+            'view_count' => $announcement->view_count,
             'action' => $announcement->action,
             'translations' => $translations,
         ];

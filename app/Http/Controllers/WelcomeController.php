@@ -101,4 +101,38 @@ class WelcomeController extends Controller
     }
 
 
+
+        public function announcements(Request $request)
+        {
+            $perPage = $request->input('per_page', 12);
+            $filters = [
+                'priority' => $request->input('priority'),
+                'search' => $request->input('search'),
+            ];
+            
+            $announcements = $this->welcomeService->getAllAnnouncements($perPage, $filters);
+
+            return Inertia::render("Web/Announcement/Index", [
+                'announcements' => $announcements,
+                'filters' => $filters
+            ]);
+        }
+
+        public function announcementDetail(string $slug): InertiaResponse
+        {
+            $announcement = $this->welcomeService->getAnnouncementDetail($slug);
+            $translation = $announcement['translations']['id'] ?? $announcement['translations']['en'] ?? null;
+
+            return Inertia::render("Web/Announcement/Detail", [
+                'announcement' => $announcement,
+                'meta' => [
+                    'title' => $translation['title'] ?? config('app.name'),
+                    'description' => $translation ? Str::limit(strip_tags($translation['content']), 160) : '',
+                    'image' => $announcement['image'] ?? '',
+                    'url' => url()->current(),
+                    'type' => 'article'
+                ]
+            ]);
+        }
+
 }
