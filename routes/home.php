@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FeaturesController;
 use App\Http\Controllers\Home\FacultyProfileController;
 use App\Http\Controllers\ProdiController;
 use App\Http\Controllers\WelcomeController;
@@ -42,3 +43,8 @@ Route::prefix('kemahasiswaan')->name('kemahasiswaan.')->group(function () {
 
 Route::get('/pengumuman', [WelcomeController::class, 'announcements'])->name('announcements');
 Route::get('/pengumuman/{slug}', [WelcomeController::class, 'announcementDetail'])->name('announcements.detail');
+
+
+Route::prefix('tentang')->group(function () {
+    Route::get('/fitur', [FeaturesController::class, 'index'])->name('about.features');
+});
