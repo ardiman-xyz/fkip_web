@@ -36,7 +36,6 @@ return new class extends Migration
             $table->index(['is_featured'], 'idx_featured');
             $table->index(['is_pinned'], 'idx_pinned');
             $table->index(['published_at'], 'idx_published');
-            $table->index(['expires_at'], 'idx_expires');
             $table->index(['user_id'], 'idx_user');
         });
     }
