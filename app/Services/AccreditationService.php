@@ -155,4 +155,46 @@ class AccreditationService {
                 ]);
         }
     }
+
+    
+    /**
+     * Get accreditations for public display (only active ones)
+     */
+    public function getAccreditationsForPublic(): array
+    {
+        $accreditations = Accreditation::with(['translations', 'media'])
+            ->where('is_active', true)
+            ->orderBy('order', 'desc') // Show newest first
+            ->orderBy('year', 'desc')
+            ->get();
+
+        return $accreditations->map(function ($accreditation) {
+            $translations = $accreditation->translations->mapWithKeys(function ($translation) {
+                return [
+                    $translation->language_id => [
+                        'title' => $translation->title, 
+                        'description' => $translation->description,
+                    ],
+                ];
+            });
+
+            return [
+                'id' => $accreditation->id,
+                'media' => $accreditation->media ? [
+                    'id' => $accreditation->media->id,
+                    'name' => $accreditation->media->name,
+                    'path' => $accreditation->media->path,
+                    'paths' => $accreditation->media->paths ?? [],
+                    'url' => $accreditation->media->url ?? $accreditation->media->path,
+                ] : null,
+                'year' => $accreditation->year,
+                'translations' => [
+                    'id' => $translations[1] ?? ['title' => '', 'description' => ''],
+                    'en' => $translations[2] ?? ['title' => '', 'description' => ''],
+                ],
+                'created_at' => $accreditation->created_at->format('d M Y'),
+                'updated_at' => $accreditation->updated_at->format('d M Y'),
+            ];
+        })->toArray();
+    }
 }

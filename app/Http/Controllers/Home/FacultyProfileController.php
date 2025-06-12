@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Home;
 use App\Http\Controllers\Controller;
 use App\Models\History;
 use App\Services\AboutService;
+use App\Services\AccreditationService;
 use App\Services\ContactInfoService;
 use App\Services\HistoryService;
 use App\Services\LeaderService;
@@ -22,7 +23,8 @@ class FacultyProfileController extends Controller
         private LeaderService $leaderService,
         private ContactInfoService $contactInfoService,
         private LecturerFrontService $lecturerFrontService,
-        private StaffFrontService $staffFrontService
+        private StaffFrontService $staffFrontService,
+        private AccreditationService $accreditationService
     )
    {}
 
@@ -92,5 +94,15 @@ class FacultyProfileController extends Controller
             // Handle the case when lecturer is not found
             return redirect()->route('fakultas.lecturer')->with('error', 'Dosen tidak ditemukan');
         }
+    }
+
+
+    public function accreditation()
+    {
+        $accreditations = $this->accreditationService->getAccreditationsForPublic();
+        
+        return Inertia::render('Web/Faculty/Accreditation', [
+            'accreditations' => $accreditations
+        ]);
     }
 }

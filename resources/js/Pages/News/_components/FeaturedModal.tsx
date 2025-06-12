@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
     Dialog,
     DialogContent,
@@ -11,8 +11,8 @@ import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import { PiImageDuotone } from "react-icons/pi";
 import { Media } from "@/types/app";
-import {MediaModal} from "@/Components/MediaModal";
-import {toast} from "sonner";
+import { MediaModal } from "@/Components/MediaModal";
+import { toast } from "sonner";
 
 interface FeaturedModalProps {
     isOpen: boolean;
@@ -23,14 +23,18 @@ interface FeaturedModalProps {
 }
 
 const FeaturedModal = ({
-                           isOpen,
-                           onClose,
-                           onConfirm,
-                           defaultImage = null,
-                           defaultExpiredDate = "",
-                       }: FeaturedModalProps) => {
-    const [selectedImage, setSelectedImage] = React.useState<Media | null>(defaultImage);
-    const [expiredDate, setExpiredDate] = React.useState(defaultExpiredDate || '');
+    isOpen,
+    onClose,
+    onConfirm,
+    defaultImage = null,
+    defaultExpiredDate = "",
+}: FeaturedModalProps) => {
+    const [selectedImage, setSelectedImage] = React.useState<Media | null>(
+        defaultImage
+    );
+    const [expiredDate, setExpiredDate] = React.useState(
+        defaultExpiredDate || ""
+    );
     const [isMediaModalOpen, setIsMediaModalOpen] = React.useState(false);
     const [isValidating, setIsValidating] = React.useState(false);
 
@@ -41,10 +45,14 @@ const FeaturedModal = ({
                 const requiredWidth = 1920;
                 const requiredHeight = 694;
 
-                const isValid = img.width === requiredWidth && img.height === requiredHeight;
+                const isValid =
+                    img.width === requiredWidth &&
+                    img.height === requiredHeight;
 
                 if (!isValid) {
-                    toast.error(`Image must be exactly ${requiredWidth}x${requiredHeight} pixels. Current size: ${img.width}x${img.height}`);
+                    toast.error(
+                        `Image must be exactly ${requiredWidth}x${requiredHeight} pixels. Current size: ${img.width}x${img.height}`
+                    );
                 }
                 resolve(isValid);
             };
@@ -56,7 +64,6 @@ const FeaturedModal = ({
         });
     };
 
-
     const handleConfirm = async () => {
         if (!selectedImage) return;
 
@@ -67,7 +74,7 @@ const FeaturedModal = ({
         if (isValid) {
             onConfirm({
                 image: selectedImage,
-                expiredDate: expiredDate
+                expiredDate: expiredDate,
             });
             onClose();
         }
@@ -80,15 +87,18 @@ const FeaturedModal = ({
                     <DialogHeader>
                         <DialogTitle>Featured News Settings</DialogTitle>
                         <DialogDescription>
-                            Configure the featured news display settings for the front slider.
-                            Image must be exactly 1920x694 pixels.
+                            Konfigurasikan pengaturan tampilan berita unggulan
+                            untuk slider depan. Gambar harus berukuran tepat
+                            1920x694 piksel.
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-6 py-4">
                         {/* Image Selection */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Slider Image</label>
+                            <label className="text-sm font-medium">
+                                Slider Image
+                            </label>
                             <div className="space-y-4">
                                 {selectedImage ? (
                                     <div className="relative group">
@@ -101,7 +111,9 @@ const FeaturedModal = ({
                                             <Button
                                                 size="sm"
                                                 variant="secondary"
-                                                onClick={() => setIsMediaModalOpen(true)}
+                                                onClick={() =>
+                                                    setIsMediaModalOpen(true)
+                                                }
                                                 type="button"
                                             >
                                                 Change
@@ -109,7 +121,9 @@ const FeaturedModal = ({
                                             <Button
                                                 size="sm"
                                                 variant="destructive"
-                                                onClick={() => setSelectedImage(null)}
+                                                onClick={() =>
+                                                    setSelectedImage(null)
+                                                }
                                                 type="button"
                                             >
                                                 Remove
@@ -119,7 +133,9 @@ const FeaturedModal = ({
                                 ) : (
                                     <Button
                                         variant="outline"
-                                        onClick={() => setIsMediaModalOpen(true)}
+                                        onClick={() =>
+                                            setIsMediaModalOpen(true)
+                                        }
                                         className="w-full h-48"
                                         type="button"
                                     >
@@ -142,10 +158,11 @@ const FeaturedModal = ({
                                 type="date"
                                 value={expiredDate}
                                 onChange={(e) => setExpiredDate(e.target.value)}
-                                min={new Date().toISOString().split('T')[0]}
+                                min={new Date().toISOString().split("T")[0]}
                             />
                             <p className="text-sm text-gray-500">
-                                The news will be shown in the slider until this date
+                                Berita akan ditampilkan di slider hingga tanggal
+                                ini.
                             </p>
                         </div>
                     </div>
@@ -156,9 +173,11 @@ const FeaturedModal = ({
                         </Button>
                         <Button
                             onClick={handleConfirm}
-                            disabled={!selectedImage || !expiredDate || isValidating}
+                            disabled={
+                                !selectedImage || !expiredDate || isValidating
+                            }
                         >
-                            {isValidating ? 'Validating...' : 'Confirm'}
+                            {isValidating ? "Validating..." : "Confirm"}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

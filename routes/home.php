@@ -22,6 +22,7 @@ Route::prefix('fakultas')->name('fakultas.')->group(function () {
     Route::get('/dosen', [FacultyProfileController::class, 'lecturer'])->name('lecturer');
     Route::get('/dosen/{id}', [FacultyProfileController::class, 'lecturerDetail'])->name('lecturer.detail');
     Route::get('/tendik', [FacultyProfileController::class, 'employee'])->name('employee');
+    Route::get('/akreditasi', [FacultyProfileController::class, 'accreditation'])->name('accreditation');
 });
 
 Route::prefix('program')->name('program.')->group(function () {

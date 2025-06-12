@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\News;
 use App\Models\Language;
 use App\Models\NewsTranslation;
+use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 
@@ -699,6 +700,211 @@ class WelcomeService
             'action' => $announcement->action,
             'translations' => $translations,
         ];
+    }
+
+
+    /**
+     * Get all events with pagination and filters
+     */
+    public function getAllEvents(int $perPage = 12, array $filters = []): array
+    {
+        $query = Event::with([
+            'translations.language',
+            'media',
+            'category.translations.language',
+            'tags.translations.language'
+        ])
+        ->orderBy('start_date', 'asc');
+
+        // Filter by category
+        if (!empty($filters['category'])) {
+            $query->whereHas('category', function ($q) use ($filters) {
+                $q->where('id', $filters['category']);
+            });
+        }
+
+        // Filter by search term
+        if (!empty($filters['search'])) {
+            $query->whereHas('translations', function ($q) use ($filters) {
+                $q->where('title', 'like', '%' . $filters['search'] . '%')
+                ->orWhere('content', 'like', '%' . $filters['search'] . '%');
+            });
+        }
+
+        // Filter by status (upcoming, ongoing, completed)
+        if (!empty($filters['status']) && $filters['status'] !== 'all') {
+            $now = now();
+            
+            switch ($filters['status']) {
+                case 'upcoming':
+                    $query->where('start_date', '>', $now);
+                    break;
+                case 'ongoing':
+                    $query->where('start_date', '<=', $now)
+                        ->where('end_date', '>=', $now);
+                    break;
+                case 'completed':
+                    $query->where('end_date', '<', $now);
+                    break;
+            }
+        }
+
+        $events = $query->paginate($perPage);
+
+        // Format the events data
+        $formattedEvents = $events->getCollection()->map(function ($event) {
+            return $this->formatEventData($event);
+        });
+
+        return [
+            'data' => $formattedEvents,
+            'current_page' => $events->currentPage(),
+            'last_page' => $events->lastPage(),
+            'per_page' => $events->perPage(),
+            'total' => $events->total(),
+            'from' => $events->firstItem(),
+            'to' => $events->lastItem(),
+        ];
+    }
+
+   /**
+     * Get event categories with count
+     */
+    public function getEventCategories(): array
+    {
+        // Get categories that are used by published events
+        $categoriesWithEvents = Category::select('categories.*')
+            ->join('events', 'categories.id', '=', 'events.category_id')
+            ->where('events.status', 'published')
+            ->with(['translations' => function($query) {
+                $query->where('language_id', 1); // Indonesian language
+            }])
+            ->groupBy('categories.id')
+            ->get();
+
+        // Count events for each category
+        $categoriesWithCount = $categoriesWithEvents->map(function ($category) {
+            $eventCount = Event::where('category_id', $category->id)
+                ->where('status', 'published')
+                ->count();
+
+            return [
+                'id' => (string) $category->id,
+                'name' => $category->translations->first()?->name ?? 'Untitled',
+                'count' => $eventCount
+            ];
+        });
+
+        // Add "All" category
+        $totalEvents = Event::where('status', 'published')->count();
+        
+        $allCategory = [
+            'id' => 'all',
+            'name' => 'Semua',
+            'count' => $totalEvents
+        ];
+
+        return collect([$allCategory])->concat($categoriesWithCount)->toArray();
+    }
+
+
+    /**
+     * Format event data for display
+     */
+    private function formatEventData($event): array
+    {
+        $translations = $event->translations->reduce(function ($acc, $translation) {
+            $langCode = $translation->language->code;
+            $acc[$langCode] = [
+                'title' => $translation->title,
+                'slug' => $translation->slug,
+                'description' => $translation->description,
+                'content' => $translation->content,
+            ];
+            return $acc;
+        }, []);
+
+        $categoryTranslations = $event->category?->translations->reduce(function ($acc, $translation) {
+            $langCode = $translation->language->code;
+            $acc[$langCode] = [
+                'name' => $translation->name,
+                'slug' => $translation->slug,
+            ];
+            return $acc;
+        }, []);
+
+        return [
+            'id' => $event->id,
+            'translations' => $translations,
+            'formatted_date' => $this->formatEventDateTime($event->start_date, $event->end_date),
+            'event_status' => $this->getEventStatus($event->start_date, $event->end_date),
+            'category' => $event->category ? [
+                'id' => $event->category->id,
+                'translations' => $categoryTranslations
+            ] : null,
+            'media' => $event->media ? [
+                'id' => $event->media->id,
+                'path' => $event->media->path,
+                'paths' => $event->media->paths,
+            ] : null,
+            'tags' => $event->tags->map(fn($tag) => [
+                'value' => (string) $tag->id,
+                'label' => $tag->translations->first()?->name
+            ]),
+            'status' => $event->status,
+            'is_featured' => $event->is_featured,
+            'start_date' => $event->start_date->format('Y-m-d H:i:s'),
+            'end_date' => $event->end_date->format('Y-m-d H:i:s'),
+            'location' => $event->location,
+            'type' => $event->type,
+            'platform' => $event->platform,
+            'meeting_url' => $event->meeting_url,
+            'registration_url' => $event->registration_url,
+            'quota' => $event->quota,
+            'is_free' => $event->is_free,
+            'price' => $event->price,
+            'created_at' => $event->created_at->format('Y-m-d H:i:s'),
+        ];
+    }
+
+    /**
+     * Format event date and time
+     */
+    private function formatEventDateTime($startDate, $endDate): string
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        
+        if ($start->format('Y-m-d') === $end->format('Y-m-d')) {
+            return $start->format('d F Y, H:i') . ' - ' . $end->format('H:i');
+        } 
+        else if ($start->format('Y-m') === $end->format('Y-m')) {
+            return $start->format('d') . ' - ' . $end->format('d F Y') . ' (' . $start->format('H:i') . ' - ' . $end->format('H:i') . ')';
+        }
+        else if ($start->format('Y') === $end->format('Y')) {
+            return $start->format('d F') . ' (' . $start->format('H:i') . ') - ' . $end->format('d F Y') . ' (' . $end->format('H:i') . ')';
+        }
+        else {
+            return $start->format('d F Y') . ' (' . $start->format('H:i') . ') - ' . $end->format('d F Y') . ' (' . $end->format('H:i') . ')';
+        }
+    }
+
+    /**
+     * Get event status based on dates
+     */
+    private function getEventStatus($startDate, $endDate): string
+    {
+        $now = Carbon::now();
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        
+        if ($now < $start) {
+            return 'upcoming';
+        } else if ($now >= $start && $now <= $end) {
+            return 'ongoing';
+        } else {
+            return 'completed';
+        }
     }
 
 }

@@ -14,6 +14,8 @@ import {
     FlaskConical,
     Newspaper,
     CalendarClock,
+    PlaneTakeoff,
+    ThumbsUp,
 } from "lucide-react";
 import { PiMegaphoneDuotone } from "react-icons/pi";
 
@@ -36,11 +38,15 @@ export const navigationMenus = {
                 icon: Building2,
                 url: "/fakultas/struktur-organisasi",
             },
-            // { title: "Fasilitas", icon: Building2, url: "/fakultas/fasilitas" },
             {
                 title: "Lokasi & Kontak",
                 icon: Globe,
                 url: "/fakultas/lokasi-kontak",
+            },
+            {
+                title: "Akreditasi",
+                icon: ThumbsUp,
+                url: "/fakultas/akreditasi",
             },
         ],
         "Staf & SDM": [
@@ -86,11 +92,11 @@ export const navigationMenus = {
             // },
         ],
         Akademik: [
-            {
-                title: "Kalender Akademik",
-                icon: Calendar,
-                url: "/akademik/kalender",
-            },
+            // {
+            //     title: "Kalender Akademik",
+            //     icon: Calendar,
+            //     url: "/akademik/kalender",
+            // },
             {
                 title: "E-Learning",
                 icon: Book,
@@ -116,6 +122,11 @@ export const navigationMenus = {
                 title: "Jurnal Universitas",
                 icon: Book,
                 url: "https://journal.umkendari.ac.id/",
+            },
+            {
+                title: "Journal of Education and Teaching (JET)",
+                icon: PlaneTakeoff,
+                url: "https://jet.or.id/index.php/jet",
             },
         ],
     },

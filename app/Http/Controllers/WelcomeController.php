@@ -78,9 +78,29 @@ class WelcomeController extends Controller
         ]);
     }
 
-    public function events()
+    public function events(Request $request)
     {
-        return Inertia::render("Web/Event/AllEvent");
+        $perPage = $request->input('per_page', 12);
+        $filters = [
+            'category' => $request->input('category'),
+            'search' => $request->input('search'),
+            'status' => $request->input('status', 'all'), 
+        ];
+        
+        $events = $this->welcomeService->getAllEvents($perPage, $filters);
+        $categories = $this->welcomeService->getEventCategories();
+
+        return Inertia::render("Web/Event/AllEvent", [
+            'events' => $events['data'] ?? [],
+            'categories' => $categories,
+            'filters' => $filters,
+            'pagination' => [
+                'current_page' => $events['current_page'] ?? 1,
+                'last_page' => $events['last_page'] ?? 1,
+                'per_page' => $events['per_page'] ?? $perPage,
+                'total' => $events['total'] ?? 0,
+            ]
+        ]);
     }
 
     public function eventDetail(string $slug): InertiaResponse
