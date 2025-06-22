@@ -22,6 +22,7 @@ interface ImportantInfoItem {
     link?: string;
     isModal?: boolean;
     modalType?: "whatsapp" | "tuition";
+    isExternal: boolean;
 }
 
 const ImportantInfoSection = () => {
@@ -38,6 +39,7 @@ const ImportantInfoSection = () => {
             icon: <PiBookOpenDuotone className="w-12 h-12" />,
             color: "text-blue-600",
             link: "https://jet.or.id/",
+            isExternal: false,
         },
         {
             id: 2,
@@ -46,7 +48,8 @@ const ImportantInfoSection = () => {
                 "Informasi Tentang Akreditasi Fakultas Keguruan dan Ilmu Pendidikan",
             icon: <PiCertificateDuotone className="w-12 h-12" />,
             color: "text-blue-800",
-            link: "https://banpt.or.id",
+            link: "fakultas/akreditasi",
+            isExternal: true,
         },
         {
             id: 3,
@@ -56,6 +59,7 @@ const ImportantInfoSection = () => {
             icon: <PiStudentDuotone className="w-12 h-12" />,
             color: "text-blue-700",
             link: "https://dspace.umkendari.ac.id",
+            isExternal: false,
         },
 
         {
@@ -66,6 +70,7 @@ const ImportantInfoSection = () => {
             icon: <PiGraduationCapDuotone className="w-12 h-12" />,
             color: "text-blue-600",
             link: "https://drtpm.umkendari.ac.id",
+            isExternal: false,
         },
         {
             id: 6,
@@ -76,6 +81,7 @@ const ImportantInfoSection = () => {
             color: "text-blue-800",
             isModal: true,
             modalType: "tuition",
+            isExternal: false,
         },
 
         {
@@ -86,6 +92,7 @@ const ImportantInfoSection = () => {
             icon: <PiUserPlusDuotone className="w-12 h-12" />,
             color: "text-green-600",
             link: "https://admisi.umkendari.ac.id",
+            isExternal: false,
         },
     ];
 
@@ -164,7 +171,7 @@ const ImportantInfoSection = () => {
                             <a
                                 key={item.id}
                                 href={item.link}
-                                target="_blank"
+                                target={item.isExternal ? "" : "_blank"}
                                 rel="noopener noreferrer"
                                 className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group cursor-pointer block"
                             >

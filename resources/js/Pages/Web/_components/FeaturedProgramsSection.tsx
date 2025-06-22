@@ -119,7 +119,7 @@ const FeaturedProgramsSection = () => {
                         </div>
                         <div className="group">
                             <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300">
-                                150+
+                                100+
                             </div>
                             <div className="text-green-100">
                                 Dosen Berpengalaman
@@ -127,7 +127,7 @@ const FeaturedProgramsSection = () => {
                         </div>
                         <div className="group">
                             <div className="text-4xl font-bold mb-2 group-hover:scale-110 transition-transform duration-300">
-                                5000+
+                                2000+
                             </div>
                             <div className="text-green-100">
                                 Mahasiswa Aktif
