@@ -38,15 +38,6 @@ const FeaturedProgramsSection = () => {
             color: "text-green-600",
             bgColor: "bg-green-50",
         },
-        {
-            id: 3,
-            title: "Program Magang",
-            description:
-                "Kesempatan magang di berbagai institusi pendidikan terkemuka.",
-            icon: <PiGraduationCapDuotone className="w-16 h-16" />,
-            color: "text-green-600",
-            bgColor: "bg-green-50",
-        },
     ];
 
     return (
@@ -106,6 +97,35 @@ const FeaturedProgramsSection = () => {
                             </button>
                         </div>
                     ))}
+
+                    <a
+                        href="https://ods.fkip.umkendari.ac.id"
+                        target="_blank"
+                        className={`bg-green-50 rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 group cursor-pointer border border-green-100`}
+                    >
+                        <img src="/images/ods-logo.webp" alt="ods" />
+                        <p className="text-gray-600 leading-relaxed  mb-6">
+                            Solusi Digital Akademik untuk Semua - Hemat Waktu,
+                            Hemat Tenaga
+                        </p>
+                        {/* Learn More Button */}
+                        <button className="inline-flex items-center text-green-600 hover:text-green-800 font-semibold group-hover:underline transition-all duration-300">
+                            Pelajari Lebih Lanjut
+                            <svg
+                                className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                        </button>
+                    </a>
                 </div>
 
                 {/* Statistics Section */}
