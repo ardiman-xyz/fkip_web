@@ -2,12 +2,11 @@ FROM composer:2.6 as composer-build
 WORKDIR /var/www/html
 
 # Install PHP extensions
-RUN apk add --no-cache $PHPIZE_DEPS linux-headers \
+RUN apk add --no-cache autoconf g++ make linux-headers \
     && docker-php-ext-install pcntl sockets
 
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
-
 
 # Stage 2: NPM build
 FROM node:22-alpine as npm-build
@@ -16,7 +15,6 @@ WORKDIR /var/www/html
 
 ARG NODE_ENV=production
 ARG APP_ENV=production
-
 
 COPY package*.json ./
 COPY postcss.config.js ./
@@ -34,26 +32,30 @@ WORKDIR /var/www/html
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install dependencies dan extensions sekaligus
+# Install dependencies dan extensions
 RUN apk add --no-cache \
-       $PHPIZE_DEPS \
-       supervisor \
-       libzip-dev \
-       oniguruma-dev \
-       libexif \        
-       libexif-dev \    
-   && docker-php-ext-install \
-       pdo \
-       pdo_mysql \
-       zip \
-       bcmath \
-       opcache \
-       pcntl \
-       exif \          
-   && pecl install redis \
-   && docker-php-ext-enable redis \
-   && apk del $PHPIZE_DEPS
-
+        supervisor \
+        libzip-dev \
+        oniguruma-dev \
+        libexif \
+        libexif-dev \
+    && apk add --no-cache --virtual .build-deps \
+        autoconf \
+        g++ \
+        make \
+        linux-headers \
+    && docker-php-ext-install \
+        pdo \
+        pdo_mysql \
+        zip \
+        bcmath \
+        opcache \
+        pcntl \
+        exif \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del .build-deps \
+    && rm -rf /tmp/* /var/cache/apk/*
 
 COPY docker/prod/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY docker/prod/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
@@ -68,19 +70,13 @@ COPY --from=composer-build /var/www/html/vendor/ ./vendor/
 COPY --from=npm-build /var/www/html/public/build /var/www/html/public/build
 
 # Create directories and set permissions
-RUN mkdir -p storage/framework && \
-   mkdir -p storage/framework/sessions && \
-   mkdir -p storage/framework/views && \
-   mkdir -p storage/framework/cache && \
-   mkdir -p storage/logs && \
-   mkdir -p storage/app && \
-   mkdir -p storage/app/public && \
-   mkdir -p bootstrap/cache && \
-   chown -R www-data:www-data . && \
-   chmod -R 775 storage bootstrap/cache && \
-   composer dump-autoload -o
+RUN mkdir -p storage/framework/{sessions,views,cache} \
+    && mkdir -p storage/{logs,app/public} \
+    && mkdir -p bootstrap/cache \
+    && chown -R www-data:www-data . \
+    && chmod -R 775 storage bootstrap/cache \
+    && composer dump-autoload -o
 
-# Tidak menggunakan USER www-data
 EXPOSE 9000 8080
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
