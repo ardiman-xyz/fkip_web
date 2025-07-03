@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
     Card,
     CardContent,
@@ -7,13 +8,13 @@ import {
 } from "@/Components/ui/card";
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
-import { useState } from "react";
 import {
     PiStudentDuotone,
     PiBooksDuotone,
     PiUsersThreeDuotone,
 } from "react-icons/pi";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/Components/ui/tabs";
+
 import StudentOrganizationList from "./_components/StudentOrganizationList";
 import ScholarshipList from "./_components/ScholarshipList";
 
@@ -25,7 +26,7 @@ const Index = () => {
             header={<h2 className="text-2xl font-black">Kemahasiswaan</h2>}
         >
             <Head title="Kemahasiswaan" />
-            <div className="flex flex-col gap-4 overflow-y-auto scroll-smooth p-4">
+            <div className="flex flex-col gap-4 overflow-y-auto scroll-smooth p-4 ">
                 <div className="grid grid-cols-1 gap-4">
                     <Card className="relative overflow-hidden shadow-none border-none">
                         <CardHeader>

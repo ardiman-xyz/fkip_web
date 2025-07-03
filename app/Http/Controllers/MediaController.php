@@ -19,33 +19,52 @@ class MediaController extends Controller
         $this->mediaService = $mediaService;
     }
 
-    public function indexView()
+    public function indexView(Request $request)
     {
-        $media = $this->mediaService->getAll();
+        $perPage = $request->get('per_page', 20);
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        $search = $request->get('search');
+
+        $media = $this->mediaService->getPaginated($perPage, $sortBy, $sortOrder, $search);
 
         return Inertia::render("Media/Index", [
-            "media" => $media
+            "media" => $media,
+            "filters" => [
+                'per_page' => $perPage,
+                'sort_by' => $sortBy,
+                'sort_order' => $sortOrder,
+                'search' => $search,
+            ]
         ]);
     }
 
-    public function index()
+
+    public function index(Request $request)
     {
         try {
-            $media = $this->mediaService->getAll();
+            $perPage = $request->get('per_page', 20);
+            $sortBy = $request->get('sort_by', 'created_at');
+            $sortOrder = $request->get('sort_order', 'desc');
+            $search = $request->get('search');
+
+            $media = $this->mediaService->getPaginated($perPage, $sortBy, $sortOrder, $search);
+
             return ResponseApi::success($media, 'Media retrieved successfully');
         } catch (Exception $e) {
             return ResponseApi::error('Failed to retrieve media', 500, ['error' => $e->getMessage()]);
         }
     }
 
+
     public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|image|max:5120'
+            'file' => 'required|file|max:10240'
         ]);
 
         try {
-            $media = $this->mediaService->upload($request->file('file'));
+            $media = $this->mediaService->uploadFileWithCompress($request->file('file'));
 
             return ResponseApi::success($media, 'File uploaded successfully');
         } catch (\Exception $e) {
@@ -60,10 +79,13 @@ class MediaController extends Controller
         try {
             $request->validate([
                 'files' => 'required|array',
-                'files.*' => 'required|file|max:2048|mimes:jpeg,png,jpg,gif,webp,svg'
+                'files.*' => 'required|file|max:10240',
+                'quality' => 'nullable|integer|min:1|max:100'
             ]);
 
-            $result = $this->mediaService->create($request->file('files'), $userId);
+
+            $quality = $request->input('quality', 80);
+            $result = $this->mediaService->uploadBatchWithCompress($request->file('files'), $userId, $quality);
 
             if (count($result['uploaded']) > 0 && count($result['failed']) > 0) {
                 return response()->json([
@@ -80,6 +102,7 @@ class MediaController extends Controller
                     'errors' => $result['failed']
                 ], 500);
             }
+
 
 
             return ResponseApi::success($result['uploaded'], 'File uploaded successfully');

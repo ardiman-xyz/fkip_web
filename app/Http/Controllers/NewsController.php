@@ -16,7 +16,7 @@ use Inertia\Inertia;
 
 class NewsController extends Controller
 {
-   
+
 
     public function __construct(
         protected NewsService $newsService,
@@ -28,29 +28,7 @@ class NewsController extends Controller
     public function index()
     {
         $news = $this->newsService->getAllWithTranslations();
-        
-        // Ambil data dari API simpeg
-        // try {
-        //     $response = Http::get('https://simpeg.umkendari.ac.id/api/pegawai/fakultas/15');
-            
-        //     if ($response->successful()) {
-        //         $pegawaiData = $response->json();
-                
-        //         // Tampilkan hasil dengan var_dump dan hentikan eksekusi
-        //         var_dump($pegawaiData);
-        //         die(); // atau bisa menggunakan dd($pegawaiData);
-        //     } else {
-        //         // Jika terjadi error pada API
-        //         var_dump('Gagal mengambil data: ' . $response->status());
-        //         die();
-        //     }
-        // } catch (\Exception $e) {
-        //     // Tangani error jika ada masalah dengan koneksi
-        //     var_dump('Error: ' . $e->getMessage());
-        //     die();
-        // }
 
-        // Kode ini tidak akan dijalankan karena sudah di-die() sebelumnya
         return Inertia::render("News/Index", [
             'news' => $news
         ]);
@@ -60,7 +38,7 @@ class NewsController extends Controller
     {
         $categories = $this->categoryService->getAllWithTranslationsLabelAndValues();
         $tags = $this->tagService->getAllWithTranslationsLabelAndValues();
-    
+
         return Inertia::render("News/Create", [
             'categories' => $categories,
             'tags' => $tags
@@ -107,7 +85,7 @@ class NewsController extends Controller
             $this->newsService->delete($news);
             return ResponseApi::success(null, 'News deleted successfully');
         } catch (\Exception $e) {
-            return ResponseApi::error('Failed to delete news', 500, ['error' => $e->getMessage()]); 
+            return ResponseApi::error('Failed to delete news', 500, ['error' => $e->getMessage()]);
         }
     }
 }

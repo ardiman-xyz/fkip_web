@@ -135,7 +135,7 @@ export const UploadModalMedia = ({
                         multiple
                         onChange={handleFileInput}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        accept="image/*"
+                        accept="*/*"
                     />
                     <UploadCloud className="mx-auto size-8 mb-3 text-gray-400" />
                     <p className="text-sm mb-1">

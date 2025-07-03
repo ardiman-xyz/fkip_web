@@ -2,127 +2,129 @@ import { Button } from "@/Components/ui/button";
 import { Input } from "@/Components/ui/input";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Media } from "@/types/app";
-import { Head, usePage } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
-import { PiUploadSimpleDuotone, PiImageDuotone } from "react-icons/pi";
+import { PiUploadSimpleDuotone } from "react-icons/pi";
 import { UploadModalMedia } from "./_components/UploadModal";
+import { MediaPagination } from "./_components/MediaPagination";
 import {
     ChevronDown,
-    Eye,
     LayoutGrid,
     List,
-    MoreVertical,
-    Pencil,
-    Trash,
+    Search,
 } from "lucide-react";
 import { MediaItem } from "./_components/MediaItem";
+import { MediaListView } from "./_components/MediaListView";
 import { PageProps } from "@/types";
-import { formatDateToIndonesian, formatFileSize } from "@/lib/utils";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/Components/ui/dropdown-menu";
-import { DeleteConfirm } from "@/Components/ModalDeleteConfirmation";
-import { ViewMediaModal } from "./_components/ViewMediaModal";
-import { MediaPagination } from "@/Components/Pagination";
+import { useDebouncedCallback } from 'use-debounce';
 
-interface Props {
-    media: Media[];
+interface PaginatedMedia {
+    data: Media[];
+    current_page: number;
+    from: number;
+    to: number;
+    total: number;
+    per_page: number;
+    last_page: number;
+    links: any[];
+    prev_page_url: string | null;
+    next_page_url: string | null;
 }
 
-const MediaLibrary = ({ media: initialMedia }: Props) => {
+interface Props {
+    media: PaginatedMedia;
+    filters: {
+        per_page: number;
+        sort_by: string;
+        sort_order: string;
+        search?: string;
+    };
+}
+
+const MediaLibrary = ({ media: paginatedMedia, filters }: Props) => {
     const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
     const [viewType, setViewType] = useState<"grid" | "list">("grid");
-    const [media, setMedia] = useState<Media[]>(initialMedia);
-    const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest");
-
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const itemsPerPage = 20; // Jumlah item per halaman
-    const totalPages = Math.ceil(media.length / itemsPerPage);
-
-    // 3. Tambahkan fungsi untuk mendapatkan media yang dipaginasi
-    const getPaginatedMedia = () => {
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        return media.slice(startIndex, endIndex);
-    };
-
-    // 4. Tambahkan fungsi untuk menangani perubahan halaman
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-        // Scroll ke atas halaman jika diperlukan
-        window.scrollTo(0, 0);
-    };
-
-    // New state variables for list view functionality
-    const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
-    const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
-    const [isModalDeleteOpen, setIsModalDeleteOpen] = useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = useState<string>(filters.search || "");
+    const [mediaData, setMediaData] = useState<Media[]>(paginatedMedia.data);
 
     const { auth } = usePage<PageProps>().props;
+
+    // Debounced search function
+    const debouncedSearch = useDebouncedCallback(
+        (value: string) => {
+            router.get(route('admin.media.indexView'), {
+                ...filters,
+                search: value || undefined,
+                page: 1,
+            }, {
+                preserveState: true,
+                preserveScroll: true,
+            });
+        },
+        500
+    );
+
+    useEffect(() => {
+        debouncedSearch(searchTerm);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        setMediaData(paginatedMedia.data);
+    }, [paginatedMedia.data]);
 
     useEffect(() => {
         const echoInstance = (window as any).Echo;
         const eventName = ".media.upload";
 
-        // Subscribe ke private channel
         const channel = echoInstance.private(`App.User.${auth.user.id}`);
 
         channel.listen(eventName, (event: any) => {
             if (event.isComplete && event.media) {
-                setMedia((prev) => {
-                    const newMedia = [event.media, ...prev];
-
-                    // Apply current sort order to the updated media array
-                    if (sortOrder === "newest") {
-                        return newMedia.sort((a, b) => {
-                            return (
-                                new Date(b.created_at).getTime() -
-                                new Date(a.created_at).getTime()
-                            );
-                        });
-                    } else {
-                        return newMedia.sort((a, b) => {
-                            return (
-                                new Date(a.created_at).getTime() -
-                                new Date(b.created_at).getTime()
-                            );
-                        });
-                    }
-                });
+                // Add new media to the beginning of the current data
+                setMediaData(prevData => [event.media, ...prevData]);
             }
         });
 
         return () => {
             channel.stopListening(eventName);
         };
-    }, [sortOrder]);
+    }, []);
 
     const handleDelete = (id: number) => {
-        setMedia((prev) => prev.filter((item) => item.id !== id));
+        setMediaData(prevData => prevData.filter(item => item.id !== id));
     };
 
     const handleUpdate = (updatedMedia: Media) => {
-        setMedia((prev) =>
-            prev.map((item) =>
+        setMediaData(prevData =>
+            prevData.map(item =>
                 item.id === updatedMedia.id ? updatedMedia : item
             )
         );
     };
 
-    const handleSortMedia = (order: "newest" | "oldest") => {
-        setSortOrder(order);
-        setMedia((prev) => {
-            const sortedMedia = [...prev].sort((a, b) => {
-                const dateA = new Date(a.created_at).getTime();
-                const dateB = new Date(b.created_at).getTime();
-                return order === "newest" ? dateB - dateA : dateA - dateB;
-            });
-            return sortedMedia;
+    const handleSortMedia = (sortBy: string, sortOrder: "asc" | "desc") => {
+        router.get(route('admin.media.indexView'), {
+            ...filters,
+            sort_by: sortBy,
+            sort_order: sortOrder,
+            page: 1,
+        }, {
+            preserveState: true,
+            preserveScroll: true,
         });
     };
+
+    const clearSearch = () => {
+        setSearchTerm("");
+    };
+
+
 
     return (
         <AuthenticatedLayout
@@ -135,53 +137,96 @@ const MediaLibrary = ({ media: initialMedia }: Props) => {
             <Head title="Media" />
 
             <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2">
-                        <Button
-                            onClick={() => setViewType("grid")}
-                            variant={
-                                viewType === "grid" ? "secondary" : "ghost"
-                            }
-                            size="icon"
-                        >
-                            <LayoutGrid className="size-4" />
-                        </Button>
-                        <Button
-                            onClick={() => setViewType("list")}
-                            variant={
-                                viewType === "list" ? "secondary" : "ghost"
-                            }
-                            size="icon"
-                        >
-                            <List className="size-4" />
-                        </Button>
+                {/* Header Controls */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-4">
+                        {/* View Type Toggles */}
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() => setViewType("grid")}
+                                variant={
+                                    viewType === "grid" ? "secondary" : "ghost"
+                                }
+                                size="icon"
+                            >
+                                <LayoutGrid className="size-4" />
+                            </Button>
+                            <Button
+                                onClick={() => setViewType("list")}
+                                variant={
+                                    viewType === "list" ? "secondary" : "ghost"
+                                }
+                                size="icon"
+                            >
+                                <List className="size-4" />
+                            </Button>
+                        </div>
+
+                        {/* Search */}
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search media..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-9 w-64"
+                            />
+                            {searchTerm && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={clearSearch}
+                                    className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                                >
+                                    ×
+                                </Button>
+                            )}
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-x-3">
-                        <Button variant="outline" size="sm" disabled>
-                            Type
-                            <ChevronDown className="ml-2 size-4" />
-                        </Button>
+                        {/* Sort Controls */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm">
-                                    Date Modified
+                                    Sort by: {filters.sort_by === 'created_at' ? 'Date' : filters.sort_by === 'name' ? 'Name' : 'Size'}
                                     <ChevronDown className="ml-2 size-4" />
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                                 <DropdownMenuItem
-                                    onClick={() => handleSortMedia("newest")}
+                                    onClick={() => handleSortMedia("created_at", "desc")}
                                 >
                                     Newest First
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => handleSortMedia("oldest")}
+                                    onClick={() => handleSortMedia("created_at", "asc")}
                                 >
                                     Oldest First
                                 </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => handleSortMedia("name", "asc")}
+                                >
+                                    Name A-Z
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => handleSortMedia("name", "desc")}
+                                >
+                                    Name Z-A
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => handleSortMedia("size", "desc")}
+                                >
+                                    Largest First
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => handleSortMedia("size", "asc")}
+                                >
+                                    Smallest First
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+
                         <Button
                             size={"lg"}
                             onClick={() => setIsUploadOpen(true)}
@@ -192,181 +237,73 @@ const MediaLibrary = ({ media: initialMedia }: Props) => {
                     </div>
                 </div>
 
-                {viewType === "list" ? (
-                    <div className="rounded-md border overflow-hidden">
-                        <div className="bg-muted/50 py-2 px-4 flex items-center border-b">
-                            <div className="w-12 mr-4 flex-shrink-0"></div>
-                            <div className="flex-1 mr-4 font-medium text-sm">
-                                Name
-                            </div>
-                            <div className="w-24 mr-4 font-medium text-sm text-center">
-                                Type
-                            </div>
-                            <div className="w-24 mr-4 font-medium text-sm text-center">
-                                Size
-                            </div>
-                            <div className="w-32 mr-4 font-medium text-sm text-center">
-                                Date
-                            </div>
-                            <div className="w-20 flex-shrink-0"></div>
-                        </div>
-                        <div className="divide-y">
-                            {media.map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="animate-in fade-in duration-300 hover:bg-muted/20 group"
-                                >
-                                    <div
-                                        className="flex items-center py-2 px-4"
-                                        onDoubleClick={() => {
-                                            setSelectedMedia(item);
-                                            setIsViewModalOpen(true);
-                                        }}
-                                    >
-                                        <div className="w-12 h-12 mr-4 flex-shrink-0 bg-white border rounded flex items-center justify-center overflow-hidden">
-                                            {item.mime_type?.includes(
-                                                "image"
-                                            ) ? (
-                                                <img
-                                                    src={item.path}
-                                                    alt={item.name}
-                                                    className="max-w-full max-h-full object-contain"
-                                                />
-                                            ) : (
-                                                <PiImageDuotone className="size-6 text-muted-foreground" />
-                                            )}
-                                        </div>
-                                        <div
-                                            className="flex-1 mr-4 truncate font-medium"
-                                            title={item.name}
-                                        >
-                                            {item.name}
-                                        </div>
-                                        <div className="w-24 mr-4 text-sm text-muted-foreground text-center">
-                                            {item.mime_type
-                                                ?.split("/")[1]
-                                                ?.toUpperCase() || "Unknown"}
-                                        </div>
-                                        <div className="w-24 mr-4 text-sm text-muted-foreground text-center">
-                                            {formatFileSize(item.size)}
-                                        </div>
-                                        <div className="w-32 mr-4 text-sm text-muted-foreground text-center">
-                                            {formatDateToIndonesian(
-                                                item.created_at
-                                            )}
-                                        </div>
-                                        <div className="w-20 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 flex justify-end">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="size-8 hover:bg-gray-100"
-                                                    >
-                                                        <MoreVertical className="size-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem
-                                                        className="cursor-pointer"
-                                                        onClick={() => {
-                                                            setSelectedMedia(
-                                                                item
-                                                            );
-                                                            setIsViewModalOpen(
-                                                                true
-                                                            );
-                                                        }}
-                                                    >
-                                                        <Eye className="size-4 mr-2" />
-                                                        View
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        className="cursor-pointer"
-                                                        onClick={() => {
-                                                            setSelectedMedia(
-                                                                item
-                                                            );
-                                                            setIsViewModalOpen(
-                                                                true
-                                                            );
-                                                        }}
-                                                    >
-                                                        <Pencil className="size-4 mr-2" />
-                                                        Rename
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem
-                                                        className="cursor-pointer"
-                                                        onClick={() => {
-                                                            setSelectedMedia(
-                                                                item
-                                                            );
-                                                            setIsModalDeleteOpen(
-                                                                true
-                                                            );
-                                                        }}
-                                                    >
-                                                        <Trash className="size-4 mr-2" />
-                                                        Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                {/* Results Info */}
+                {searchTerm && (
+                    <div className="mb-4 text-sm text-muted-foreground">
+                        {paginatedMedia.total > 0 ? (
+                            <>Found {paginatedMedia.total} result{paginatedMedia.total !== 1 ? 's' : ''} for "{searchTerm}"</>
+                        ) : (
+                            <>No results found for "{searchTerm}"</>
+                        )}
                     </div>
-                ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                        {media.map((item) => (
-                            <div
-                                key={item.id}
-                                className="animate-in fade-in slide-in-from-bottom-4 duration-500"
-                            >
-                                <MediaItem
-                                    item={item}
-                                    onDelete={handleDelete}
-                                    handleUpdate={handleUpdate}
-                                />
+                )}
+
+                {/* Media Display */}
+                {mediaData.length > 0 ? (
+                    <>
+                        {viewType === "list" ? (
+                            <MediaListView
+                                media={mediaData}
+                                onDelete={handleDelete}
+                                onUpdate={handleUpdate}
+                            />
+                        ) : (
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                                {mediaData.map((item) => (
+                                    <div
+                                        key={item.id}
+                                        className="animate-in fade-in slide-in-from-bottom-4 duration-500"
+                                    >
+                                        <MediaItem
+                                            item={item}
+                                            onDelete={handleDelete}
+                                            handleUpdate={handleUpdate}
+                                        />
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
+
+                        {/* Pagination */}
+                        <MediaPagination
+                            paginationData={paginatedMedia}
+                            filters={filters}
+                        />
+                    </>
+                ) : (
+                    <div className="text-center py-12">
+                        <div className="text-muted-foreground">
+                            {searchTerm ? 'No media found matching your search.' : 'No media files yet.'}
+                        </div>
+                        {!searchTerm && (
+                            <Button
+                                onClick={() => setIsUploadOpen(true)}
+                                className="mt-4"
+                            >
+                                <PiUploadSimpleDuotone className="mr-2 size-4" />
+                                Upload your first media
+                            </Button>
+                        )}
                     </div>
                 )}
             </div>
 
             <UploadModalMedia
                 isOpen={isUploadOpen}
-                onClose={() => setIsUploadOpen(false)}
+                onClose={() => {
+                    setIsUploadOpen(false);
+                }}
             />
-
-            {selectedMedia && (
-                <>
-                    {isModalDeleteOpen && (
-                        <DeleteConfirm
-                            onClose={(success) => {
-                                if (success) {
-                                    handleDelete(selectedMedia.id);
-                                }
-                                setIsModalDeleteOpen(false);
-                                setSelectedMedia(null);
-                            }}
-                            id={selectedMedia.id}
-                            routeAction="admin.media.destroy"
-                        />
-                    )}
-
-                    <ViewMediaModal
-                        media={selectedMedia}
-                        isOpen={isViewModalOpen}
-                        onClose={() => {
-                            setIsViewModalOpen(false);
-                            setSelectedMedia(null);
-                        }}
-                        onUpdate={handleUpdate}
-                    />
-                </>
-            )}
         </AuthenticatedLayout>
     );
 };

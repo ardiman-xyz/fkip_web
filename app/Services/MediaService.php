@@ -14,6 +14,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Intervention\Image\Encoders\PngEncoder;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Encoders\JpegEncoder;
@@ -21,7 +22,6 @@ use Intervention\Image\Encoders\WebpEncoder;
 
 class MediaService
 {
-
     private ImageManager $manager;
 
     public function __construct()
@@ -29,52 +29,35 @@ class MediaService
         $this->manager = new ImageManager(new Driver());
     }
 
-
     private const IMAGE_VERSIONS = [
         'original' => null,
         'thumbnail' => [400, 300],
         'blur' => [40, 30]
     ];
 
-
-    public function upload(UploadedFile $file)
+    /**
+     * Upload single file - otomatis menggunakan processAndUploadImage untuk gambar
+     */
+    public function upload(UploadedFile $file): Media
     {
         try {
-            $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
-
-            $randomSubdirectory = 'media/' . date('Y') . '/' . date('m');
-
-            $path = $file->storeAs($randomSubdirectory, $randomFileName, 'public');
-
-            $media = Media::create([
-                'name' => $file->getClientOriginalName(),
-                'file_name' => $randomFileName,
-                'mime_type' => $file->getMimeType(),
-                'path' => $path,
-                'size' => $file->getSize()
-            ]);
-
-            event(new MediaUploaded($media));
-
-            return $media;
-
+            if ($this->isImage($file)) {
+                // Untuk gambar, gunakan processAndUploadImage
+                $paths = $this->processAndUploadImage($file);
+                return $this->createMediaRecord($file, $paths);
+            } else {
+                // Untuk non-gambar, upload langsung
+                return $this->uploadNonImageFile($file);
+            }
         } catch (Exception $e) {
+            Log::error('File upload error: ' . $e->getMessage());
             throw $e;
         }
     }
 
-
-    public function getAll()
-    {
-        return Media::latest()->limit(50)->get();
-    }
-
-    public function delete($id)
-    {
-        return Media::findOrFail($id)->delete();
-    }
-
-
+    /**
+     * Upload batch files - otomatis menggunakan processAndUploadImage untuk gambar
+     */
     public function create(array $files, string $userId): array
     {
         $results = [];
@@ -85,12 +68,16 @@ class MediaService
             try {
                 $this->broadcastProgress($uploadId, $file->getClientOriginalName(), 0, null, $userId);
 
-                $paths = $this->processAndUploadImage($file);
-
-                $media = $this->createMediaRecord($file, $paths);
+                if ($this->isImage($file)) {
+                    // Untuk gambar, gunakan processAndUploadImage
+                    $paths = $this->processAndUploadImage($file);
+                    $media = $this->createMediaRecord($file, $paths);
+                } else {
+                    // Untuk non-gambar, upload langsung
+                    $media = $this->uploadNonImageFile($file);
+                }
 
                 $results[] = $media;
-
                 $this->broadcastProgress($uploadId, $file->getClientOriginalName(), 100, $media, $userId);
 
             } catch (Exception $e) {
@@ -104,6 +91,65 @@ class MediaService
         ];
     }
 
+    /**
+     * Upload file dengan compress (legacy method - sekarang menggunakan processAndUploadImage untuk gambar)
+     */
+    public function uploadFileWithCompress(UploadedFile $file, int $quality = 80): Media
+    {
+        try {
+            if ($this->isImage($file)) {
+                // Untuk gambar, gunakan processAndUploadImage (ignore quality parameter)
+                $paths = $this->processAndUploadImage($file);
+                return $this->createMediaRecord($file, $paths);
+            } else {
+                // Untuk non-gambar, upload langsung
+                return $this->uploadNonImageFile($file);
+            }
+        } catch (Exception $e) {
+            Log::error('File upload error: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Upload batch dengan compress (legacy method - sekarang menggunakan processAndUploadImage untuk gambar)
+     */
+    public function uploadBatchWithCompress(array $files, string $userId, int $quality = 80): array
+    {
+        $results = [];
+        $errors = [];
+        $uploadId = Str::uuid();
+
+        foreach ($files as $file) {
+            try {
+                $this->broadcastProgress($uploadId, $file->getClientOriginalName(), 0, null, $userId);
+
+                if ($this->isImage($file)) {
+                    // Untuk gambar, gunakan processAndUploadImage (ignore quality parameter)
+                    $paths = $this->processAndUploadImage($file);
+                    $media = $this->createMediaRecord($file, $paths);
+                } else {
+                    // Untuk non-gambar, upload langsung
+                    $media = $this->uploadNonImageFile($file);
+                }
+
+                $results[] = $media;
+                $this->broadcastProgress($uploadId, $file->getClientOriginalName(), 100, $media, $userId);
+
+            } catch (Exception $e) {
+                $this->handleError($uploadId, $file, $e, $errors, $userId);
+            }
+        }
+
+        return [
+            'uploaded' => $results,
+            'failed' => $errors
+        ];
+    }
+
+    /**
+     * Process dan upload gambar dengan 3 versi (original, thumbnail, blur)
+     */
     public function processAndUploadImage($file): array
     {
         $baseFileName = Str::uuid() . '_' . time();
@@ -138,7 +184,9 @@ class MediaService
                     $extension
                 );
 
-                $imageData = $processedImage->encode(new JpegEncoder($quality));
+                // Encode berdasarkan mime type
+                $encoder = $this->getEncoderByMimeType($file->getMimeType(), $quality);
+                $imageData = $processedImage->encode($encoder);
 
                 Storage::disk('minio')->put(
                     $path,
@@ -157,7 +205,60 @@ class MediaService
         }
     }
 
+    /**
+     * Upload file non-gambar langsung tanpa processing
+     */
+    private function uploadNonImageFile(UploadedFile $file): Media
+    {
+        $randomFileName = Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $randomSubdirectory = 'media/' . date('Y') . '/' . date('m');
+        $path = sprintf('%s/%s', $randomSubdirectory, $randomFileName);
 
+        Storage::disk('minio')->putFileAs(
+            dirname($path),
+            $file,
+            basename($path)
+        );
+
+        $fullUrl = $this->getMinioUrl($path);
+
+        $media = Media::create([
+            'name' => $file->getClientOriginalName(),
+            'file_name' => $randomFileName,
+            'mime_type' => $file->getMimeType(),
+            'path' => $fullUrl,
+            'size' => $file->getSize()
+        ]);
+
+        event(new MediaUploaded($media));
+
+        return $media;
+    }
+
+    /**
+     * Cek apakah file adalah gambar
+     */
+    private function isImage(UploadedFile $file): bool
+    {
+        return str_starts_with($file->getMimeType(), 'image/');
+    }
+
+    /**
+     * Get encoder berdasarkan mime type
+     */
+    private function getEncoderByMimeType(string $mimeType, int $quality): JpegEncoder|PngEncoder|WebpEncoder
+    {
+        return match ($mimeType) {
+            'image/jpeg' => new JpegEncoder($quality),
+            'image/png' => new PngEncoder(),
+            'image/webp' => new WebpEncoder($quality),
+            default => new JpegEncoder($quality)
+        };
+    }
+
+    /**
+     * Get quality berdasarkan versi gambar
+     */
     private function getQualityByVersion(string $version): int
     {
         return match($version) {
@@ -168,6 +269,9 @@ class MediaService
         };
     }
 
+    /**
+     * Generate MinIO URL
+     */
     private function getMinioUrl(string $path): string
     {
         return sprintf(
@@ -178,9 +282,12 @@ class MediaService
         );
     }
 
+    /**
+     * Create media record dengan paths untuk gambar
+     */
     private function createMediaRecord($file, array $paths): Media
     {
-        return Media::create([
+        $media = Media::create([
             'name' => $file->getClientOriginalName(),
             'file_name' => basename($paths['original']),
             'mime_type' => $file->getMimeType(),
@@ -188,8 +295,15 @@ class MediaService
             'paths' => $paths,
             'size' => $file->getSize()
         ]);
+
+        event(new MediaUploaded($media));
+
+        return $media;
     }
 
+    /**
+     * Broadcast progress untuk real-time upload
+     */
     private function broadcastProgress(
         string $uploadId,
         string $fileName,
@@ -209,6 +323,9 @@ class MediaService
         ));
     }
 
+    /**
+     * Handle error saat upload
+     */
     private function handleError($uploadId, $file, Exception $e, array &$errors, $userId): void
     {
         $errors[] = [
@@ -226,14 +343,44 @@ class MediaService
         );
     }
 
+    // === EXISTING METHODS (unchanged) ===
+
+    public function getAll()
+    {
+        return Media::latest()->limit(50)->get();
+    }
+
+    public function delete($id)
+    {
+        return Media::findOrFail($id)->delete();
+    }
+
+    public function getPaginated(int $perPage = 20, string $sortBy = 'created_at', string $sortOrder = 'desc', ?string $search = null)
+    {
+        $query = Media::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('mime_type', 'like', "%{$search}%");
+            });
+        }
+
+        $validSortColumns = ['created_at', 'name', 'size', 'mime_type'];
+        if (in_array($sortBy, $validSortColumns)) {
+            $query->orderBy($sortBy, $sortOrder === 'asc' ? 'asc' : 'desc');
+        } else {
+            $query->latest();
+        }
+
+        return $query->paginate($perPage)->withQueryString();
+    }
+
     public function update(Media $media, string $name)
     {
         try {
-
-            $newName = $name;
-
             $media->update([
-                'name' => $newName
+                'name' => $name
             ]);
 
             return $media->fresh();
@@ -247,11 +394,11 @@ class MediaService
         try {
             $usageCheck = $this->checkMediaUsage($media);
 
-
             if ($usageCheck['isUsed']) {
                 throw new Exception("Media sedang digunakan di: " . $usageCheck['usedIn']);
             }
 
+            // Delete all image versions if exists
             if ($media->paths) {
                 foreach ($media->paths as $version => $path) {
                     $relativePath = str_replace(
@@ -264,6 +411,7 @@ class MediaService
                 }
             }
 
+            // Delete single path if exists
             if ($media->path) {
                 $relativePath = str_replace(
                     config('filesystems.disks.minio.url') . '/' . config('filesystems.disks.minio.bucket') . '/',
@@ -288,7 +436,6 @@ class MediaService
         }
     }
 
-
     private function checkMediaUsage(Media $media): array
     {
         $usedIn = [];
@@ -296,38 +443,37 @@ class MediaService
         $usedInEvents = Event::where('media_id', $media->id)->first();
         if ($usedInEvents) {
             $usedIn[] = "Event (" . $usedInEvents->translations()
-                ->whereHas('language', function($q) {
-                    $q->where('code', 'id');
-                })
-                ->first()?->title . ")";
+                    ->whereHas('language', function($q) {
+                        $q->where('code', 'id');
+                    })
+                    ->first()?->title . ")";
         }
 
         $eventTranslations = EventTranslation::whereRaw('content LIKE ?', ['%' . $media->id . '%'])->first();
         if ($eventTranslations) {
             $usedIn[] = "Konten Event (" . $eventTranslations->event->translations()
-                ->whereHas('language', function($q) {
-                    $q->where('code', 'id');
-                })
-                ->first()?->title . ")";
+                    ->whereHas('language', function($q) {
+                        $q->where('code', 'id');
+                    })
+                    ->first()?->title . ")";
         }
 
-        // Check in news
         $usedInNews = News::where('media_id', $media->id)->first();
         if ($usedInNews) {
             $usedIn[] = "News (" . $usedInNews->translations()
-                ->whereHas('language', function($q) {
-                    $q->where('code', 'id');
-                })
-                ->first()?->title . ")";
+                    ->whereHas('language', function($q) {
+                        $q->where('code', 'id');
+                    })
+                    ->first()?->title . ")";
         }
 
         $newsTranslations = NewsTranslation::whereRaw('content LIKE ?', ['%' . $media->id . '%'])->first();
         if ($newsTranslations) {
             $usedIn[] = "Konten News (" . $newsTranslations->news->translations()
-                ->whereHas('language', function($q) {
-                    $q->where('code', 'id');
-                })
-                ->first()?->title . ")";
+                    ->whereHas('language', function($q) {
+                        $q->where('code', 'id');
+                    })
+                    ->first()?->title . ")";
         }
 
         return [

@@ -28,8 +28,9 @@ class StoreNewsRequest extends FormRequest
             'en.content' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'featured_image' => 'nullable|exists:media,id',
-            'is_featured' => 'boolean',
+            'is_featured' => 'nullable|boolean',
             'slider_image' => [
+                'nullable',
                 'required_if:is_featured,true',
                 'array'
             ],
@@ -38,15 +39,35 @@ class StoreNewsRequest extends FormRequest
                 'exists:media,id'
             ],
             'featured_expired_date' => [
+                'nullable',
                 'required_if:is_featured,true',
                 'date',
                 'after:today'
             ],
             'status' => 'required|in:draft,published',
             'publish_date' => 'required|date',
-            'tags' => 'array',
+            'tags' => 'nullable|array',
             'tags.*' => 'exists:tags,id'
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation()
+    {
+        // Konversi is_featured ke boolean dan default ke false
+        $this->merge([
+            'is_featured' => $this->boolean('is_featured', false)
+        ]);
+
+        // Jika is_featured false, set slider_image dan featured_expired_date ke null
+        if (!$this->boolean('is_featured', false)) {
+            $this->merge([
+                'slider_image' => null,
+                'featured_expired_date' => null
+            ]);
+        }
     }
 
     public function messages(): array
@@ -56,8 +77,10 @@ class StoreNewsRequest extends FormRequest
             'id.content.required' => 'Konten dalam bahasa Indonesia wajib diisi',
             'category_id.required' => 'Kategori wajib dipilih',
             'slider_image.required_if' => 'Gambar slider wajib dipilih jika artikel featured',
+            'slider_image.array' => 'Format gambar slider tidak valid',
             'featured_expired_date.required_if' => 'Tanggal expired wajib diisi jika artikel featured',
-            'featured_expired_date.after' => 'Tanggal expired harus setelah hari ini'
+            'featured_expired_date.after' => 'Tanggal expired harus setelah hari ini',
+            'featured_expired_date.date' => 'Format tanggal expired tidak valid'
         ];
     }
 }

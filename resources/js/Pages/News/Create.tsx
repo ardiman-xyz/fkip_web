@@ -102,6 +102,7 @@ const Create = ({ categories, tags }: Props) => {
     const onSubmit = async (values: NewsFormValues) => {
         if (isSubmitting) return;
 
+
         try {
             form.setValue("status", values.status);
             setIsSubmitting(true);
@@ -564,6 +565,9 @@ const Create = ({ categories, tags }: Props) => {
                     form.setValue("featured_image", media);
                     setIsMediaModalOpen(false);
                 }}
+                mediaType="images"
+                title="Select Featured Image"
+
             />
             <FeaturedModal
                 isOpen={isFeaturedModalOpen}

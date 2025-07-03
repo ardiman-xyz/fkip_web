@@ -126,9 +126,9 @@ class NewsService
             $news = News::create([
                 'media_id' => $data['featured_image'] ?? null,
                 'category_id' => $data['category_id'],
-                'is_featured' => $data['is_featured'],
-                'slider_image_id' => $data['is_featured'] ? $data['slider_image']['id'] : null,
-                'featured_expired_date' => $data['is_featured'] ? $data['featured_expired_date'] : null,
+                'is_featured' => $data['is_featured'] ?? false, // Default ke false
+                'slider_image_id' => ($data['is_featured'] ?? false) ? ($data['slider_image']['id'] ?? null) : null,
+                'featured_expired_date' => ($data['is_featured'] ?? false) ? ($data['featured_expired_date'] ?? null) : null,
                 'status' => $data['status'],
                 'publish_date' => $data['publish_date']
             ]);
@@ -158,7 +158,6 @@ class NewsService
             throw $e;
         }
     }
-
 
     public function update(News $news, array $data)
     {

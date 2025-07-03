@@ -24,7 +24,7 @@ export default function Authenticated({
 
     return (
         <div className="relative min-h-dvh bg-gray-200 dark:bg-black">
-            <Toaster richColors={true} />
+            <Toaster richColors={true} position={"bottom-center"} />
             <div className="flex p-3 2xl:h-dvh">
                 <div className="flex w-full rounded-xl shadow-sm dark:bg-gray-900">
                     <div className="max-h-vh hidden h-full w-96 flex-col justify-between overflow-y-auto rounded-s-xl border border-gray-200 bg-white xl:flex dark:border-gray-800 dark:bg-gray-900">

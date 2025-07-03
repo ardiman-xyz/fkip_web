@@ -101,10 +101,3 @@ jobs:
               echo "Waiting for container... attempt $i/30"
               sleep 5
             done
-
-            # Run migrations after ensuring container is up and healthy
-            docker compose -p fkip exec -T app php artisan migrate --force
-
-            # Verify all is good
-            docker compose -p fkip ps
-            echo "Deployment completed successfully"
