@@ -32,43 +32,53 @@ RUN npm ci && npm run build && \
 FROM dunglas/frankenphp:1-alpine as app
 WORKDIR /app
 
+# Update dan install dependencies dasar
+RUN apk update && apk add --no-cache \
+    supervisor \
+    libzip-dev \
+    libexif-dev \
+    linux-headers
+
+# Install GD dependencies
 RUN apk add --no-cache \
-        supervisor \
-        libzip-dev \
-        libexif-dev \
-        linux-headers \
-        libpng-dev \
-        libjpeg-turbo-dev \
-        libwebp-dev \
-        freetype-dev \
-    && apk add --no-cache --virtual .build-deps \
-        autoconf \
-        g++ \
-        gcc \
-        make \
-        pkgconfig \
-        libc-dev \
-        dpkg-dev \
-        file \
-        re2c \
-    && docker-php-ext-configure gd \
-        --with-freetype \
-        --with-jpeg \
-        --with-webp \
-    && docker-php-ext-install -j$(nproc) \
-        gd \
-        pdo \
-        pdo_mysql \
-        zip \
-        bcmath \
-        pcntl \
-        exif \
-        opcache \
-        sockets \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && apk del .build-deps \
-    && rm -rf /tmp/* /var/cache/apk/*
+    libpng-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    freetype-dev
+
+# Install build tools
+RUN apk add --no-cache \
+    autoconf \
+    g++ \
+    gcc \
+    make \
+    pkgconfig \
+    libc-dev
+
+# Configure and install PHP extensions (tanpa GD dulu)
+RUN docker-php-ext-install -j$(nproc) \
+    pdo \
+    pdo_mysql \
+    zip \
+    bcmath \
+    pcntl \
+    exif \
+    opcache \
+    sockets
+
+# Configure and install GD separately
+RUN docker-php-ext-configure gd \
+    --with-freetype \
+    --with-jpeg \
+    --with-webp \
+    && docker-php-ext-install -j$(nproc) gd
+
+# Install Redis
+RUN pecl install redis && docker-php-ext-enable redis
+
+# Cleanup
+RUN apk del autoconf gcc g++ make && \
+    rm -rf /tmp/* /var/cache/apk/*
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -84,8 +94,16 @@ COPY --chown=www-data . .
 COPY --chown=www-data --from=composer-build /var/www/html/vendor/ ./vendor/
 COPY --chown=www-data --from=npm-build /var/www/html/public/build ./public/build/
 
+# Create directories before running artisan
+RUN mkdir -p storage/framework/{sessions,views,cache,testing} \
+    && mkdir -p storage/logs \
+    && mkdir -p storage/app/public \
+    && mkdir -p bootstrap/cache \
+    && chown -R www-data:www-data /app \
+    && chmod -R 775 storage bootstrap/cache
+
 RUN composer dump-autoload -o \
-   && php artisan storage:link \
+   && php artisan storage:link || true \
    && rm -rf \
        .git \
        .github \
@@ -100,9 +118,7 @@ RUN composer dump-autoload -o \
        package*.json \
        webpack.mix.js \
        yarn.lock \
-       *.log \
-   && chown -R www-data:www-data /app \
-   && chmod -R 775 storage bootstrap/cache
+       *.log
 
 ENV APP_RUNTIME="Laravel\Octane\Octane"
 ENV OCTANE_SERVER="frankenphp"
