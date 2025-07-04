@@ -37,8 +37,7 @@ RUN npm ci && npm run build && \
 FROM dunglas/frankenphp:1-alpine as app
 WORKDIR /app
 
-RUN apk add --no-cache \
-        supervisor \
+RUN apk add supervisor \
         libzip-dev \
         libexif-dev \
         linux-headers \
@@ -46,7 +45,7 @@ RUN apk add --no-cache \
         libjpeg-turbo-dev \
         libwebp-dev \
         freetype-dev \
-    && apk add --no-cache --virtual .build-deps \
+    && apk add --virtual .build-deps \
         $PHPIZE_DEPS \
     && docker-php-ext-configure gd \
         --with-freetype \
