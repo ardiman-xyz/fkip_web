@@ -60,7 +60,7 @@ class TagService
 
             foreach ($languages as $language) {
                 $languageCode = $language->code;
-                
+
                 if (empty($data[$languageCode]['name'])) {
                     continue;
                 }
@@ -80,7 +80,7 @@ class TagService
         }
     }
 
-    
+
     public function update(Tag $tag, array $data)
     {
         try {
@@ -89,7 +89,7 @@ class TagService
             foreach (['id', 'en'] as $langCode) {
                 if (!empty($data[$langCode]['name'])) {
                     $language = Language::where('code', $langCode)->first();
-                    
+
                     $translation = $tag->translations()
                         ->whereHas('language', fn($q) => $q->where('code', $langCode))
                         ->first();
