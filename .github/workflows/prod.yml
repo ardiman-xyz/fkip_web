@@ -35,9 +35,14 @@ jobs:
             exit 1
           fi
 
+      - name: Clear Docker Cache
+        run: |
+          docker system prune -af
+          docker builder prune -af
+
       - name: Build Application Image
         run: |
-          docker build -f docker/prod/prod.Dockerfile \
+          docker build --no-cache --pull -f docker/prod/prod.Dockerfile \
             -t ghcr.io/ardiman-xyz/fkip_web_app:${{ env.VERSION }} \
             -t ghcr.io/ardiman-xyz/fkip_web_app:stable .
 
