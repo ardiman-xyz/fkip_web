@@ -29,6 +29,9 @@ class CategoryController extends Controller
     {
         try {
             $category = $this->categoryService->getAllWithTranslations();
+            // if ($category->isEmpty()) {
+            //     return ResponseApi::error('No categories found', 404);
+            // }
             return ResponseApi::success($category, 'Categorys retrieved successfully');
         } catch (\Exception $e) {
             return ResponseApi::error('Failed to retrieve cate$category', 500, ['exception' => $e->getMessage()]);
