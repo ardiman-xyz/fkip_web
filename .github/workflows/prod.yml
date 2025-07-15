@@ -91,22 +91,6 @@ jobs:
             # Wait for the container to be fully started
             echo "Waiting for container to be ready..."
 
-            # More robust approach for checking if container is ready
-            for i in {1..30}; do
-              if docker compose -p fkip ps | grep -q "app.*running"; then
-                echo "Container is running!"
-                break
-              fi
-
-              if [ $i -eq 30 ]; then
-                echo "Container failed to start within timeout"
-                exit 1
-              fi
-
-              echo "Waiting for container... attempt $i/30"
-              sleep 5
-            done
-
             # Verify all is good
             docker compose -p fkip ps
             echo "Deployment completed successfully"
